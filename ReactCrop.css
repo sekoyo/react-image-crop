@@ -1,19 +1,19 @@
-.CropEdit {
+.ReactCrop {
 	position: relative;
 	display: inline-block;
 	cursor: crosshair;
 }
 
-.CropEdit--image {
+.ReactCrop--image {
 	display: block;
 }
-.CropEdit--image-copy {
+.ReactCrop--image-copy {
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 
-.CropEdit--crop-wrapper {
+.ReactCrop--crop-wrapper {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -22,7 +22,7 @@
 	background-color: rgba(0,0,0,0.4);
 }
 
-.CropEdit--crop-selection {
+.ReactCrop--crop-selection {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -31,7 +31,7 @@
 	cursor: move;
 }
 
-.CropEdit--marching-ants {
+.ReactCrop--marching-ants {
 	background-image: linear-gradient(to right, #eee 50%, #444 50%), linear-gradient(to right, #eee 50%, #444 50%), linear-gradient(to bottom, #eee 50%, #444 50%), linear-gradient(to bottom, #eee 50%, #444 50%);
 	padding: 1px;
 	background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
@@ -43,7 +43,7 @@
 	animation-play-state: paused;
 }
 
-.CropEdit--marching-ants.marching {
+.ReactCrop--marching-ants.marching {
 	animation-play-state: running;
 }
 
@@ -57,7 +57,7 @@
 	}
 }
 
-.CropEdit--drag-handle {
+.ReactCrop--drag-handle {
 	position: absolute;
 	width: 7px;
 	height: 7px;
@@ -65,56 +65,56 @@
 	border: 1px solid #eee;
 }
 
-.CropEdit .ord-nw {
+.ReactCrop .ord-nw {
 	top: 0;
 	left: 0;
 	margin-top: -4px;
 	margin-left: -4px;
 	cursor: nw-resize;
 }
-.CropEdit .ord-n {
+.ReactCrop .ord-n {
 	top: 0;
 	left: 50%;
 	margin-top: -4px;
 	margin-left: -4px;
 	cursor: n-resize;
 }
-.CropEdit .ord-ne {
+.ReactCrop .ord-ne {
 	top: 0;
 	right: 0;
 	margin-top: -4px;
 	margin-right: -4px;
 	cursor: ne-resize;
 }
-.CropEdit .ord-e {
+.ReactCrop .ord-e {
 	top: 50%;
 	right: 0;
 	margin-top: -4px;
 	margin-right: -4px;
 	cursor: e-resize;
 }
-.CropEdit .ord-se {
+.ReactCrop .ord-se {
 	bottom: 0;
 	right: 0;
 	margin-bottom: -4px;
 	margin-right: -4px;
 	cursor: se-resize;
 }
-.CropEdit .ord-s {
+.ReactCrop .ord-s {
 	bottom: 0;
 	left: 50%;
 	margin-bottom: -4px;
 	margin-left: -4px;
 	cursor: s-resize;
 }
-.CropEdit .ord-sw {
+.ReactCrop .ord-sw {
 	bottom: 0;
 	left: 0;
 	margin-bottom: -4px;
 	margin-left: -4px;
 	cursor: sw-resize;
 }
-.CropEdit .ord-w {
+.ReactCrop .ord-w {
 	top: 50%;
 	left: 0;
 	margin-top: -4px;
@@ -122,31 +122,31 @@
 	cursor: w-resize;
 }
 
-.CropEdit--drag-bar {
+.ReactCrop--drag-bar {
 	position: absolute;
 }
-.CropEdit--drag-bar.ord-n {
+.ReactCrop--drag-bar.ord-n {
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 7px;
 	margin-top: -4px;
 }
-.CropEdit--drag-bar.ord-e {
+.ReactCrop--drag-bar.ord-e {
 	right: 0;
 	top: 0;
 	width: 7px;
 	height: 100%;
 	margin-right: -4px;
 }
-.CropEdit--drag-bar.ord-s {
+.ReactCrop--drag-bar.ord-s {
 	bottom: 0;
 	left: 0;
 	width: 100%;
 	height: 7px;
 	margin-bottom: -4px;
 }
-.CropEdit--drag-bar.ord-w {
+.ReactCrop--drag-bar.ord-w {
 	top: 0;
 	left: 0;
 	width: 7px;

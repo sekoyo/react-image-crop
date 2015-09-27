@@ -1,7 +1,7 @@
 var React = require('react');
 var ReactCreateFragment = require('react-addons-create-fragment');
 
-var CropEdit = React.createClass({
+var ReactCrop = React.createClass({
 	propTypes: {
 		src: React.PropTypes.string.isRequired,
 		crop: React.PropTypes.object
@@ -71,7 +71,6 @@ var CropEdit = React.createClass({
 			if (mEventData.yCrossOver) {
 				newHeight = Math.abs(newHeight);
 			}
-			newHeight = this.clamp(newHeight, 0, (100 - crop.y));
 
 			// Cap if polarity is inversed and the shape fills the y space.
 			if (mEventData.yCrossOver) {
@@ -83,12 +82,15 @@ var CropEdit = React.createClass({
 			if (mEventData.xCrossOver) {
 				newWidth = Math.abs(newWidth);
 			}
-			newWidth = this.clamp(newWidth, 0, (100 - crop.x));
 
 			// Adjust x/y to give illusion of 'staticness' as width/height is increased
 			// when polarity is inversed.
 			crop.y = mEventData.yCrossOver ? crop.y + (crop.height - newHeight) : mEventData.cropStartY;
 			crop.x = mEventData.xCrossOver ? crop.x + (crop.width - newWidth) : mEventData.cropStartX;
+
+			// Clamp width & height.
+			newWidth = this.clamp(newWidth, 0, (100 - crop.x));
+			newHeight = this.clamp(newHeight, 0, (100 - crop.y));
 
 			// Apply width/height changes depending on ordinate.
 			if (this.xyOrds.indexOf(ord) > -1) {
@@ -169,23 +171,23 @@ var CropEdit = React.createClass({
 		return (
 			<div ref="cropSelect"
 				style={style}
-				className="CropEdit--crop-selection CropEdit--marching-ants marching"
+				className="ReactCrop--crop-selection ReactCrop--marching-ants marching"
 				onMouseDown={this.onCropMouseDown}
 				onMouseUp={this.onCropMouseUp}>
 
-				<div className="CropEdit--drag-bar ord-n" data-ord="n"></div>
-				<div className="CropEdit--drag-bar ord-e" data-ord="e"></div>
-				<div className="CropEdit--drag-bar ord-s" data-ord="s"></div>
-				<div className="CropEdit--drag-bar ord-w" data-ord="w"></div>
+				<div className="ReactCrop--drag-bar ord-n" data-ord="n"></div>
+				<div className="ReactCrop--drag-bar ord-e" data-ord="e"></div>
+				<div className="ReactCrop--drag-bar ord-s" data-ord="s"></div>
+				<div className="ReactCrop--drag-bar ord-w" data-ord="w"></div>
 
-				<div className="CropEdit--drag-handle ord-nw" data-ord="nw"></div>
-				<div className="CropEdit--drag-handle ord-n" data-ord="n"></div>
-				<div className="CropEdit--drag-handle ord-ne" data-ord="ne"></div>
-				<div className="CropEdit--drag-handle ord-e" data-ord="e"></div>
-				<div className="CropEdit--drag-handle ord-se" data-ord="se"></div>
-				<div className="CropEdit--drag-handle ord-s" data-ord="s"></div>
-				<div className="CropEdit--drag-handle ord-sw" data-ord="sw"></div>
-				<div className="CropEdit--drag-handle ord-w" data-ord="w"></div>
+				<div className="ReactCrop--drag-handle ord-nw" data-ord="nw"></div>
+				<div className="ReactCrop--drag-handle ord-n" data-ord="n"></div>
+				<div className="ReactCrop--drag-handle ord-ne" data-ord="ne"></div>
+				<div className="ReactCrop--drag-handle ord-e" data-ord="e"></div>
+				<div className="ReactCrop--drag-handle ord-se" data-ord="se"></div>
+				<div className="ReactCrop--drag-handle ord-s" data-ord="s"></div>
+				<div className="ReactCrop--drag-handle ord-sw" data-ord="sw"></div>
+				<div className="ReactCrop--drag-handle ord-w" data-ord="w"></div>
 			</div>
 		);
 	},
@@ -217,11 +219,11 @@ var CropEdit = React.createClass({
 		var imageClip = this.getImageClipStyle();
 
 		return (
-			<div className="CropEdit">
-				<img ref="image" className="CropEdit--image" src={this.props.src} />
+			<div className="ReactCrop">
+				<img ref="image" className="ReactCrop--image" src={this.props.src} />
 
-				<div className="CropEdit--crop-wrapper">
-					<img className="CropEdit--image-copy" src={this.props.src} style={imageClip} />
+				<div className="ReactCrop--crop-wrapper">
+					<img className="ReactCrop--image-copy" src={this.props.src} style={imageClip} />
 					{cropSelection}
 				</div>
 
@@ -231,4 +233,4 @@ var CropEdit = React.createClass({
 	}
 });
 
-module.exports = CropEdit;
+module.exports = ReactCrop;

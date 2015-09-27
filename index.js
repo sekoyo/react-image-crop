@@ -1,1 +1,1 @@
-module.exports = require('./components/CropEdit');
+module.exports = require('./ReactCrop');

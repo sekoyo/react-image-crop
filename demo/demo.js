@@ -37,5 +37,5 @@ function loadEditView(dataUrl) {
 		height: 40
 	};
 
-	ReactDOM.render(<ReactCrop.Editor src={dataUrl} crop={crop} />, cropEditor);
+	ReactDOM.render(<ReactCrop src={dataUrl} crop={crop} />, cropEditor);
 }
