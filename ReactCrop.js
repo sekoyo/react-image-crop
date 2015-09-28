@@ -12,11 +12,7 @@ var ReactCrop = React.createClass({
 	xyOrds: ['nw', 'ne', 'se', 'sw'],
 
 	getInitialState: function() {
-		return {
-			crop: this.props.crop,
-			mouseDownOnCrop: false,
-			currentCropName: this.props.currentCrop
-		};
+		return {};
 	},
 
 	componentDidMount: function() {
@@ -30,22 +26,20 @@ var ReactCrop = React.createClass({
 	},
 
 	getCropStyle: function() {
-		var crop = this.state.crop;
-
 		return {
-			top: crop.y + '%',
-			left: crop.x + '%',
-			width: crop.width + '%',
-			height: crop.height + '%'
+			top: this.crop.y + '%',
+			left: this.crop.x + '%',
+			width: this.crop.width + '%',
+			height: this.crop.height + '%'
 		};
 	},
 
 	onMouseMove: function(e) {
-		if (!this.state.mouseDownOnCrop) {
+		if (!this.mouseDownOnCrop) {
 			return;
 		}
 
-		var crop = this.state.crop;
+		var crop = this.crop;
 		var mEventData = this.mEventData;
 
 		var xDiffPx = e.clientX - mEventData.clientStartX;
@@ -119,9 +113,11 @@ var ReactCrop = React.createClass({
 			crop.y = this.clamp(mEventData.cropStartY + yDiffPc, 0, (100 - crop.height));
 		}
 
-		this.setState({
-			crop: crop
-		});
+		if (this.props.onChange) {
+			this.props.onChange(crop);
+		}
+
+		this.forceUpdate();
 	},
 
 	onCropMouseDown: function(e) {
@@ -136,10 +132,10 @@ var ReactCrop = React.createClass({
 			imageHeight: this.refs.image.height,
 			clientStartX: e.clientX,
 			clientStartY: e.clientY,
-			cropStartWidth: this.state.crop.width,
-			cropStartHeight: this.state.crop.height,
-			cropStartX: xInversed ? (this.state.crop.x + this.state.crop.width) : this.state.crop.x,
-			cropStartY: yInversed ? (this.state.crop.y + this.state.crop.height) : this.state.crop.y,
+			cropStartWidth: this.crop.width,
+			cropStartHeight: this.crop.height,
+			cropStartX: xInversed ? (this.crop.x + this.crop.width) : this.crop.x,
+			cropStartY: yInversed ? (this.crop.y + this.crop.height) : this.crop.y,
 			xInversed: xInversed,
 			yInversed: yInversed,
 			xCrossOver: xInversed,
@@ -148,46 +144,112 @@ var ReactCrop = React.createClass({
 			ord: ord
 		};
 
+		this.mouseDownOnCrop = true;
+	},
+
+	onComponentMouseDown: function(e) {
+		if (e.target !== this.refs.imageCopy) {
+			return;
+		}
+		
+		e.preventDefault(); // Stop drag selection.
+
+		var elOffset = this.getElementOffset(e.target);
+
+		var xPc = (e.clientX - elOffset.left) / this.refs.image.width * 100;
+		var yPc = (e.clientY - elOffset.top) / this.refs.image.height * 100;
+
+		if (!this.crop) {
+			this.crop = {};
+		}
+
+		this.crop.x = xPc;
+		this.crop.y = yPc;
+		this.crop.width = 0;
+		this.crop.height = 0;
+
+		this.mEventData = {
+			imageWidth: this.refs.image.width,
+			imageHeight: this.refs.image.height,
+			clientStartX: e.clientX,
+			clientStartY: e.clientY,
+			cropStartWidth: this.crop.width,
+			cropStartHeight: this.crop.height,
+			cropStartX: this.crop.x,
+			cropStartY: this.crop.y,
+			xInversed: false,
+			yInversed: false,
+			xCrossOver: false,
+			yCrossOver: false,
+			isResize: true,
+			ord: 'nw'
+		};
+
+		this.mouseDownOnCrop = true;
 		this.setState({
-			mouseDownOnCrop: true
+			newCropIsBeingDrawn: true
 		});
 	},
 
 	onMouseUp: function(e) {
-		if (this.state.mouseDownOnCrop) {
+		if (this.mouseDownOnCrop) {
+			if (this.props.onComplete) {
+				this.props.onComplete(this.crop);
+			}
+
+			if (this.crop) {
+				if (!this.crop.width || !this.crop.height) {
+					this.crop = null;
+				}
+			}
+
+			this.mouseDownOnCrop = false;
 			this.setState({
-				mouseDownOnCrop: false
+				newCropIsBeingDrawn: false
 			});
 		}
+	},
+
+	getElementOffset: function(el) {
+		var rect = el.getBoundingClientRect();
+		var docEl = document.documentElement;
+
+		var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
+		var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
+
+		return {
+			top: rectTop,
+			left: rectLeft
+		};
 	},
 
 	clamp: function(num, min, max) {
 		return Math.min(Math.max(num, min), max);
 	},
 
-	createCropSelection: function(cropName) {
+	createCropSelection: function() {
 		var style = this.getCropStyle();
 
 		return (
-			<div ref="cropSelect"
+			<div ref='cropSelect'
 				style={style}
-				className="ReactCrop--crop-selection ReactCrop--marching-ants marching"
+				className='ReactCrop--crop-selection ReactCrop--marching-ants marching'
 				onMouseDown={this.onCropMouseDown}
 				onMouseUp={this.onCropMouseUp}>
 
-				<div className="ReactCrop--drag-bar ord-n" data-ord="n"></div>
-				<div className="ReactCrop--drag-bar ord-e" data-ord="e"></div>
-				<div className="ReactCrop--drag-bar ord-s" data-ord="s"></div>
-				<div className="ReactCrop--drag-bar ord-w" data-ord="w"></div>
+				<div className='ReactCrop--drag-bar ord-n' data-ord='n'></div>
+				<div className='ReactCrop--drag-bar ord-e' data-ord='e'></div>
+				<div className='ReactCrop--drag-bar ord-s' data-ord='s'></div>
+				<div className='ReactCrop--drag-bar ord-w' data-ord='w'></div>
 
-				<div className="ReactCrop--drag-handle ord-nw" data-ord="nw"></div>
-				<div className="ReactCrop--drag-handle ord-n" data-ord="n"></div>
-				<div className="ReactCrop--drag-handle ord-ne" data-ord="ne"></div>
-				<div className="ReactCrop--drag-handle ord-e" data-ord="e"></div>
-				<div className="ReactCrop--drag-handle ord-se" data-ord="se"></div>
-				<div className="ReactCrop--drag-handle ord-s" data-ord="s"></div>
-				<div className="ReactCrop--drag-handle ord-sw" data-ord="sw"></div>
-				<div className="ReactCrop--drag-handle ord-w" data-ord="w"></div>
+				<div className='ReactCrop--drag-handle ord-nw' data-ord='nw'></div>
+				<div className='ReactCrop--drag-handle ord-n' data-ord='n'></div>
+				<div className='ReactCrop--drag-handle ord-ne' data-ord='ne'></div>
+				<div className='ReactCrop--drag-handle ord-e' data-ord='e'></div>
+				<div className='ReactCrop--drag-handle ord-se' data-ord='se'></div>
+				<div className='ReactCrop--drag-handle ord-s' data-ord='s'></div>
+				<div className='ReactCrop--drag-handle ord-sw' data-ord='sw'></div>
+				<div className='ReactCrop--drag-handle ord-w' data-ord='w'></div>
 			</div>
 		);
 	},
@@ -200,12 +262,11 @@ var ReactCrop = React.createClass({
 	},
 
 	getImageClipStyle: function() {
-		var crop = this.state.crop;
 		var insetVal = 'inset(' + this.arrayToPercent([
-			crop.y,
-			100 - (crop.x + crop.width),
-			100 - (crop.y + crop.height),
-			crop.x
+			this.crop.y,
+			100 - (this.crop.x + this.crop.width),
+			100 - (this.crop.y + this.crop.height),
+			this.crop.x
 		]) +')';
 
 		return {
@@ -215,15 +276,26 @@ var ReactCrop = React.createClass({
 	},
 
 	render: function () {
-		var cropSelection = this.createCropSelection(this.state.currentCropName);
-		var imageClip = this.getImageClipStyle();
+		var cropSelection, imageClip;
+		this.crop = this.crop || this.props.crop;
+
+		if (this.crop) {
+			cropSelection = this.createCropSelection();
+			imageClip = this.getImageClipStyle();
+		}
+
+		var componentClasses = ['ReactCrop'];
+
+		if (this.state.newCropIsBeingDrawn) {
+			componentClasses.push('ReactCrop-new-crop');
+		}
 
 		return (
-			<div className="ReactCrop">
-				<img ref="image" className="ReactCrop--image" src={this.props.src} />
+			<div className={componentClasses.join(' ')} onMouseDown={this.onComponentMouseDown}>
+				<img ref='image' className='ReactCrop--image' src={this.props.src} />
 
-				<div className="ReactCrop--crop-wrapper">
-					<img className="ReactCrop--image-copy" src={this.props.src} style={imageClip} />
+				<div className='ReactCrop--crop-wrapper'>
+					<img ref='imageCopy' className='ReactCrop--image-copy' src={this.props.src} style={imageClip} />
 					{cropSelection}
 				</div>
 
