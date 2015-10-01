@@ -11,7 +11,7 @@ var fileInput = document.querySelector('#file-picker');
 fileInput.addEventListener('change', function(e) {
 	var file = e.target.files.item(0);
 
-	if (!imageType.test(file.type)) {
+	if (!file || !imageType.test(file.type)) {
 		return;
     }
 
@@ -31,10 +31,18 @@ var cropEditor = document.querySelector('#crop-editor');
 
 function loadEditView(dataUrl) {
 	var crop = {
-		x: 40,
-		y: 20,
+		x: 35,
+		y: 30,
 		width: 20,
-		height: 40
+		// height: 40,
+		aspect: 16/9
 	};
-	ReactDOM.render(<ReactCrop src={dataUrl} />, cropEditor);
+	ReactDOM.render(<ReactCrop src={dataUrl} crop={crop} onComplete={onCropComplete} />, cropEditor);
+}
+
+/**
+ * On crop complete update the preview.
+ */
+function onCropComplete (crop) {
+	// console.log(crop);
 }

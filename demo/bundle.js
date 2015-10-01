@@ -59,7 +59,7 @@
 	fileInput.addEventListener('change', function (e) {
 		var file = e.target.files.item(0);
 
-		if (!imageType.test(file.type)) {
+		if (!file || !imageType.test(file.type)) {
 			return;
 		}
 
@@ -79,12 +79,20 @@
 
 	function loadEditView(dataUrl) {
 		var crop = {
-			x: 40,
-			y: 20,
+			x: 35,
+			y: 30,
 			width: 20,
-			height: 40
+			// height: 40,
+			aspect: 16 / 9
 		};
-		ReactDOM.render(React.createElement(ReactCrop, { src: dataUrl }), cropEditor);
+		ReactDOM.render(React.createElement(ReactCrop, { src: dataUrl, crop: crop, onComplete: onCropComplete }), cropEditor);
+	}
+
+	/**
+	 * On crop complete update the preview.
+	 */
+	function onCropComplete(crop) {
+		// console.log(crop);
 	}
 
 /***/ },
@@ -18911,7 +18919,6 @@
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var ReactCreateFragment = __webpack_require__(158);
 
 	var ReactCrop = React.createClass({
 		displayName: 'ReactCrop',
@@ -18948,6 +18955,31 @@
 			};
 		},
 
+		straightenYPath: function straightenYPath(clientX) {
+			var markerEl = document.getElementById('marker'); //debugger
+
+			var ord = this.mEventData.ord;
+			var cropOffset = this.mEventData.cropOffset;
+			var cropStartWidth = this.mEventData.cropStartWidth / 100 * this.mEventData.imageWidth;
+			var cropStartHeight = this.mEventData.cropStartHeight / 100 * this.mEventData.imageHeight;
+			var k, d;
+
+			if (ord === 'nw' || ord === 'se') {
+				k = cropStartHeight / cropStartWidth;
+				d = cropOffset.top - cropOffset.left * k;
+			} else {
+				k = -cropStartHeight / cropStartWidth;
+				d = cropOffset.top + cropStartHeight - cropOffset.left * k;
+			}
+
+			var clientY = k * clientX + d;
+
+			markerEl.style.left = clientX + 'px'; //debugger
+			markerEl.style.top = clientY + 'px'; //debugger
+
+			return clientY;
+		},
+
 		onMouseMove: function onMouseMove(e) {
 			if (!this.mouseDownOnCrop) {
 				return;
@@ -18955,15 +18987,22 @@
 
 			var crop = this.crop;
 			var mEventData = this.mEventData;
+			var clientX = e.clientX;
+			var clientY = e.clientY;
 
-			var xDiffPx = e.clientX - mEventData.clientStartX;
+			if (mEventData.isResize && crop.aspect && mEventData.cropOffset) {
+				clientY = this.straightenYPath(clientX);
+			}
+
+			var xDiffPx = clientX - mEventData.clientStartX;
 			var xDiffPc = xDiffPx / mEventData.imageWidth * 100;
 
-			var yDiffPx = e.clientY - mEventData.clientStartY;
+			var yDiffPx = clientY - mEventData.clientStartY;
 			var yDiffPc = yDiffPx / mEventData.imageHeight * 100;
 
 			if (mEventData.isResize) {
 				var ord = mEventData.ord;
+				var imageAspect = mEventData.imageWidth / mEventData.imageHeight;
 
 				// On the inverse change the diff so it's the same and
 				// the same algo applies.
@@ -18974,10 +19013,26 @@
 					yDiffPc -= mEventData.cropStartHeight * 2;
 				}
 
+				// New width.
+				var newWidth = mEventData.cropStartWidth + xDiffPc;
+
+				if (mEventData.xCrossOver) {
+					newWidth = Math.abs(newWidth);
+				}
+
+				newWidth = this.clamp(newWidth, 0, 100 - crop.x);
+
 				// New height.
-				var newHeight = mEventData.cropStartHeight + yDiffPc;
-				if (mEventData.yCrossOver) {
-					newHeight = Math.abs(newHeight);
+				var newHeight;
+
+				if (crop.aspect) {
+					newHeight = newWidth / crop.aspect * imageAspect;
+				} else {
+					newHeight = mEventData.cropStartHeight + yDiffPc;
+
+					if (mEventData.yCrossOver) {
+						newHeight = Math.abs(newHeight);
+					}
 				}
 
 				// Cap if polarity is inversed and the shape fills the y space.
@@ -18985,23 +19040,27 @@
 					newHeight = Math.min(newHeight, mEventData.cropStartY);
 				}
 
-				// New width.
-				var newWidth = mEventData.cropStartWidth + xDiffPc;
-				if (mEventData.xCrossOver) {
-					newWidth = Math.abs(newWidth);
+				newHeight = this.clamp(newHeight, 0, 100 - crop.y);
+
+				if (crop.aspect) {
+					newWidth = newHeight * crop.aspect / imageAspect;
 				}
 
 				// Adjust x/y to give illusion of 'staticness' as width/height is increased
 				// when polarity is inversed.
-				crop.y = mEventData.yCrossOver ? crop.y + (crop.height - newHeight) : mEventData.cropStartY;
 				crop.x = mEventData.xCrossOver ? crop.x + (crop.width - newWidth) : mEventData.cropStartX;
 
-				// Clamp width & height.
-				newWidth = this.clamp(newWidth, 0, 100 - crop.x);
-				newHeight = this.clamp(newHeight, 0, 100 - crop.y);
+				if (!this.lastYCrossover && mEventData.yCrossOver) {
+					// This not only removes the little "shake" when inverting at a diagonal, but for some
+					// reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
+					// figure out why.
+					crop.y -= newHeight;
+				} else {
+					crop.y = mEventData.yCrossOver ? crop.y + (crop.height - newHeight) : mEventData.cropStartY;
+				}
 
 				// Apply width/height changes depending on ordinate.
-				if (this.xyOrds.indexOf(ord) > -1) {
+				if (crop.aspect || this.xyOrds.indexOf(ord) > -1) {
 					crop.width = newWidth;
 					crop.height = newHeight;
 				} else if (this.xOrds.indexOf(ord) > -1) {
@@ -19010,18 +19069,14 @@
 					crop.height = newHeight;
 				}
 
-				// Detect changes in polarity.
-				if (!mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc >= 0 || mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc <= 0) {
-					mEventData.yCrossOver = !mEventData.yCrossOver;
-				}
-
-				if (!mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc >= 0 || mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc <= 0) {
-					mEventData.xCrossOver = !mEventData.xCrossOver;
-				}
+				this.lastYCrossover = mEventData.yCrossOver;
+				this.crossOverCheck(xDiffPc, yDiffPc);
 			} else {
 				crop.x = this.clamp(mEventData.cropStartX + xDiffPc, 0, 100 - crop.width);
 				crop.y = this.clamp(mEventData.cropStartY + yDiffPc, 0, 100 - crop.height);
 			}
+
+			this.cropInvalid = false;
 
 			if (this.props.onChange) {
 				this.props.onChange(crop);
@@ -19030,12 +19085,30 @@
 			this.forceUpdate();
 		},
 
+		crossOverCheck: function crossOverCheck(xDiffPc, yDiffPc) {
+			var mEventData = this.mEventData;
+
+			if (!mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc >= 0 || mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc <= 0) {
+				mEventData.yCrossOver = !mEventData.yCrossOver;
+			}
+
+			if (!mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc >= 0 || mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc <= 0) {
+				mEventData.xCrossOver = !mEventData.xCrossOver;
+			}
+		},
+
 		onCropMouseDown: function onCropMouseDown(e) {
 			e.preventDefault(); // Stop drag selection.
 
 			var ord = e.target.dataset.ord;
 			var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
 			var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
+
+			var cropOffset, imageOffset;
+
+			if (this.crop.aspect) {
+				cropOffset = this.getElementOffset(this.refs.cropSelect);
+			}
 
 			this.mEventData = {
 				imageWidth: this.refs.image.width,
@@ -19051,7 +19124,8 @@
 				xCrossOver: xInversed,
 				yCrossOver: yInversed,
 				isResize: e.target !== this.refs.cropSelect,
-				ord: ord
+				ord: ord,
+				cropOffset: cropOffset
 			};
 
 			this.mouseDownOnCrop = true;
@@ -19064,14 +19138,9 @@
 
 			e.preventDefault(); // Stop drag selection.
 
-			var elOffset = this.getElementOffset(e.target);
-
-			var xPc = (e.clientX - elOffset.left) / this.refs.image.width * 100;
-			var yPc = (e.clientY - elOffset.top) / this.refs.image.height * 100;
-
-			if (!this.crop) {
-				this.crop = {};
-			}
+			var imageOffset = this.getElementOffset(this.refs.image);
+			var xPc = (e.clientX - imageOffset.left) / this.refs.image.width * 100;
+			var yPc = (e.clientY - imageOffset.top) / this.refs.image.height * 100;
 
 			this.crop.x = xPc;
 			this.crop.y = yPc;
@@ -19103,17 +19172,14 @@
 
 		onMouseUp: function onMouseUp(e) {
 			if (this.mouseDownOnCrop) {
+
+				this.cropInvalid = !this.crop.width && !this.crop.height;
+				this.mouseDownOnCrop = false;
+
 				if (this.props.onComplete) {
 					this.props.onComplete(this.crop);
 				}
 
-				if (this.crop) {
-					if (!this.crop.width || !this.crop.height) {
-						this.crop = null;
-					}
-				}
-
-				this.mouseDownOnCrop = false;
 				this.setState({
 					newCropIsBeingDrawn: false
 				});
@@ -19178,11 +19244,39 @@
 			};
 		},
 
+		setupCropObject: function setupCropObject() {
+			if (!this.crop && !this.props.crop) {
+				this.crop = {};
+				this.cropInvalid = true;
+			} else if (this.props.crop) {
+				this.crop = this.props.crop;
+			}
+		},
+
+		onImageLoad: function onImageLoad(e) {
+			var imageWidth = e.target.naturalWidth;
+			var imageHeight = e.target.naturalHeight;
+			var imageAspect = imageWidth / imageHeight;
+
+			// If there is a missing width or height but an aspect is
+			// specified, then infer it.
+			if (this.crop.aspect) {
+				if (!this.crop.height && this.crop.width) {
+					this.crop.height = this.crop.width / this.crop.aspect * imageAspect;
+					this.forceUpdate();
+				} else if (!this.crop.width && this.crop.height) {
+					this.crop.width = this.crop.height * this.crop.aspect / imageAspect;
+					this.forceUpdate();
+				}
+			}
+		},
+
 		render: function render() {
 			var cropSelection, imageClip;
-			this.crop = this.crop || this.props.crop;
 
-			if (this.crop) {
+			this.setupCropObject();
+
+			if (!this.cropInvalid) {
 				cropSelection = this.createCropSelection();
 				imageClip = this.getImageClipStyle();
 			}
@@ -19192,11 +19286,14 @@
 			if (this.state.newCropIsBeingDrawn) {
 				componentClasses.push('ReactCrop-new-crop');
 			}
+			if (this.crop.aspect) {
+				componentClasses.push('ReactCrop-fixed-aspect');
+			}
 
 			return React.createElement(
 				'div',
 				{ className: componentClasses.join(' '), onMouseDown: this.onComponentMouseDown },
-				React.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src }),
+				React.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
 				React.createElement(
 					'div',
 					{ className: 'ReactCrop--crop-wrapper' },
@@ -19209,12 +19306,6 @@
 	});
 
 	module.exports = ReactCrop;
-
-/***/ },
-/* 158 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(83).create;
 
 /***/ }
 /******/ ]);
