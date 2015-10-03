@@ -35,7 +35,7 @@ function loadEditView(dataUrl) {
 		y: 30,
 		width: 20,
 		// height: 40,
-		aspect: 16/9
+		aspect: 1
 	};
 	ReactDOM.render(<ReactCrop src={dataUrl} crop={crop} onComplete={onCropComplete} />, cropEditor);
 }

@@ -98,7 +98,7 @@ var ReactCrop = React.createClass({
 				newWidth = Math.abs(newWidth);
 			}
 
-			newWidth = this.clamp(newWidth, 0, 100 - crop.x);
+			newWidth = this.clamp(newWidth, 0, 100);
 
 			// New height.
 			var newHeight;
@@ -118,7 +118,7 @@ var ReactCrop = React.createClass({
 				newHeight = Math.min(newHeight, mEventData.cropStartY);
 			}
 
-			newHeight = this.clamp(newHeight, 0, 100 - crop.y);
+			newHeight = this.clamp(newHeight, 0, 100);
 
 			if (crop.aspect) {
 				newWidth = (newHeight * crop.aspect) / imageAspect;
@@ -128,7 +128,7 @@ var ReactCrop = React.createClass({
 			// when polarity is inversed.
 			crop.x = mEventData.xCrossOver ? crop.x + (crop.width - newWidth) : mEventData.cropStartX;
 			
-			if (!this.lastYCrossover && mEventData.yCrossOver) {
+			if (mEventData.lastYCrossover === false && mEventData.yCrossOver) {
 				// This not only removes the little "shake" when inverting at a diagonal, but for some
 				// reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
 				// figure out why.
@@ -137,8 +137,11 @@ var ReactCrop = React.createClass({
 				crop.y = mEventData.yCrossOver ? crop.y + (crop.height - newHeight) : mEventData.cropStartY;
 			}
 
+			crop.x = this.clamp(crop.x, 0, 100 - newWidth);
+			crop.y = this.clamp(crop.y, 0, 100 - newHeight);
+
 			// Apply width/height changes depending on ordinate.
-			if (crop.aspect || this.xyOrds.indexOf(ord) > -1) {
+			if (this.xyOrds.indexOf(ord) > -1) {
 				crop.width = newWidth;
 				crop.height = newHeight;
 			} else if (this.xOrds.indexOf(ord) > -1) {
@@ -147,12 +150,12 @@ var ReactCrop = React.createClass({
 				crop.height = newHeight;
 			}
 
-			this.lastYCrossover = mEventData.yCrossOver;
+			mEventData.lastYCrossover = mEventData.yCrossOver;
 			this.crossOverCheck(xDiffPc, yDiffPc);
 
 		} else {
-			crop.x = this.clamp(mEventData.cropStartX + xDiffPc, 0, (100 - crop.width));
-			crop.y = this.clamp(mEventData.cropStartY + yDiffPc, 0, (100 - crop.height));
+			crop.x = this.clamp(mEventData.cropStartX + xDiffPc, 0, 100 - crop.width);
+			crop.y = this.clamp(mEventData.cropStartY + yDiffPc, 0, 100 - crop.height);
 		}
 
 		this.cropInvalid = false;
