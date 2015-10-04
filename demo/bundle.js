@@ -49,6 +49,7 @@
 	var React = __webpack_require__(1);
 	var ReactDOM = __webpack_require__(155);
 	var ReactCrop = __webpack_require__(156);
+	var CropPreview = __webpack_require__(158);
 
 	/**
 	 * Select an image file.
@@ -73,26 +74,25 @@
 	});
 
 	/**
-	 * Load the image in the crop editor.
+	 * Load the image in the crop editor & preview the crop.
 	 */
 	var cropEditor = document.querySelector('#crop-editor');
+	var cropPreview = document.querySelector('#crop-preview');
 
 	function loadEditView(dataUrl) {
 		var crop = {
 			x: 35,
 			y: 30,
 			width: 20,
-			// height: 40,
-			aspect: 1
+			height: 40
 		};
-		ReactDOM.render(React.createElement(ReactCrop, { src: dataUrl, crop: crop, onComplete: onCropComplete }), cropEditor);
-	}
 
-	/**
-	 * On crop complete update the preview.
-	 */
-	function onCropComplete(crop) {
-		// console.log(crop);
+		// aspect: 1
+		function onCropComplete(crop) {
+			ReactDOM.render(React.createElement(CropPreview, { crop: crop, src: dataUrl }), cropPreview);
+		}
+
+		ReactDOM.render(React.createElement(ReactCrop, { src: dataUrl, crop: crop, onComplete: onCropComplete }), cropEditor);
 	}
 
 /***/ },
@@ -18932,31 +18932,41 @@
 		yOrds: ['n', 's'],
 		xyOrds: ['nw', 'ne', 'se', 'sw'],
 
+		arrowKey: {
+			left: 37,
+			up: 38,
+			right: 39,
+			down: 40
+		},
+		nudgeStep: 0.2,
+
 		getInitialState: function getInitialState() {
-			return {};
+			return {
+				crop: {}
+			};
 		},
 
 		componentDidMount: function componentDidMount() {
-			document.addEventListener('mousemove', this.onMouseMove);
-			document.addEventListener('mouseup', this.onMouseUp);
+			document.addEventListener('mousemove', this.onDocMouseMove);
+			document.addEventListener('mouseup', this.onDocMouseUp);
 		},
 
 		componentWillUnmount: function componentWillUnmount() {
-			document.removeEventListener('mousemove', this.onMouseMove);
-			document.addEventListener('mouseup', this.onMouseUp);
+			document.removeEventListener('mousemove', this.onDocMouseMove);
+			document.addEventListener('mouseup', this.onDocMouseUp);
 		},
 
 		getCropStyle: function getCropStyle() {
 			return {
-				top: this.crop.y + '%',
-				left: this.crop.x + '%',
-				width: this.crop.width + '%',
-				height: this.crop.height + '%'
+				top: this.state.crop.y + '%',
+				left: this.state.crop.x + '%',
+				width: this.state.crop.width + '%',
+				height: this.state.crop.height + '%'
 			};
 		},
 
 		straightenYPath: function straightenYPath(clientX) {
-			var markerEl = document.getElementById('marker'); //debugger
+			var markerEl = document.getElementById('marker'); //debug
 
 			var ord = this.mEventData.ord;
 			var cropOffset = this.mEventData.cropOffset;
@@ -18974,18 +18984,18 @@
 
 			var clientY = k * clientX + d;
 
-			markerEl.style.left = clientX + 'px'; //debugger
-			markerEl.style.top = clientY + 'px'; //debugger
+			markerEl.style.left = clientX + 'px'; //debug
+			markerEl.style.top = clientY + 'px'; //debug
 
 			return clientY;
 		},
 
-		onMouseMove: function onMouseMove(e) {
+		onDocMouseMove: function onDocMouseMove(e) {
 			if (!this.mouseDownOnCrop) {
 				return;
 			}
 
-			var crop = this.crop;
+			var crop = this.state.crop;
 			var mEventData = this.mEventData;
 			var clientX = e.clientX;
 			var clientY = e.clientY;
@@ -19085,7 +19095,7 @@
 				this.props.onChange(crop);
 			}
 
-			this.forceUpdate();
+			this.setState({ crop: crop });
 		},
 
 		crossOverCheck: function crossOverCheck(xDiffPc, yDiffPc) {
@@ -19103,13 +19113,18 @@
 		onCropMouseDown: function onCropMouseDown(e) {
 			e.preventDefault(); // Stop drag selection.
 
+			var crop = this.state.crop;
+
+			// Focus for detecting keypress.
+			this.refs.component.focus();
+
 			var ord = e.target.dataset.ord;
 			var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
 			var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
 
 			var cropOffset, imageOffset;
 
-			if (this.crop.aspect) {
+			if (crop.aspect) {
 				cropOffset = this.getElementOffset(this.refs.cropSelect);
 			}
 
@@ -19118,10 +19133,10 @@
 				imageHeight: this.refs.image.height,
 				clientStartX: e.clientX,
 				clientStartY: e.clientY,
-				cropStartWidth: this.crop.width,
-				cropStartHeight: this.crop.height,
-				cropStartX: xInversed ? this.crop.x + this.crop.width : this.crop.x,
-				cropStartY: yInversed ? this.crop.y + this.crop.height : this.crop.y,
+				cropStartWidth: crop.width,
+				cropStartHeight: crop.height,
+				cropStartX: xInversed ? crop.x + crop.width : crop.x,
+				cropStartY: yInversed ? crop.y + crop.height : crop.y,
 				xInversed: xInversed,
 				yInversed: yInversed,
 				xCrossOver: xInversed,
@@ -19141,24 +19156,29 @@
 
 			e.preventDefault(); // Stop drag selection.
 
+			var crop = this.state.crop;
+
+			// Focus for detecting keypress.
+			this.refs.component.focus();
+
 			var imageOffset = this.getElementOffset(this.refs.image);
 			var xPc = (e.clientX - imageOffset.left) / this.refs.image.width * 100;
 			var yPc = (e.clientY - imageOffset.top) / this.refs.image.height * 100;
 
-			this.crop.x = xPc;
-			this.crop.y = yPc;
-			this.crop.width = 0;
-			this.crop.height = 0;
+			crop.x = xPc;
+			crop.y = yPc;
+			crop.width = 0;
+			crop.height = 0;
 
 			this.mEventData = {
 				imageWidth: this.refs.image.width,
 				imageHeight: this.refs.image.height,
 				clientStartX: e.clientX,
 				clientStartY: e.clientY,
-				cropStartWidth: this.crop.width,
-				cropStartHeight: this.crop.height,
-				cropStartX: this.crop.x,
-				cropStartY: this.crop.y,
+				cropStartWidth: crop.width,
+				cropStartHeight: crop.height,
+				cropStartX: crop.x,
+				cropStartY: crop.y,
 				xInversed: false,
 				yInversed: false,
 				xCrossOver: false,
@@ -19168,25 +19188,75 @@
 			};
 
 			this.mouseDownOnCrop = true;
-			this.setState({
-				newCropIsBeingDrawn: true
-			});
+			this.setState({ newCropIsBeingDrawn: true });
 		},
 
-		onMouseUp: function onMouseUp(e) {
+		onComponentKeyDown: function onComponentKeyDown(e) {
+			var keyCode = e.which;
+			var crop = this.state.crop;
+			var nudged = false;
+
+			if (!crop.width || !crop.height) {
+				return;
+			}
+
+			if (keyCode === this.arrowKey.left) {
+				crop.x -= this.nudgeStep;
+				nudged = true;
+			} else if (keyCode === this.arrowKey.right) {
+				crop.x += this.nudgeStep;
+				nudged = true;
+			} else if (keyCode === this.arrowKey.up) {
+				crop.y -= this.nudgeStep;
+				nudged = true;
+			} else if (keyCode === this.arrowKey.down) {
+				crop.y += this.nudgeStep;
+				nudged = true;
+			}
+
+			if (nudged) {
+				crop.x = this.clamp(crop.x, 0, 100 - crop.width);
+				crop.y = this.clamp(crop.y, 0, 100 - crop.height);
+
+				this.setState({ crop: crop });
+
+				if (this.props.onChange) {
+					this.props.onChange(crop);
+				}
+				if (this.props.onComplete) {
+					this.props.onComplete(crop);
+				}
+			}
+		},
+
+		onDocMouseUp: function onDocMouseUp(e) {
 			if (this.mouseDownOnCrop) {
 
-				this.cropInvalid = !this.crop.width && !this.crop.height;
+				this.cropInvalid = !this.state.crop.width && !this.state.crop.height;
 				this.mouseDownOnCrop = false;
 
 				if (this.props.onComplete) {
-					this.props.onComplete(this.crop);
+					this.props.onComplete(this.state.crop);
 				}
 
-				this.setState({
-					newCropIsBeingDrawn: false
-				});
+				this.setState({ newCropIsBeingDrawn: false });
 			}
+		},
+
+		debounce: function debounce(func, wait, immediate) {
+			var timeout;
+			return function () {
+				var context = this,
+				    args = arguments;
+				var later = function later() {
+					timeout = null;
+					if (!immediate) func.apply(context, args);
+				};
+				var callNow = immediate && !timeout;
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+				if (callNow) func.apply(context, args);
+			};
 		},
 
 		getElementOffset: function getElementOffset(el) {
@@ -19239,7 +19309,9 @@
 		},
 
 		getImageClipStyle: function getImageClipStyle() {
-			var insetVal = 'inset(' + this.arrayToPercent([this.crop.y, 100 - (this.crop.x + this.crop.width), 100 - (this.crop.y + this.crop.height), this.crop.x]) + ')';
+			var crop = this.state.crop;
+
+			var insetVal = 'inset(' + this.arrayToPercent([crop.y, 100 - (crop.x + crop.width), 100 - (crop.y + crop.height), crop.x]) + ')';
 
 			return {
 				WebkitClipPath: insetVal,
@@ -19248,28 +19320,28 @@
 		},
 
 		setupCropObject: function setupCropObject() {
-			if (!this.crop && !this.props.crop) {
-				this.crop = {};
+			if (!Object.keys(this.state.crop).length && !this.props.crop) {
 				this.cropInvalid = true;
 			} else if (this.props.crop) {
-				this.crop = this.props.crop;
+				this.state.crop = this.props.crop;
 			}
 		},
 
 		onImageLoad: function onImageLoad(e) {
+			var crop = this.state.crop;
 			var imageWidth = e.target.naturalWidth;
 			var imageHeight = e.target.naturalHeight;
 			var imageAspect = imageWidth / imageHeight;
 
 			// If there is a missing width or height but an aspect is
 			// specified, then infer it.
-			if (this.crop.aspect) {
-				if (!this.crop.height && this.crop.width) {
-					this.crop.height = this.crop.width / this.crop.aspect * imageAspect;
-					this.forceUpdate();
-				} else if (!this.crop.width && this.crop.height) {
-					this.crop.width = this.crop.height * this.crop.aspect / imageAspect;
-					this.forceUpdate();
+			if (crop.aspect) {
+				if (!crop.height && crop.width) {
+					crop.height = crop.width / crop.aspect * imageAspect;
+					this.setState({ crop: crop });
+				} else if (!crop.width && crop.height) {
+					crop.width = crop.height * crop.aspect / imageAspect;
+					this.setState({ crop: crop });
 				}
 			}
 		},
@@ -19289,13 +19361,17 @@
 			if (this.state.newCropIsBeingDrawn) {
 				componentClasses.push('ReactCrop-new-crop');
 			}
-			if (this.crop.aspect) {
+			if (this.state.crop.aspect) {
 				componentClasses.push('ReactCrop-fixed-aspect');
 			}
 
 			return React.createElement(
 				'div',
-				{ className: componentClasses.join(' '), onMouseDown: this.onComponentMouseDown },
+				{ ref: 'component',
+					className: componentClasses.join(' '),
+					onMouseDown: this.onComponentMouseDown,
+					tabIndex: '1',
+					onKeyDown: this.onComponentKeyDown },
 				React.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
 				React.createElement(
 					'div',
@@ -19309,6 +19385,143 @@
 	});
 
 	module.exports = ReactCrop;
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var React = __webpack_require__(1);
+
+	var CropPreview = React.createClass({
+		displayName: 'CropPreview',
+
+		propTypes: {
+			crop: React.PropTypes.object.isRequired
+		},
+
+		maxScale: 1,
+
+		debounce: function debounce(func, wait, immediate) {
+			var timeout;
+			return function () {
+				var context = this,
+				    args = arguments;
+				var later = function later() {
+					timeout = null;
+					if (!immediate) func.apply(context, args);
+				};
+				var callNow = immediate && !timeout;
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+				if (callNow) func.apply(context, args);
+			};
+		},
+
+		scale: function scale(options) {
+			var scale = options.scale || Math.min(options.maxWidth / options.width, options.maxHeight / options.height);
+
+			scale = Math.min(scale, this.maxScale);
+
+			return {
+				scale: scale,
+				width: options.width * scale,
+				height: options.height * scale
+			};
+		},
+
+		calcCrop: function calcCrop(options) {
+			var imageWidthUnit = options.imageEl.naturalWidth / 100;
+			var imageHeightUnit = options.imageEl.naturalHeight / 100;
+
+			// Viewport.
+			var viewportWidth = imageWidthUnit * options.cropWidth;
+			var viewportHeight = imageHeightUnit * options.cropHeight;
+
+			// Scale viewport.
+			var scaledViewport = this.scale({
+				width: viewportWidth,
+				height: viewportHeight,
+				maxWidth: options.maxWidth,
+				maxHeight: options.maxHeight
+			});
+
+			// Scale image based on the viewport scale.
+			var scaledImage = this.scale({
+				scale: scaledViewport.scale,
+				width: this.refs.image.naturalWidth,
+				height: this.refs.image.naturalHeight
+			});
+
+			options.imageEl.width = scaledImage.width;
+			options.imageEl.height = scaledImage.height;
+
+			imageWidthUnit = scaledImage.width / 100;
+			imageHeightUnit = scaledImage.height / 100;
+
+			// For adjusting the position of the image underneath the viewport.
+			var imageMLeft = -Math.abs(imageWidthUnit * options.cropX);
+			var imageMTop = -Math.abs(imageHeightUnit * options.cropY);
+
+			return {
+				image: {
+					marginLeft: imageMLeft,
+					marginTop: imageMTop
+				},
+				viewport: {
+					width: scaledViewport.width,
+					height: scaledViewport.height
+				}
+			};
+		},
+
+		updateCrop: function updateCrop() {
+			var cssProps = this.calcCrop({
+				imageEl: this.refs.image,
+				cropWidth: this.props.crop.width,
+				cropHeight: this.props.crop.height,
+				cropX: this.props.crop.x,
+				cropY: this.props.crop.y,
+				maxWidth: 600,
+				maxHeight: 500
+			});
+
+			this.refs.imageWrapper.style.width = cssProps.viewport.width + 'px';
+			this.refs.imageWrapper.style.height = cssProps.viewport.height + 'px';
+
+			this.refs.image.style.marginLeft = cssProps.image.marginLeft + 'px';
+			this.refs.image.style.marginTop = cssProps.image.marginTop + 'px';
+		},
+
+		onWindowResize: function onWindowResize() {
+			this.updateCrop();
+		},
+
+		componentDidMount: function componentDidMount() {
+			this.onWindowResize = this.debounce(this.onWindowResize, 1000);
+			window.addEventListener('resize', this.onWindowResize);
+			this.updateCrop();
+		},
+
+		componentWillUnmount: function componentWillUnmount() {
+			window.removeEventListener('resize', this.onWindowResize);
+		},
+
+		componentDidUpdate: function componentDidUpdate() {
+			this.updateCrop();
+		},
+
+		render: function render() {
+			return React.createElement(
+				'div',
+				{ ref: 'imageWrapper', className: 'CropPreview' },
+				React.createElement('img', { ref: 'image', src: this.props.src, className: 'CropPreview--image' })
+			);
+		}
+	});
+
+	module.exports = CropPreview;
 
 /***/ }
 /******/ ]);

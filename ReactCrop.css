@@ -5,6 +5,10 @@
 	overflow: hidden;
 }
 
+.ReactCrop:focus {
+	outline: none;
+}
+
 .ReactCrop--image {
 	display: block;
 }
@@ -60,10 +64,11 @@
 
 .ReactCrop--drag-handle {
 	position: absolute;
-	width: 6px;
-	height: 6px;
+	width: 8px;
+	height: 8px;
 	background-color: rgba(0,0,0,0.2);
 	border: 1px solid #eee;
+	box-sizing: border-box;
 }
 
 .ReactCrop .ord-nw {

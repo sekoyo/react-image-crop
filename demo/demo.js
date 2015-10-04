@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var ReactCrop = require('../index');
+var CropPreview = require('./CropPreview');
 
 /**
  * Select an image file.
@@ -25,24 +26,23 @@ fileInput.addEventListener('change', function(e) {
 });
 
 /**
- * Load the image in the crop editor.
+ * Load the image in the crop editor & preview the crop.
  */
 var cropEditor = document.querySelector('#crop-editor');
+var cropPreview = document.querySelector('#crop-preview');
 
 function loadEditView(dataUrl) {
 	var crop = {
 		x: 35,
 		y: 30,
 		width: 20,
-		// height: 40,
-		aspect: 1
+		height: 40,
+		// aspect: 1
 	};
-	ReactDOM.render(<ReactCrop src={dataUrl} crop={crop} onComplete={onCropComplete} />, cropEditor);
-}
 
-/**
- * On crop complete update the preview.
- */
-function onCropComplete (crop) {
-	// console.log(crop);
+	function onCropComplete (crop) {
+		ReactDOM.render(<CropPreview crop={crop} src={dataUrl} />, cropPreview);
+	}
+
+	ReactDOM.render(<ReactCrop src={dataUrl} crop={crop} onComplete={onCropComplete} />, cropEditor);
 }
