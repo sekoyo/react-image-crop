@@ -1,4 +1,5 @@
 var React = require('react');
+var objectAssign = require('object-assign');
 
 var ReactCrop = React.createClass({
 	propTypes: {
@@ -18,20 +19,41 @@ var ReactCrop = React.createClass({
 	},
 	nudgeStep: 0.2,
 
+	defaultCrop: {
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0
+	},
+
 	getInitialState: function() {
+		var crop = objectAssign({}, this.defaultCrop, this.props.crop);
+
+		if (crop.width === 0 || crop.height === 0) {
+			this.cropInvalid = true;
+		}
+
 		return {
-			crop: {}
+			crop: crop
 		};
 	},
 
 	componentDidMount: function() {
-		document.addEventListener('mousemove', this.onDocMouseMove);
-		document.addEventListener('mouseup', this.onDocMouseUp);
+		document.addEventListener('mousemove', this.onDocMouseTouchMove);
+		document.addEventListener('touchmove', this.onDocMouseTouchMove);
+
+		document.addEventListener('mouseup', this.onDocMouseTouchEnd);
+		document.addEventListener('touchend', this.onDocMouseTouchEnd);
+		document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 	},
 
 	componentWillUnmount: function() {
-		document.removeEventListener('mousemove', this.onDocMouseMove);
-		document.addEventListener('mouseup', this.onDocMouseUp);
+		document.removeEventListener('mousemove', this.onDocMouseTouchMove);
+		document.removeEventListener('touchmove', this.onDocMouseTouchMove);
+
+		document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
+		document.removeEventListener('touchend', this.onDocMouseTouchEnd);
+		document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
 	},
 
 	getCropStyle: function() {
@@ -44,8 +66,6 @@ var ReactCrop = React.createClass({
 	},
 
 	straightenYPath: function(clientX) {
-		var markerEl = document.getElementById('marker');//debug
-
 		var ord = this.mEventData.ord;
 		var cropOffset = this.mEventData.cropOffset;
 		var cropStartWidth = this.mEventData.cropStartWidth / 100 * this.mEventData.imageWidth;
@@ -62,13 +82,10 @@ var ReactCrop = React.createClass({
 
 		var clientY = k * clientX + d;
 
-		markerEl.style.left = clientX + 'px';//debug
-		markerEl.style.top = clientY + 'px';//debug
-
 		return clientY;
 	},
 
-	onDocMouseMove: function(e) {
+	onDocMouseTouchMove: function(e) {
 		if (!this.mouseDownOnCrop) {
 			return;
 		}
@@ -108,7 +125,7 @@ var ReactCrop = React.createClass({
 				newWidth = Math.abs(newWidth);
 			}
 
-			newWidth = this.clamp(newWidth, 0, 100);
+			newWidth = this.clamp(newWidth, this.props.minWidth || 0, 100);
 
 			// New height.
 			var newHeight;
@@ -128,11 +145,24 @@ var ReactCrop = React.createClass({
 				newHeight = Math.min(newHeight, mEventData.cropStartY);
 			}
 
-			newHeight = this.clamp(newHeight, 0, 100);
+			newHeight = this.clamp(newHeight, this.props.minHeight || 0, 100);
 
 			if (crop.aspect) {
 				newWidth = (newHeight * crop.aspect) / imageAspect;
 			}
+
+			// This is an alternative for calulating x+y which doesn't use
+			// newWidth/newHeight. It makes it easier to stop increasing size
+			// when hitting some edges, but still increase the size when the
+			// crop is sitting flat against some. It also avoids the 'lastYCrossover'
+			// edge-case, and the 'crossOverCheck' check can happen before any 
+			// calcs. However it is much harder in fixed aspect to stop x/y from
+			// moving when hitting certain boundaries, and capping x/y to
+			// the value it should have been at the boundary. Perhaps an
+			// enhancement for the next version..
+			// 
+			// if crossed { n = startSize + (startPos + diffPc)}
+			// else { n = startPos }
 
 			// Adjust x/y to give illusion of 'staticness' as width/height is increased
 			// when polarity is inversed.
@@ -191,10 +221,19 @@ var ReactCrop = React.createClass({
 		}
 	},
 
-	onCropMouseDown: function(e) {
+	onCropMouseTouchDown: function(e) {
 		e.preventDefault(); // Stop drag selection.
 
 		var crop = this.state.crop;
+		var clientX, clientY;
+
+		if (e.touches) {
+			clientX = e.touches[0].clientX;
+			clientY = e.touches[0].clientY;
+		} else {
+			clientX = e.clientX;
+			clientY = e.clientY;
+		}
 
 		// Focus for detecting keypress.
 		this.refs.component.focus();
@@ -212,8 +251,8 @@ var ReactCrop = React.createClass({
 		this.mEventData = {
 			imageWidth: this.refs.image.width,
 			imageHeight: this.refs.image.height,
-			clientStartX: e.clientX,
-			clientStartY: e.clientY,
+			clientStartX: clientX,
+			clientStartY: clientY,
 			cropStartWidth: crop.width,
 			cropStartHeight: crop.height,
 			cropStartX: xInversed ? (crop.x + crop.width) : crop.x,
@@ -230,7 +269,7 @@ var ReactCrop = React.createClass({
 		this.mouseDownOnCrop = true;
 	},
 
-	onComponentMouseDown: function(e) {
+	onComponentMouseTouchDown: function(e) {
 		if (e.target !== this.refs.imageCopy) {
 			return;
 		}
@@ -238,13 +277,22 @@ var ReactCrop = React.createClass({
 		e.preventDefault(); // Stop drag selection.
 
 		var crop = this.state.crop;
+		var clientX, clientY;
+
+		if (e.touches) {
+			clientX = e.touches[0].clientX;
+			clientY = e.touches[0].clientY;
+		} else {
+			clientX = e.clientX;
+			clientY = e.clientY;
+		}
 
 		// Focus for detecting keypress.
 		this.refs.component.focus();
 
 		var imageOffset = this.getElementOffset(this.refs.image);
-		var xPc = (e.clientX - imageOffset.left) / this.refs.image.width * 100;
-		var yPc = (e.clientY - imageOffset.top) / this.refs.image.height * 100;
+		var xPc = (clientX - imageOffset.left) / this.refs.image.width * 100;
+		var yPc = (clientY - imageOffset.top) / this.refs.image.height * 100;
 
 		crop.x = xPc;
 		crop.y = yPc;
@@ -254,8 +302,8 @@ var ReactCrop = React.createClass({
 		this.mEventData = {
 			imageWidth: this.refs.image.width,
 			imageHeight: this.refs.image.height,
-			clientStartX: e.clientX,
-			clientStartY: e.clientY,
+			clientStartX: clientX,
+			clientStartY: clientY,
 			cropStartWidth: crop.width,
 			cropStartHeight: crop.height,
 			cropStartX: crop.x,
@@ -310,7 +358,7 @@ var ReactCrop = React.createClass({
 		}
 	},
 
-	onDocMouseUp: function(e) {
+	onDocMouseTouchEnd: function(e) {
 		if (this.mouseDownOnCrop) {
 
 			this.cropInvalid = !this.state.crop.width && !this.state.crop.height;
@@ -322,21 +370,6 @@ var ReactCrop = React.createClass({
 
 			this.setState({ newCropIsBeingDrawn: false });
 		}
-	},
-
-	debounce: function (func, wait, immediate) {
-		var timeout;
-		return function() {
-			var context = this, args = arguments;
-			var later = function() {
-				timeout = null;
-				if (!immediate) func.apply(context, args);
-			};
-			var callNow = immediate && !timeout;
-			clearTimeout(timeout);
-			timeout = setTimeout(later, wait);
-			if (callNow) func.apply(context, args);
-		};
 	},
 
 	getElementOffset: function(el) {
@@ -359,12 +392,18 @@ var ReactCrop = React.createClass({
 	createCropSelection: function() {
 		var style = this.getCropStyle();
 
+		var cropClasses = ['ReactCrop--crop-selection'];
+
+		if (!this.props.noAnts) {
+			cropClasses.push('ReactCrop--marching-ants marching');
+		}
+
 		return (
 			<div ref='cropSelect'
 				style={style}
-				className='ReactCrop--crop-selection ReactCrop--marching-ants marching'
-				onMouseDown={this.onCropMouseDown}
-				onMouseUp={this.onCropMouseUp}>
+				className={cropClasses.join(' ')}
+				onMouseDown={this.onCropMouseTouchDown}
+				onTouchStart={this.onCropMouseTouchDown}>
 
 				<div className='ReactCrop--drag-bar ord-n' data-ord='n'></div>
 				<div className='ReactCrop--drag-bar ord-e' data-ord='e'></div>
@@ -393,10 +432,23 @@ var ReactCrop = React.createClass({
 	getImageClipStyle: function() {
 		var crop = this.state.crop;
 
+		var right = 100 - (crop.x + crop.width);
+		var bottom = 100 - (crop.y + crop.height);
+
+		// Safari doesn't like it if values add up to exactly
+		// 100 (it doesn't draw the clip). I have submitted a bug.
+		if (crop.x + right === 100) {
+			right -= 0.00001;
+		}
+
+		if (crop.y + bottom === 100) {
+			bottom -= 0.00001;
+		}
+
 		var insetVal = 'inset(' + this.arrayToPercent([
 			crop.y,
-			100 - (crop.x + crop.width),
-			100 - (crop.y + crop.height),
+			right,
+			bottom,
 			crop.x
 		]) +')';
 
@@ -406,37 +458,26 @@ var ReactCrop = React.createClass({
 		};
 	},
 
-	setupCropObject: function() {
-		if (!Object.keys(this.state.crop).length && !this.props.crop) {
-			this.cropInvalid = true;
-		} else if (this.props.crop) {
-			this.state.crop = this.props.crop;
-		}
-	},
-
 	onImageLoad: function(e) {
 		var crop = this.state.crop;
 		var imageWidth = e.target.naturalWidth;
 		var imageHeight = e.target.naturalHeight;
 		var imageAspect = imageWidth / imageHeight;
 
-		// If there is a missing width or height but an aspect is
-		// specified, then infer it.
+		// If there is a width or height then infer the other to
+		// ensure the value is correct.
 		if (crop.aspect) {
-			if (!crop.height && crop.width) {
+			if (crop.width) {
 				crop.height = (crop.width / crop.aspect) * imageAspect;
-				this.setState({ crop: crop });
-			} else if (!crop.width && crop.height) {
+			} else if (crop.height) {
 				crop.width = (crop.height * crop.aspect) / imageAspect;
-				this.setState({ crop: crop });
 			}
+			this.setState({ crop: crop });
 		}
 	},
 
-	render: function () {
+	render: function() {
 		var cropSelection, imageClip;
-
-		this.setupCropObject();
 
 		if (!this.cropInvalid) {
 			cropSelection = this.createCropSelection();
@@ -455,7 +496,8 @@ var ReactCrop = React.createClass({
 		return (
 			<div ref="component"
 				className={componentClasses.join(' ')}
-				onMouseDown={this.onComponentMouseDown} 
+				onTouchStart={this.onComponentMouseTouchDown}
+				onMouseDown={this.onComponentMouseTouchDown} 
 				tabIndex="1" 
 				onKeyDown={this.onComponentKeyDown}>
 

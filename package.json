@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --progress --colors --watch --config demo/webpack.config.js"
+    "start": "webpack --progress --colors --watch --config demo/webpack.config.js",
+    "sass": "node-sass --watch ReactCrop.scss ReactCrop.css"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +16,8 @@
     "webpack": "^1.12.1"
   },
   "dependencies": {
-    "react": "^0.14.0-beta1",
-    "react-dom": "^0.14.0-beta1"
+    "object-assign": "^4.0.1",
+    "react": "^0.14",
+    "react-dom": "^0.14"
   }
 }

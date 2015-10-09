@@ -1,176 +1,202 @@
 .ReactCrop {
-	position: relative;
-	display: inline-block;
-	cursor: crosshair;
-	overflow: hidden;
-}
+  position: relative;
+  display: inline-block;
+  cursor: crosshair;
+  overflow: hidden; }
 
 .ReactCrop:focus {
-	outline: none;
-}
+  outline: none; }
 
 .ReactCrop--image {
-	display: block;
-}
+  display: block; }
+
 .ReactCrop--image-copy {
-	position: absolute;
-	top: 0;
-	left: 0;
-}
+  position: absolute;
+  top: 0;
+  left: 0; }
 
 .ReactCrop--crop-wrapper {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background-color: rgba(0,0,0,0.6);
-}
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.6); }
 
 .ReactCrop--crop-selection {
-	position: absolute;
-	top: 0;
-	left: 0;
-	transform: translate3d(0,0,0);
-	box-sizing: border-box;
-	cursor: move;
-}
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(0, 0, 0);
+  box-sizing: border-box;
+  cursor: move; }
 
 .ReactCrop--marching-ants {
-	background-image: linear-gradient(to right, #eee 50%, #444 50%), linear-gradient(to right, #eee 50%, #444 50%), linear-gradient(to bottom, #eee 50%, #444 50%), linear-gradient(to bottom, #eee 50%, #444 50%);
-	padding: 1px;
-	background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
-	background-position: 0 0, 0 100%, 0 0, 100% 0;
-	background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-	animation: marching-ants 2s;
-	animation-timing-function: linear;
-	animation-iteration-count: infinite;
-	animation-play-state: paused;
-}
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.7) 50%, rgba(0, 0, 0, 0.7) 50%), linear-gradient(to right, rgba(255, 255, 255, 0.7) 50%, rgba(0, 0, 0, 0.7) 50%), linear-gradient(to bottom, rgba(255, 255, 255, 0.7) 50%, rgba(0, 0, 0, 0.7) 50%), linear-gradient(to bottom, rgba(255, 255, 255, 0.7) 50%, rgba(0, 0, 0, 0.7) 50%);
+  padding: 1px;
+  background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  animation: marching-ants 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: paused; }
 
 .ReactCrop--marching-ants.marching {
-	animation-play-state: running;
-}
+  animation-play-state: running; }
 
 @keyframes marching-ants {
-	0% {
-		background-position: 0 0,  0 100%,  0 0,  100% 0;
-	}
-
-	100% {
-		background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
-	}
-}
+  0% {
+    background-position: 0 0,  0 100%,  0 0,  100% 0; }
+  100% {
+    background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px; } }
 
 .ReactCrop--drag-handle {
-	position: absolute;
-	width: 8px;
-	height: 8px;
-	background-color: rgba(0,0,0,0.2);
-	border: 1px solid #eee;
-	box-sizing: border-box;
-}
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-sizing: border-box;
+  outline: 1px solid transparent; }
 
 .ReactCrop .ord-nw {
-	top: 0;
-	left: 0;
-	margin-top: -4px;
-	margin-left: -4px;
-	cursor: nw-resize;
-}
+  top: 0;
+  left: 0;
+  margin-top: -4px;
+  margin-left: -4px;
+  cursor: nw-resize; }
+
 .ReactCrop .ord-n {
-	top: 0;
-	left: 50%;
-	margin-top: -4px;
-	margin-left: -4px;
-	cursor: n-resize;
-}
+  top: 0;
+  left: 50%;
+  margin-top: -4px;
+  margin-left: -4px;
+  cursor: n-resize; }
+
 .ReactCrop .ord-ne {
-	top: 0;
-	right: 0;
-	margin-top: -4px;
-	margin-right: -4px;
-	cursor: ne-resize;
-}
+  top: 0;
+  right: 0;
+  margin-top: -4px;
+  margin-right: -4px;
+  cursor: ne-resize; }
+
 .ReactCrop .ord-e {
-	top: 50%;
-	right: 0;
-	margin-top: -4px;
-	margin-right: -4px;
-	cursor: e-resize;
-}
+  top: 50%;
+  right: 0;
+  margin-top: -4px;
+  margin-right: -4px;
+  cursor: e-resize; }
+
 .ReactCrop .ord-se {
-	bottom: 0;
-	right: 0;
-	margin-bottom: -4px;
-	margin-right: -4px;
-	cursor: se-resize;
-}
+  bottom: 0;
+  right: 0;
+  margin-bottom: -4px;
+  margin-right: -4px;
+  cursor: se-resize; }
+
 .ReactCrop .ord-s {
-	bottom: 0;
-	left: 50%;
-	margin-bottom: -4px;
-	margin-left: -4px;
-	cursor: s-resize;
-}
+  bottom: 0;
+  left: 50%;
+  margin-bottom: -4px;
+  margin-left: -4px;
+  cursor: s-resize; }
+
 .ReactCrop .ord-sw {
-	bottom: 0;
-	left: 0;
-	margin-bottom: -4px;
-	margin-left: -4px;
-	cursor: sw-resize;
-}
+  bottom: 0;
+  left: 0;
+  margin-bottom: -4px;
+  margin-left: -4px;
+  cursor: sw-resize; }
+
 .ReactCrop .ord-w {
-	top: 50%;
-	left: 0;
-	margin-top: -4px;
-	margin-left: -4px;
-	cursor: w-resize;
-}
+  top: 50%;
+  left: 0;
+  margin-top: -4px;
+  margin-left: -4px;
+  cursor: w-resize; }
 
 .ReactCrop--drag-bar {
-	position: absolute;
-}
+  position: absolute; }
+
 .ReactCrop--drag-bar.ord-n {
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 6px;
-	margin-top: -4px;
-}
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  margin-top: -4px; }
+
 .ReactCrop--drag-bar.ord-e {
-	right: 0;
-	top: 0;
-	width: 6px;
-	height: 100%;
-	margin-right: -4px;
-}
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  margin-right: -4px; }
+
 .ReactCrop--drag-bar.ord-s {
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 6px;
-	margin-bottom: -4px;
-}
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  margin-bottom: -4px; }
+
 .ReactCrop--drag-bar.ord-w {
-	top: 0;
-	left: 0;
-	width: 6px;
-	height: 100%;
-	margin-left: -4px;
-}
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  margin-left: -4px; }
 
 .ReactCrop-new-crop .ReactCrop--drag-bar,
 .ReactCrop-new-crop .ReactCrop--drag-handle {
-	display: none;
-}
+  display: none; }
 
 .ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-n,
 .ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-e,
 .ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-s,
 .ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-w {
-	display: none;
-}
+  display: none; }
+
 .ReactCrop-fixed-aspect .ReactCrop--drag-bar {
-	display: none;
-}
+  display: none; }
+
+@media (max-width: 768px) {
+  .ReactCrop--drag-handle {
+    width: 17px;
+    height: 17px; }
+  .ReactCrop .ord-nw {
+    margin-top: -8px;
+    margin-left: -8px; }
+  .ReactCrop .ord-n {
+    margin-top: -8px;
+    margin-left: -8px; }
+  .ReactCrop .ord-ne {
+    margin-top: -8px;
+    margin-right: -8px; }
+  .ReactCrop .ord-e {
+    margin-top: -8px;
+    margin-right: -8px; }
+  .ReactCrop .ord-se {
+    margin-bottom: -8px;
+    margin-right: -8px; }
+  .ReactCrop .ord-s {
+    margin-bottom: -8px;
+    margin-left: -8px; }
+  .ReactCrop .ord-sw {
+    margin-bottom: -8px;
+    margin-left: -8px; }
+  .ReactCrop .ord-w {
+    margin-top: -8px;
+    margin-left: -8px; }
+  .ReactCrop--drag-bar.ord-n {
+    height: 14px;
+    margin-top: -12px; }
+  .ReactCrop--drag-bar.ord-e {
+    width: 14px;
+    margin-right: -12px; }
+  .ReactCrop--drag-bar.ord-s {
+    height: 14px;
+    margin-bottom: -12px; }
+  .ReactCrop--drag-bar.ord-w {
+    width: 14px;
+    margin-left: -12px; } }

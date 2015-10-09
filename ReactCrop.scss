@@ -1,0 +1,258 @@
+$marching-ants-colour: rgba(255,255,255,0.7);
+$marching-ants-alt-colour: rgba(0,0,0,0.7);
+
+$drag-handle-width: 9px;
+$drag-handle-height: 9px;
+$drag-handle-background-colour: rgba(0,0,0,0.2);
+$drag-handle-border: 1px solid rgba(255,255,255,0.7);
+
+$drag-bar-size: 6px;
+
+$cropped-area-overlay-color: rgba(0,0,0,0.6);
+
+$mobile-max-width: 768px;
+$drag-handle-mobile-width: $drag-handle-width + 8;
+$drag-handle-mobile-height: $drag-handle-height + 8;
+$drag-bar-mobile-size: $drag-bar-size + 8;
+
+.ReactCrop {
+	position: relative;
+	display: inline-block;
+	cursor: crosshair;
+	overflow: hidden;
+}
+
+.ReactCrop:focus {
+	outline: none;
+}
+
+.ReactCrop--image {
+	display: block;
+}
+.ReactCrop--image-copy {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.ReactCrop--crop-wrapper {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: $cropped-area-overlay-color;
+}
+
+.ReactCrop--crop-selection {
+	position: absolute;
+	top: 0;
+	left: 0;
+	transform: translate3d(0,0,0);
+	box-sizing: border-box;
+	cursor: move;
+}
+
+.ReactCrop--marching-ants {
+	background-image:
+		linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
+		linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
+		linear-gradient(to bottom, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
+		linear-gradient(to bottom, $marching-ants-colour 50%, $marching-ants-alt-colour 50%);
+	padding: 1px;
+	background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
+	background-position: 0 0, 0 100%, 0 0, 100% 0;
+	background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+	animation: marching-ants 2s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-play-state: paused;
+}
+
+.ReactCrop--marching-ants.marching {
+	animation-play-state: running;
+}
+
+@keyframes marching-ants {
+	0% {
+		background-position: 0 0,  0 100%,  0 0,  100% 0;
+	}
+
+	100% {
+		background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
+	}
+}
+
+.ReactCrop--drag-handle {
+	position: absolute;
+	width: $drag-handle-width;
+	height: $drag-handle-height;
+	background-color: $drag-handle-background-colour;
+	border: $drag-handle-border;
+	box-sizing: border-box;
+
+	// This stops the borders disappearing when keyboard
+	// nudging.
+	outline: 1px solid transparent;
+}
+
+.ReactCrop .ord-nw {
+	top: 0;
+	left: 0;
+	margin-top: -(floor($drag-handle-height / 2));
+	margin-left: -(floor($drag-handle-width / 2));
+	cursor: nw-resize;
+}
+.ReactCrop .ord-n {
+	top: 0;
+	left: 50%;
+	margin-top: -(floor($drag-handle-height / 2));
+	margin-left: -(floor($drag-handle-width / 2));
+	cursor: n-resize;
+}
+.ReactCrop .ord-ne {
+	top: 0;
+	right: 0;
+	margin-top: -(floor($drag-handle-height / 2));
+	margin-right: -(floor($drag-handle-width / 2));
+	cursor: ne-resize;
+}
+.ReactCrop .ord-e {
+	top: 50%;
+	right: 0;
+	margin-top: -(floor($drag-handle-height / 2));
+	margin-right: -(floor($drag-handle-width / 2));
+	cursor: e-resize;
+}
+.ReactCrop .ord-se {
+	bottom: 0;
+	right: 0;
+	margin-bottom: -(floor($drag-handle-height / 2));
+	margin-right: -(floor($drag-handle-width / 2));
+	cursor: se-resize;
+}
+.ReactCrop .ord-s {
+	bottom: 0;
+	left: 50%;
+	margin-bottom: -(floor($drag-handle-height / 2));
+	margin-left: -(floor($drag-handle-width / 2));
+	cursor: s-resize;
+}
+.ReactCrop .ord-sw {
+	bottom: 0;
+	left: 0;
+	margin-bottom: -(floor($drag-handle-height / 2));
+	margin-left: -(floor($drag-handle-width / 2));
+	cursor: sw-resize;
+}
+.ReactCrop .ord-w {
+	top: 50%;
+	left: 0;
+	margin-top: -(floor($drag-handle-height / 2));
+	margin-left: -(floor($drag-handle-width / 2));
+	cursor: w-resize;
+}
+
+.ReactCrop--drag-bar {
+	position: absolute;
+}
+.ReactCrop--drag-bar.ord-n {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: $drag-bar-size;
+	margin-top: -($drag-bar-size - 2);
+}
+.ReactCrop--drag-bar.ord-e {
+	right: 0;
+	top: 0;
+	width: $drag-bar-size;
+	height: 100%;
+	margin-right: -($drag-bar-size - 2);
+}
+.ReactCrop--drag-bar.ord-s {
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: $drag-bar-size;
+	margin-bottom: -($drag-bar-size - 2);
+}
+.ReactCrop--drag-bar.ord-w {
+	top: 0;
+	left: 0;
+	width: $drag-bar-size;
+	height: 100%;
+	margin-left: -($drag-bar-size - 2);
+}
+
+.ReactCrop-new-crop .ReactCrop--drag-bar,
+.ReactCrop-new-crop .ReactCrop--drag-handle {
+	display: none;
+}
+
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-n,
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-e,
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-s,
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-w {
+	display: none;
+}
+.ReactCrop-fixed-aspect .ReactCrop--drag-bar {
+	display: none;
+}
+
+@media (max-width: $mobile-max-width) {
+	.ReactCrop--drag-handle {
+		width: $drag-handle-mobile-width;
+		height: $drag-handle-mobile-height;
+	}
+
+	.ReactCrop .ord-nw {
+		margin-top: -(floor($drag-handle-mobile-height / 2));
+		margin-left: -(floor($drag-handle-mobile-width / 2));
+	}
+	.ReactCrop .ord-n {
+		margin-top: -(floor($drag-handle-mobile-height / 2));
+		margin-left: -(floor($drag-handle-mobile-width / 2));
+	}
+	.ReactCrop .ord-ne {
+		margin-top: -(floor($drag-handle-mobile-height / 2));
+		margin-right: -(floor($drag-handle-mobile-width / 2));
+	}
+	.ReactCrop .ord-e {
+		margin-top: -(floor($drag-handle-mobile-height / 2));
+		margin-right: -(floor($drag-handle-mobile-width / 2));
+	}
+	.ReactCrop .ord-se {
+		margin-bottom: -(floor($drag-handle-mobile-height / 2));
+		margin-right: -(floor($drag-handle-mobile-width / 2));
+	}
+	.ReactCrop .ord-s {
+		margin-bottom: -(floor($drag-handle-mobile-height / 2));
+		margin-left: -(floor($drag-handle-mobile-width / 2));
+	}
+	.ReactCrop .ord-sw {
+		margin-bottom: -(floor($drag-handle-mobile-height / 2));
+		margin-left: -(floor($drag-handle-mobile-width / 2));
+	}
+	.ReactCrop .ord-w {
+		margin-top: -(floor($drag-handle-mobile-height / 2));
+		margin-left: -(floor($drag-handle-mobile-width / 2));
+	}
+
+	.ReactCrop--drag-bar.ord-n {
+		height: $drag-bar-mobile-size;
+		margin-top: -($drag-bar-mobile-size - 2);
+	}
+	.ReactCrop--drag-bar.ord-e {
+		width: $drag-bar-mobile-size;
+		margin-right: -($drag-bar-mobile-size - 2);
+	}
+	.ReactCrop--drag-bar.ord-s {
+		height: $drag-bar-mobile-size;
+		margin-bottom: -($drag-bar-mobile-size - 2);
+	}
+	.ReactCrop--drag-bar.ord-w {
+		width: $drag-bar-mobile-size;
+		margin-left: -($drag-bar-mobile-size - 2);
+	}
+}

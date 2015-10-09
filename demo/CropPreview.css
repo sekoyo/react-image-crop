@@ -1,8 +1,0 @@
-.CropPreview {
-	display: inline-block;
-	overflow: hidden;
-}
-
-.CropPreview--image {
-	max-width: none;
-}
