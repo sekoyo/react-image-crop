@@ -51,9 +51,8 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 	transform: translate3d(0,0,0);
 	box-sizing: border-box;
 	cursor: move;
-}
 
-.ReactCrop--marching-ants {
+	// Marching ants.
 	background-image:
 		linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
 		linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
@@ -66,10 +65,6 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 	animation: marching-ants 2s;
 	animation-timing-function: linear;
 	animation-iteration-count: infinite;
-	animation-play-state: paused;
-}
-
-.ReactCrop--marching-ants.marching {
 	animation-play-state: running;
 }
 

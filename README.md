@@ -2,7 +2,7 @@
 
 An image cropping tool much like jCrop but deals exclusively in percentages, thus it is fully responsive.
 
-![ReactCrop Demo](https://github.com/Demo/raw/master/crop-demo.gif)
+![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/ReactCrop/master/crop-demo.gif)
 
 ## Features
 
@@ -12,15 +12,27 @@ An image cropping tool much like jCrop but deals exclusively in percentages, thu
 - Keyboard support for nudging selection
 - Min/max crop size
 
+## Usage
+
+Include the main js module, e.g.:
+
+```js
+var ReactCrop = require('react-crop');
+// or es6:
+import ReactCrop from 'react-crop';
+```
+
+Include either `ReactCrop.css` or `ReactCrop.scss`.
+
 ## Props
 
-### src (required)
+#### src (required)
 
 ```jsx
 <ReactCrop src={imageSource} />
 ```
 
-### crop (optional)
+#### crop (optional)
 
 All crop values are in percentages, and are relative to the image. All crop options are optional.
 
@@ -46,18 +58,18 @@ var crop = {
 
 You can also omit both and only specify the aspect.
 
-### minWidth (optional)
+#### minWidth (optional)
 
 A minimum crop width.
 
-### minHeight (optional)
+#### minHeight (optional)
 
 A minimum crop height.
 
-### onChange(crop) (optional)
+#### onChange(crop) (optional)
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop object.
 
-### onComplete(crop) (optional)
+#### onComplete(crop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop object.

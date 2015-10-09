@@ -394,10 +394,6 @@ var ReactCrop = React.createClass({
 
 		var cropClasses = ['ReactCrop--crop-selection'];
 
-		if (!this.props.noAnts) {
-			cropClasses.push('ReactCrop--marching-ants marching');
-		}
-
 		return (
 			<div ref='cropSelect'
 				style={style}
