@@ -134,14 +134,11 @@ var ReactCrop = React.createClass({
 				newHeight = (newWidth / crop.aspect) * imageAspect;
 			} else {
 				newHeight = mEventData.cropStartHeight + yDiffPc;
-
-				if (mEventData.yCrossOver) {
-					newHeight = Math.abs(newHeight);
-				}
 			}
 
-			// Cap if polarity is inversed and the shape fills the y space.
 			if (mEventData.yCrossOver) {
+				newHeight = Math.abs(newHeight);
+				// Cap if polarity is inversed and the shape fills the y space.
 				newHeight = Math.min(newHeight, mEventData.cropStartY);
 			}
 
@@ -392,12 +389,10 @@ var ReactCrop = React.createClass({
 	createCropSelection: function() {
 		var style = this.getCropStyle();
 
-		var cropClasses = ['ReactCrop--crop-selection'];
-
 		return (
 			<div ref='cropSelect'
 				style={style}
-				className={cropClasses.join(' ')}
+				className='ReactCrop--crop-selection'
 				onMouseDown={this.onCropMouseTouchDown}
 				onTouchStart={this.onCropMouseTouchDown}>
 

@@ -19794,14 +19794,11 @@
 					newHeight = newWidth / crop.aspect * imageAspect;
 				} else {
 					newHeight = mEventData.cropStartHeight + yDiffPc;
-
-					if (mEventData.yCrossOver) {
-						newHeight = Math.abs(newHeight);
-					}
 				}
 
-				// Cap if polarity is inversed and the shape fills the y space.
 				if (mEventData.yCrossOver) {
+					newHeight = Math.abs(newHeight);
+					// Cap if polarity is inversed and the shape fills the y space.
 					newHeight = Math.min(newHeight, mEventData.cropStartY);
 				}
 
@@ -20049,13 +20046,11 @@
 		createCropSelection: function createCropSelection() {
 			var style = this.getCropStyle();
 
-			var cropClasses = ['ReactCrop--crop-selection'];
-
 			return React.createElement(
 				'div',
 				{ ref: 'cropSelect',
 					style: style,
-					className: cropClasses.join(' '),
+					className: 'ReactCrop--crop-selection',
 					onMouseDown: this.onCropMouseTouchDown,
 					onTouchStart: this.onCropMouseTouchDown },
 				React.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),

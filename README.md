@@ -34,7 +34,7 @@ Include either `ReactCrop.css` or `ReactCrop.scss`.
 
 #### crop (optional)
 
-All crop values are in percentages, and are relative to the image. All crop options are optional.
+All crop values are in percentages, and are relative to the image. All crop params are optional.
 
 ```jsx
 var crop = {
@@ -56,7 +56,7 @@ var crop = {
 }
 ```
 
-You can also omit both and only specify the aspect.
+..Or you can omit both and only specify the aspect.
 
 #### minWidth (optional)
 
@@ -68,8 +68,8 @@ A minimum crop height.
 
 #### onChange(crop) (optional)
 
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop object.
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
 
 #### onComplete(crop) (optional)
 
-A callback which happens after a resize, drag, or nudge. Passes the current crop object.
+A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
