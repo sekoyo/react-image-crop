@@ -1,6 +1,6 @@
 {
   "name": "react-image-crop",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A responsive image cropping tool for React",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,13 @@
     "release": "babel ReactCrop.jsx --out-file dist/ReactCrop.js && node-sass ReactCrop.scss dist/ReactCrop.css",
     "sass-watch": "node-sass --watch ReactCrop.scss dist/ReactCrop.css"
   },
-  "author": "",
+  "author": "Dominic Tobias <dominic.tobias@gmail.com>",
+  "keywords": [
+    "react",
+    "image",
+    "crop",
+    "react-component"
+  ],
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^5.8.25",
@@ -17,7 +23,6 @@
     "webpack": "^1.12.1"
   },
   "dependencies": {
-    "react": "^0.14",
-    "react-dom": "^0.14"
+    "react": "^0.14"
   }
 }
