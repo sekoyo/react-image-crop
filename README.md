@@ -84,7 +84,7 @@ I wanted to keep this component focused so I didn't provide this. Normally a cro
 
 Example: https://gist.github.com/DominicTobias/6aa43d03bc12232ef723
 
-- The other technique is to map the cropped image to a canvas, and then get the `toDataURL` on the canvas and set this as an image source. Now this is important:
+- The other technique is to map the cropped image to a canvas, and then get the `toDataURL` on the canvas and set this as an image source. The advantage is that the preview behaves like a proper image and is responsive. Now this is important:
 
 1. `toDataURL` is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. *Always* use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
 
