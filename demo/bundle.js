@@ -19648,16 +19648,16 @@
 
 	'use strict';
 
-	module.exports = __webpack_require__(159);
+	module.exports = __webpack_require__(160);
 
 /***/ },
-/* 159 */
+/* 159 */,
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(1);
-	var objectAssign = __webpack_require__(160);
 
 	var ReactCrop = React.createClass({
 		displayName: 'ReactCrop',
@@ -19686,8 +19686,19 @@
 			height: 0
 		},
 
+		mergeObjects: function mergeObjects(obj1, obj2) {
+			var obj3 = {};
+			for (var attrname in obj1) {
+				obj3[attrname] = obj1[attrname];
+			}
+			for (var attrname in obj2) {
+				obj3[attrname] = obj2[attrname];
+			}
+			return obj3;
+		},
+
 		getInitialState: function getInitialState() {
-			var crop = objectAssign({}, this.defaultCrop, this.props.crop);
+			var crop = this.mergeObjects(this.defaultCrop, this.props.crop);
 
 			if (crop.width === 0 || crop.height === 0) {
 				this.cropInvalid = true;
@@ -20046,26 +20057,11 @@
 		createCropSelection: function createCropSelection() {
 			var style = this.getCropStyle();
 
-			return React.createElement(
-				'div',
-				{ ref: 'cropSelect',
-					style: style,
-					className: 'ReactCrop--crop-selection',
-					onMouseDown: this.onCropMouseTouchDown,
-					onTouchStart: this.onCropMouseTouchDown },
-				React.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
-				React.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
-				React.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
-				React.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-				React.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
-			);
+			return React.createElement('div', { ref: 'cropSelect',
+				style: style,
+				className: 'ReactCrop--crop-selection',
+				onMouseDown: this.onCropMouseTouchDown,
+				onTouchStart: this.onCropMouseTouchDown }, React.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }), React.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }), React.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }), React.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' }));
 		},
 
 		arrayToPercent: function arrayToPercent(arr, delimeter) {
@@ -20134,72 +20130,16 @@
 				componentClasses.push('ReactCrop-fixed-aspect');
 			}
 
-			return React.createElement(
-				'div',
-				{ ref: 'component',
-					className: componentClasses.join(' '),
-					onTouchStart: this.onComponentMouseTouchDown,
-					onMouseDown: this.onComponentMouseTouchDown,
-					tabIndex: '1',
-					onKeyDown: this.onComponentKeyDown },
-				React.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
-				React.createElement(
-					'div',
-					{ className: 'ReactCrop--crop-wrapper' },
-					React.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
-					cropSelection
-				),
-				this.props.children
-			);
+			return React.createElement('div', { ref: 'component',
+				className: componentClasses.join(' '),
+				onTouchStart: this.onComponentMouseTouchDown,
+				onMouseDown: this.onComponentMouseTouchDown,
+				tabIndex: '1',
+				onKeyDown: this.onComponentKeyDown }, React.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }), React.createElement('div', { className: 'ReactCrop--crop-wrapper' }, React.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }), cropSelection), this.props.children);
 		}
 	});
 
 	module.exports = ReactCrop;
-
-/***/ },
-/* 160 */
-/***/ function(module, exports) {
-
-	/* eslint-disable no-unused-vars */
-	'use strict';
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-	function toObject(val) {
-		if (val === null || val === undefined) {
-			throw new TypeError('Object.assign cannot be called with null or undefined');
-		}
-
-		return Object(val);
-	}
-
-	module.exports = Object.assign || function (target, source) {
-		var from;
-		var to = toObject(target);
-		var symbols;
-
-		for (var s = 1; s < arguments.length; s++) {
-			from = Object(arguments[s]);
-
-			for (var key in from) {
-				if (hasOwnProperty.call(from, key)) {
-					to[key] = from[key];
-				}
-			}
-
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
-				for (var i = 0; i < symbols.length; i++) {
-					if (propIsEnumerable.call(from, symbols[i])) {
-						to[symbols[i]] = from[symbols[i]];
-					}
-				}
-			}
-		}
-
-		return to;
-	};
-
 
 /***/ }
 /******/ ]);

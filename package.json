@@ -1,12 +1,13 @@
 {
   "name": "react-image-crop",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A responsive image cropping tool for React",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --progress --colors --watch --config demo/webpack.config.js",
-    "sass": "node-sass --watch ReactCrop.scss ReactCrop.css"
+    "dev": "webpack --progress --colors --watch --config demo/webpack.config.js",
+    "release": "babel ReactCrop.jsx --out-file dist/ReactCrop.js && node-sass ReactCrop.scss dist/ReactCrop.css",
+    "sass-watch": "node-sass --watch ReactCrop.scss dist/ReactCrop.css"
   },
   "author": "",
   "license": "ISC",

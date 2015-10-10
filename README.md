@@ -22,7 +22,7 @@ var ReactCrop = require('react-image-crop');
 import ReactCrop from 'react-image-crop';
 ```
 
-Include either `ReactCrop.css` or `ReactCrop.scss`.
+Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
 ## Props
 

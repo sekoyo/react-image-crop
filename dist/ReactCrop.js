@@ -1,7 +1,10 @@
+'use strict';
+
 var React = require('react');
-var objectAssign = require('object-assign');
 
 var ReactCrop = React.createClass({
+	displayName: 'ReactCrop',
+
 	propTypes: {
 		src: React.PropTypes.string.isRequired,
 		crop: React.PropTypes.object
@@ -26,8 +29,19 @@ var ReactCrop = React.createClass({
 		height: 0
 	},
 
-	getInitialState: function() {
-		var crop = objectAssign({}, this.defaultCrop, this.props.crop);
+	mergeObjects: function mergeObjects(obj1, obj2) {
+		var obj3 = {};
+		for (var attrname in obj1) {
+			obj3[attrname] = obj1[attrname];
+		}
+		for (var attrname in obj2) {
+			obj3[attrname] = obj2[attrname];
+		}
+		return obj3;
+	},
+
+	getInitialState: function getInitialState() {
+		var crop = this.mergeObjects(this.defaultCrop, this.props.crop);
 
 		if (crop.width === 0 || crop.height === 0) {
 			this.cropInvalid = true;
@@ -38,7 +52,7 @@ var ReactCrop = React.createClass({
 		};
 	},
 
-	componentDidMount: function() {
+	componentDidMount: function componentDidMount() {
 		document.addEventListener('mousemove', this.onDocMouseTouchMove);
 		document.addEventListener('touchmove', this.onDocMouseTouchMove);
 
@@ -47,7 +61,7 @@ var ReactCrop = React.createClass({
 		document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 	},
 
-	componentWillUnmount: function() {
+	componentWillUnmount: function componentWillUnmount() {
 		document.removeEventListener('mousemove', this.onDocMouseTouchMove);
 		document.removeEventListener('touchmove', this.onDocMouseTouchMove);
 
@@ -56,7 +70,7 @@ var ReactCrop = React.createClass({
 		document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
 	},
 
-	getCropStyle: function() {
+	getCropStyle: function getCropStyle() {
 		return {
 			top: this.state.crop.y + '%',
 			left: this.state.crop.x + '%',
@@ -65,19 +79,19 @@ var ReactCrop = React.createClass({
 		};
 	},
 
-	straightenYPath: function(clientX) {
+	straightenYPath: function straightenYPath(clientX) {
 		var ord = this.mEventData.ord;
 		var cropOffset = this.mEventData.cropOffset;
 		var cropStartWidth = this.mEventData.cropStartWidth / 100 * this.mEventData.imageWidth;
 		var cropStartHeight = this.mEventData.cropStartHeight / 100 * this.mEventData.imageHeight;
 		var k, d;
-		
+
 		if (ord === 'nw' || ord === 'se') {
 			k = cropStartHeight / cropStartWidth;
 			d = cropOffset.top - cropOffset.left * k;
 		} else {
-			k =  - cropStartHeight / cropStartWidth;
-			d = (cropOffset.top + cropStartHeight) - cropOffset.left * k;
+			k = -cropStartHeight / cropStartWidth;
+			d = cropOffset.top + cropStartHeight - cropOffset.left * k;
 		}
 
 		var clientY = k * clientX + d;
@@ -85,7 +99,7 @@ var ReactCrop = React.createClass({
 		return clientY;
 	},
 
-	onDocMouseTouchMove: function(e) {
+	onDocMouseTouchMove: function onDocMouseTouchMove(e) {
 		if (!this.mouseDownOnCrop) {
 			return;
 		}
@@ -131,7 +145,7 @@ var ReactCrop = React.createClass({
 			var newHeight;
 
 			if (crop.aspect) {
-				newHeight = (newWidth / crop.aspect) * imageAspect;
+				newHeight = newWidth / crop.aspect * imageAspect;
 			} else {
 				newHeight = mEventData.cropStartHeight + yDiffPc;
 			}
@@ -145,26 +159,26 @@ var ReactCrop = React.createClass({
 			newHeight = this.clamp(newHeight, this.props.minHeight || 0, 100);
 
 			if (crop.aspect) {
-				newWidth = (newHeight * crop.aspect) / imageAspect;
+				newWidth = newHeight * crop.aspect / imageAspect;
 			}
 
 			// This is an alternative for calulating x+y which doesn't use
 			// newWidth/newHeight. It makes it easier to stop increasing size
 			// when hitting some edges, but still increase the size when the
 			// crop is sitting flat against some. It also avoids the 'lastYCrossover'
-			// edge-case, and the 'crossOverCheck' check can happen before any 
+			// edge-case, and the 'crossOverCheck' check can happen before any
 			// calcs. However it is much harder in fixed aspect to stop x/y from
 			// moving when hitting certain boundaries, and capping x/y to
 			// the value it should have been at the boundary. Perhaps an
 			// enhancement for the next version..
-			// 
+			//
 			// if crossed { n = startSize + (startPos + diffPc)}
 			// else { n = startPos }
 
 			// Adjust x/y to give illusion of 'staticness' as width/height is increased
 			// when polarity is inversed.
 			crop.x = mEventData.xCrossOver ? crop.x + (crop.width - newWidth) : mEventData.cropStartX;
-			
+
 			if (mEventData.lastYCrossover === false && mEventData.yCrossOver) {
 				// This not only removes the little "shake" when inverting at a diagonal, but for some
 				// reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
@@ -189,7 +203,6 @@ var ReactCrop = React.createClass({
 
 			mEventData.lastYCrossover = mEventData.yCrossOver;
 			this.crossOverCheck(xDiffPc, yDiffPc);
-
 		} else {
 			crop.x = this.clamp(mEventData.cropStartX + xDiffPc, 0, 100 - crop.width);
 			crop.y = this.clamp(mEventData.cropStartY + yDiffPc, 0, 100 - crop.height);
@@ -204,21 +217,19 @@ var ReactCrop = React.createClass({
 		this.setState({ crop: crop });
 	},
 
-	crossOverCheck: function(xDiffPc, yDiffPc) {
+	crossOverCheck: function crossOverCheck(xDiffPc, yDiffPc) {
 		var mEventData = this.mEventData;
 
-		if ((!mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc >= 0) ||
-			(mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc <= 0)) {
+		if (!mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc >= 0 || mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc <= 0) {
 			mEventData.yCrossOver = !mEventData.yCrossOver;
 		}
 
-		if ((!mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc >= 0) ||
-			(mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc <= 0)) {
+		if (!mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc >= 0 || mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc <= 0) {
 			mEventData.xCrossOver = !mEventData.xCrossOver;
 		}
 	},
 
-	onCropMouseTouchDown: function(e) {
+	onCropMouseTouchDown: function onCropMouseTouchDown(e) {
 		e.preventDefault(); // Stop drag selection.
 
 		var crop = this.state.crop;
@@ -252,8 +263,8 @@ var ReactCrop = React.createClass({
 			clientStartY: clientY,
 			cropStartWidth: crop.width,
 			cropStartHeight: crop.height,
-			cropStartX: xInversed ? (crop.x + crop.width) : crop.x,
-			cropStartY: yInversed ? (crop.y + crop.height) : crop.y,
+			cropStartX: xInversed ? crop.x + crop.width : crop.x,
+			cropStartY: yInversed ? crop.y + crop.height : crop.y,
 			xInversed: xInversed,
 			yInversed: yInversed,
 			xCrossOver: xInversed,
@@ -266,7 +277,7 @@ var ReactCrop = React.createClass({
 		this.mouseDownOnCrop = true;
 	},
 
-	onComponentMouseTouchDown: function(e) {
+	onComponentMouseTouchDown: function onComponentMouseTouchDown(e) {
 		if (e.target !== this.refs.imageCopy) {
 			return;
 		}
@@ -317,7 +328,7 @@ var ReactCrop = React.createClass({
 		this.setState({ newCropIsBeingDrawn: true });
 	},
 
-	onComponentKeyDown: function(e) {
+	onComponentKeyDown: function onComponentKeyDown(e) {
 		var keyCode = e.which;
 		var crop = this.state.crop;
 		var nudged = false;
@@ -343,7 +354,7 @@ var ReactCrop = React.createClass({
 		if (nudged) {
 			crop.x = this.clamp(crop.x, 0, 100 - crop.width);
 			crop.y = this.clamp(crop.y, 0, 100 - crop.height);
-			
+
 			this.setState({ crop: crop });
 
 			if (this.props.onChange) {
@@ -355,7 +366,7 @@ var ReactCrop = React.createClass({
 		}
 	},
 
-	onDocMouseTouchEnd: function(e) {
+	onDocMouseTouchEnd: function onDocMouseTouchEnd(e) {
 		if (this.mouseDownOnCrop) {
 
 			this.cropInvalid = !this.state.crop.width && !this.state.crop.height;
@@ -369,7 +380,7 @@ var ReactCrop = React.createClass({
 		}
 	},
 
-	getElementOffset: function(el) {
+	getElementOffset: function getElementOffset(el) {
 		var rect = el.getBoundingClientRect();
 		var docEl = document.documentElement;
 
@@ -382,45 +393,43 @@ var ReactCrop = React.createClass({
 		};
 	},
 
-	clamp: function(num, min, max) {
+	clamp: function clamp(num, min, max) {
 		return Math.min(Math.max(num, min), max);
 	},
 
-	createCropSelection: function() {
+	createCropSelection: function createCropSelection() {
 		var style = this.getCropStyle();
 
-		return (
-			<div ref='cropSelect'
-				style={style}
-				className='ReactCrop--crop-selection'
-				onMouseDown={this.onCropMouseTouchDown}
-				onTouchStart={this.onCropMouseTouchDown}>
-
-				<div className='ReactCrop--drag-bar ord-n' data-ord='n'></div>
-				<div className='ReactCrop--drag-bar ord-e' data-ord='e'></div>
-				<div className='ReactCrop--drag-bar ord-s' data-ord='s'></div>
-				<div className='ReactCrop--drag-bar ord-w' data-ord='w'></div>
-
-				<div className='ReactCrop--drag-handle ord-nw' data-ord='nw'></div>
-				<div className='ReactCrop--drag-handle ord-n' data-ord='n'></div>
-				<div className='ReactCrop--drag-handle ord-ne' data-ord='ne'></div>
-				<div className='ReactCrop--drag-handle ord-e' data-ord='e'></div>
-				<div className='ReactCrop--drag-handle ord-se' data-ord='se'></div>
-				<div className='ReactCrop--drag-handle ord-s' data-ord='s'></div>
-				<div className='ReactCrop--drag-handle ord-sw' data-ord='sw'></div>
-				<div className='ReactCrop--drag-handle ord-w' data-ord='w'></div>
-			</div>
+		return React.createElement(
+			'div',
+			{ ref: 'cropSelect',
+				style: style,
+				className: 'ReactCrop--crop-selection',
+				onMouseDown: this.onCropMouseTouchDown,
+				onTouchStart: this.onCropMouseTouchDown },
+			React.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
+			React.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
+			React.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
+			React.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
+			React.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
 		);
 	},
 
-	arrayToPercent: function(arr, delimeter) {
+	arrayToPercent: function arrayToPercent(arr, delimeter) {
 		delimeter = delimeter || ' ';
-		return arr.map(function(number) {
+		return arr.map(function (number) {
 			return number + '%';
 		}).join(delimeter);
 	},
 
-	getImageClipStyle: function() {
+	getImageClipStyle: function getImageClipStyle() {
 		var crop = this.state.crop;
 
 		var right = 100 - (crop.x + crop.width);
@@ -436,12 +445,7 @@ var ReactCrop = React.createClass({
 			bottom -= 0.00001;
 		}
 
-		var insetVal = 'inset(' + this.arrayToPercent([
-			crop.y,
-			right,
-			bottom,
-			crop.x
-		]) +')';
+		var insetVal = 'inset(' + this.arrayToPercent([crop.y, right, bottom, crop.x]) + ')';
 
 		return {
 			WebkitClipPath: insetVal,
@@ -449,7 +453,7 @@ var ReactCrop = React.createClass({
 		};
 	},
 
-	onImageLoad: function(e) {
+	onImageLoad: function onImageLoad(e) {
 		var crop = this.state.crop;
 		var imageWidth = e.target.naturalWidth;
 		var imageHeight = e.target.naturalHeight;
@@ -459,15 +463,15 @@ var ReactCrop = React.createClass({
 		// ensure the value is correct.
 		if (crop.aspect) {
 			if (crop.width) {
-				crop.height = (crop.width / crop.aspect) * imageAspect;
+				crop.height = crop.width / crop.aspect * imageAspect;
 			} else if (crop.height) {
-				crop.width = (crop.height * crop.aspect) / imageAspect;
+				crop.width = crop.height * crop.aspect / imageAspect;
 			}
 			this.setState({ crop: crop });
 		}
 	},
 
-	render: function() {
+	render: function render() {
 		var cropSelection, imageClip;
 
 		if (!this.cropInvalid) {
@@ -484,23 +488,22 @@ var ReactCrop = React.createClass({
 			componentClasses.push('ReactCrop-fixed-aspect');
 		}
 
-		return (
-			<div ref="component"
-				className={componentClasses.join(' ')}
-				onTouchStart={this.onComponentMouseTouchDown}
-				onMouseDown={this.onComponentMouseTouchDown} 
-				tabIndex="1" 
-				onKeyDown={this.onComponentKeyDown}>
-
-				<img ref='image' className='ReactCrop--image' src={this.props.src} onLoad={this.onImageLoad} />
-
-				<div className='ReactCrop--crop-wrapper'>
-					<img ref='imageCopy' className='ReactCrop--image-copy' src={this.props.src} style={imageClip} />
-					{cropSelection}
-				</div>
-
-				{this.props.children}
-			</div>
+		return React.createElement(
+			'div',
+			{ ref: 'component',
+				className: componentClasses.join(' '),
+				onTouchStart: this.onComponentMouseTouchDown,
+				onMouseDown: this.onComponentMouseTouchDown,
+				tabIndex: '1',
+				onKeyDown: this.onComponentKeyDown },
+			React.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
+			React.createElement(
+				'div',
+				{ className: 'ReactCrop--crop-wrapper' },
+				React.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
+				cropSelection
+			),
+			this.props.children
 		);
 	}
 });

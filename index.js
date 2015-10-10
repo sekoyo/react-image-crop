@@ -1,1 +1,1 @@
-module.exports = require('./ReactCrop');
+module.exports = require('./dist/ReactCrop');
