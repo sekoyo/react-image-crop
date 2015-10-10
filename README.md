@@ -88,7 +88,7 @@ Example: https://gist.github.com/DominicTobias/6aa43d03bc12232ef723
 
 1. [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. *Always* use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
 
-2. Keep an eye out for when this lands on more browsers [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob), as it will be both faster than `toDataURL` and asynchronous.
+2. Keep an eye out for [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob) when this lands on more browsers, as it will be both faster than and asynchronous.
 
 Example: https://gist.github.com/DominicTobias/b1fb501349893922ec7f
 
