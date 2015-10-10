@@ -29,8 +29,10 @@ Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 #### src (required)
 
 ```jsx
-<ReactCrop src={imageSource} />
+<ReactCrop src='path/to/image.jpg' />
 ```
+
+You can of course pass a blob path or base64 data.
 
 #### crop (optional)
 
@@ -44,7 +46,7 @@ var crop = {
 	height: 10
 }
 
-<ReactCrop src={imageSource} crop={crop} />
+<ReactCrop src='path/to/image.jpg' crop={crop} />
 ```
 
 If you want a fixed aspect you only need to specify a width *or* a height:
