@@ -1,8 +1,8 @@
-# ReactCrop
+# React image crop
 
-An image cropping tool much like jCrop but deals exclusively in percentages, thus it is fully responsive.
+A responsive image cropping tool for React.
 
-![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/ReactCrop/master/crop-demo.gif)
+![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
 ## Features
 
@@ -17,9 +17,9 @@ An image cropping tool much like jCrop but deals exclusively in percentages, thu
 Include the main js module, e.g.:
 
 ```js
-var ReactCrop = require('react-crop');
+var ReactCrop = require('react-image-crop');
 // or es6:
-import ReactCrop from 'react-crop';
+import ReactCrop from 'react-image-crop';
 ```
 
 Include either `ReactCrop.css` or `ReactCrop.scss`.
