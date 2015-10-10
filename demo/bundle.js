@@ -19648,23 +19648,32 @@
 
 	'use strict';
 
-	module.exports = __webpack_require__(160);
+	module.exports = __webpack_require__(159);
 
 /***/ },
-/* 159 */,
-/* 160 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var React = __webpack_require__(1);
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
 
-	var ReactCrop = React.createClass({
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : { 'default': obj };
+	}
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var ReactCrop = _react2['default'].createClass({
 		displayName: 'ReactCrop',
 
 		propTypes: {
-			src: React.PropTypes.string.isRequired,
-			crop: React.PropTypes.object
+			src: _react2['default'].PropTypes.string.isRequired,
+			crop: _react2['default'].PropTypes.object
 		},
 
 		xOrds: ['e', 'w'],
@@ -19741,7 +19750,8 @@
 			var cropOffset = this.mEventData.cropOffset;
 			var cropStartWidth = this.mEventData.cropStartWidth / 100 * this.mEventData.imageWidth;
 			var cropStartHeight = this.mEventData.cropStartHeight / 100 * this.mEventData.imageHeight;
-			var k, d;
+			var k = undefined,
+			    d = undefined;
 
 			if (ord === 'nw' || ord === 'se') {
 				k = cropStartHeight / cropStartWidth;
@@ -19799,7 +19809,7 @@
 				newWidth = this.clamp(newWidth, this.props.minWidth || 0, 100);
 
 				// New height.
-				var newHeight;
+				var newHeight = undefined;
 
 				if (crop.aspect) {
 					newHeight = newWidth / crop.aspect * imageAspect;
@@ -19890,7 +19900,8 @@
 			e.preventDefault(); // Stop drag selection.
 
 			var crop = this.state.crop;
-			var clientX, clientY;
+			var clientX = undefined,
+			    clientY = undefined;
 
 			if (e.touches) {
 				clientX = e.touches[0].clientX;
@@ -19907,7 +19918,7 @@
 			var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
 			var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
 
-			var cropOffset, imageOffset;
+			var cropOffset = undefined;
 
 			if (crop.aspect) {
 				cropOffset = this.getElementOffset(this.refs.cropSelect);
@@ -19942,7 +19953,8 @@
 			e.preventDefault(); // Stop drag selection.
 
 			var crop = this.state.crop;
-			var clientX, clientY;
+			var clientX = undefined,
+			    clientY = undefined;
 
 			if (e.touches) {
 				clientX = e.touches[0].clientX;
@@ -20057,11 +20069,11 @@
 		createCropSelection: function createCropSelection() {
 			var style = this.getCropStyle();
 
-			return React.createElement('div', { ref: 'cropSelect',
+			return _react2['default'].createElement('div', { ref: 'cropSelect',
 				style: style,
 				className: 'ReactCrop--crop-selection',
 				onMouseDown: this.onCropMouseTouchDown,
-				onTouchStart: this.onCropMouseTouchDown }, React.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }), React.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }), React.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }), React.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }), React.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' }));
+				onTouchStart: this.onCropMouseTouchDown }, _react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }), _react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' }));
 		},
 
 		arrayToPercent: function arrayToPercent(arr, delimeter) {
@@ -20114,7 +20126,8 @@
 		},
 
 		render: function render() {
-			var cropSelection, imageClip;
+			var cropSelection = undefined,
+			    imageClip = undefined;
 
 			if (!this.cropInvalid) {
 				cropSelection = this.createCropSelection();
@@ -20130,16 +20143,17 @@
 				componentClasses.push('ReactCrop-fixed-aspect');
 			}
 
-			return React.createElement('div', { ref: 'component',
+			return _react2['default'].createElement('div', { ref: 'component',
 				className: componentClasses.join(' '),
 				onTouchStart: this.onComponentMouseTouchDown,
 				onMouseDown: this.onComponentMouseTouchDown,
 				tabIndex: '1',
-				onKeyDown: this.onComponentKeyDown }, React.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }), React.createElement('div', { className: 'ReactCrop--crop-wrapper' }, React.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }), cropSelection), this.props.children);
+				onKeyDown: this.onComponentKeyDown }, _react2['default'].createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }), _react2['default'].createElement('div', { className: 'ReactCrop--crop-wrapper' }, _react2['default'].createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }), cropSelection), this.props.children);
 		}
 	});
 
-	module.exports = ReactCrop;
+	exports['default'] = ReactCrop;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ]);
