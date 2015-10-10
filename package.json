@@ -17,7 +17,6 @@
     "webpack": "^1.12.1"
   },
   "dependencies": {
-    "object-assign": "^4.0.1",
     "react": "^0.14",
     "react-dom": "^0.14"
   }
