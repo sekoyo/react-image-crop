@@ -84,9 +84,9 @@ I wanted to keep this component focused so I didn't provide this. Normally a cro
 
 Example: https://gist.github.com/DominicTobias/6aa43d03bc12232ef723
 
-- The other technique is to map the cropped image to a canvas, and then get the `toDataURL` on the canvas and set this as an image source. The advantage is that the preview behaves like a proper image and is responsive. Now this is important:
+- The other technique is to map the cropped image to a canvas, and then get the base64 of the canvas via [toDataURL](https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement) and set this as an image source. The advantage is that the preview behaves like a proper image and is responsive. Now this is important:
 
-1. `toDataURL` is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. *Always* use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
+1. [toDataURL](https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. *Always* use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
 
 2. Keep an eye out for when this lands on more browsers [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob), as it will be both faster than `toDataURL` and asynchronous.
 
