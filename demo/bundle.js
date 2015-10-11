@@ -82,9 +82,10 @@
 		var crop = {
 			x: 35,
 			y: 10,
-			width: 20,
-			aspect: 16 / 9
+			width: 20
 		};
+		// height: 30,
+		// aspect: 16/9
 		ReactDOM.render(React.createElement(ReactCrop, { crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
 	}
 
@@ -19796,7 +19797,10 @@
 					newWidth = Math.abs(newWidth);
 				}
 
-				newWidth = this.clamp(newWidth, this.props.minWidth || 0, 100);
+				// Stop the box expanding on the opposite side when some edges are hit.
+				var maxWidth = this.state.newCropIsBeingDrawn ? 100 : ['nw', 'w', 'sw'].indexOf(mEventData.inversedXOrd || mEventData.ord) > -1 ? mEventData.cropStartX : 100 - mEventData.cropStartX;
+
+				newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
 
 				// New height.
 				var newHeight = undefined;
@@ -19813,15 +19817,14 @@
 					newHeight = Math.min(newHeight, mEventData.cropStartY);
 				}
 
-				newHeight = this.clamp(newHeight, this.props.minHeight || 0, 100);
+				// Stop the box expanding on the opposite side when some edges are hit.
+				var maxHeight = this.state.newCropIsBeingDrawn ? 100 : ['nw', 'n', 'ne'].indexOf(mEventData.inversedYOrd || mEventData.ord) > -1 ? mEventData.cropStartY : 100 - mEventData.cropStartY;
+
+				newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
 
 				if (crop.aspect) {
 					newWidth = newHeight * crop.aspect / imageAspect;
 				}
-
-				// Alt x+y calc:
-				// if crossed { n = startSize + (startPos + diffPc)}
-				// else { n = startPos }
 
 				// Adjust x/y to give illusion of 'staticness' as width/height is increased
 				// when polarity is inversed.
@@ -19872,16 +19875,30 @@
 			this.setState({ crop: crop });
 		},
 
+		inverseOrd: function inverseOrd(ord) {
+			var inverseOrd = undefined;
+
+			if (ord === 'n') inverseOrd = 's';else if (ord === 'ne') inverseOrd = 'sw';else if (ord === 'e') inverseOrd = 'w';else if (ord === 'se') inverseOrd = 'nw';else if (ord === 's') inverseOrd = 'n';else if (ord === 'sw') inverseOrd = 'ne';else if (ord === 'w') inverseOrd = 'e';else if (ord === 'nw') inverseOrd = 'se';
+
+			return inverseOrd;
+		},
+
 		crossOverCheck: function crossOverCheck(xDiffPc, yDiffPc) {
 			var mEventData = this.mEventData;
+
+			if (!mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc >= 0 || mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc <= 0) {
+				mEventData.xCrossOver = !mEventData.xCrossOver;
+			}
 
 			if (!mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc >= 0 || mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc <= 0) {
 				mEventData.yCrossOver = !mEventData.yCrossOver;
 			}
 
-			if (!mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc >= 0 || mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc <= 0) {
-				mEventData.xCrossOver = !mEventData.xCrossOver;
-			}
+			var swapXOrd = mEventData.xCrossOver !== mEventData.startXCrossOver;
+			var swapYOrd = mEventData.yCrossOver !== mEventData.startYCrossOver;
+
+			mEventData.inversedXOrd = swapXOrd ? this.inverseOrd(mEventData.ord) : false;
+			mEventData.inversedYOrd = swapYOrd ? this.inverseOrd(mEventData.ord) : false;
 		},
 
 		onCropMouseTouchDown: function onCropMouseTouchDown(e) {
@@ -19925,6 +19942,8 @@
 				yInversed: yInversed,
 				xCrossOver: xInversed,
 				yCrossOver: yInversed,
+				startXCrossOver: xInversed,
+				startYCrossOver: yInversed,
 				isResize: e.target !== this.refs.cropSelect,
 				ord: ord,
 				cropOffset: cropOffset
@@ -19977,6 +19996,8 @@
 				yInversed: false,
 				xCrossOver: false,
 				yCrossOver: false,
+				startXCrossOver: false,
+				startYCrossOver: false,
 				isResize: true,
 				ord: 'nw'
 			};
