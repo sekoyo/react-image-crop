@@ -131,7 +131,7 @@ var ReactCrop = React.createClass({
 				newWidth = Math.abs(newWidth);
 			}
 
-			newWidth = this.clamp(newWidth, this.props.minWidth || 0, 100);
+			newWidth = this.clamp(newWidth, this.props.minWidth || 0, 100 - crop.x);
 
 			// New height.
 			let newHeight;
@@ -148,40 +148,38 @@ var ReactCrop = React.createClass({
 				newHeight = Math.min(newHeight, mEventData.cropStartY);
 			}
 
-			newHeight = this.clamp(newHeight, this.props.minHeight || 0, 100);
+			newHeight = this.clamp(newHeight, this.props.minHeight || 0, 100 - crop.y);
 
 			if (crop.aspect) {
 				newWidth = (newHeight * crop.aspect) / imageAspect;
 			}
 
-			// This is an alternative for calulating x+y which doesn't use
-			// newWidth/newHeight. It makes it easier to stop increasing size
-			// when hitting some edges, but still increase the size when the
-			// crop is sitting flat against some. It also avoids the 'lastYCrossover'
-			// edge-case, and the 'crossOverCheck' check can happen before any 
-			// calcs. However it is much harder in fixed aspect to stop x/y from
-			// moving when hitting certain boundaries, and capping x/y to
-			// the value it should have been at the boundary. Perhaps an
-			// enhancement for the next version..
-			// 
+			// Alt x+y calc:
 			// if crossed { n = startSize + (startPos + diffPc)}
 			// else { n = startPos }
 
 			// Adjust x/y to give illusion of 'staticness' as width/height is increased
 			// when polarity is inversed.
-			crop.x = mEventData.xCrossOver ? crop.x + (crop.width - newWidth) : mEventData.cropStartX;
-			
-			if (mEventData.lastYCrossover === false && mEventData.yCrossOver) {
+			let newX = mEventData.cropStartX;
+			let newY = mEventData.cropStartY;
+
+			if (mEventData.xCrossOver) {
+				newX = crop.x + (crop.width - newWidth);
+			}
+
+			if (mEventData.yCrossOver) {
 				// This not only removes the little "shake" when inverting at a diagonal, but for some
 				// reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
 				// figure out why.
-				crop.y -= newHeight;
-			} else {
-				crop.y = mEventData.yCrossOver ? crop.y + (crop.height - newHeight) : mEventData.cropStartY;
+				if (mEventData.lastYCrossover === false) {
+					newY = crop.y - newHeight;
+				} else {
+					newY = crop.y + (crop.height - newHeight);
+				}
 			}
 
-			crop.x = this.clamp(crop.x, 0, 100 - newWidth);
-			crop.y = this.clamp(crop.y, 0, 100 - newHeight);
+			crop.x = this.clamp(newX, 0, 100 - newWidth);
+			crop.y = this.clamp(newY, 0, 100 - newHeight);
 
 			// Apply width/height changes depending on ordinate.
 			if (this.xyOrds.indexOf(ord) > -1) {
@@ -467,6 +465,7 @@ var ReactCrop = React.createClass({
 			} else if (crop.height) {
 				crop.width = (crop.height * crop.aspect) / imageAspect;
 			}
+			this.cropInvalid = !crop.width && !crop.height;
 			this.setState({ crop: crop });
 		}
 	},
