@@ -131,7 +131,7 @@ var ReactCrop = React.createClass({
 				newWidth = Math.abs(newWidth);
 			}
 
-			newWidth = this.clamp(newWidth, this.props.minWidth || 0, 100 - crop.x);
+			newWidth = this.clamp(newWidth, this.props.minWidth || 0, 100);
 
 			// New height.
 			let newHeight;
@@ -148,7 +148,7 @@ var ReactCrop = React.createClass({
 				newHeight = Math.min(newHeight, mEventData.cropStartY);
 			}
 
-			newHeight = this.clamp(newHeight, this.props.minHeight || 0, 100 - crop.y);
+			newHeight = this.clamp(newHeight, this.props.minHeight || 0, 100);
 
 			if (crop.aspect) {
 				newWidth = (newHeight * crop.aspect) / imageAspect;
