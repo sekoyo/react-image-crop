@@ -19789,7 +19789,7 @@
 				this.props.onChange(crop);
 			}
 
-			this.forceUpdate();
+			this.setState({ crop: crop });
 		},
 
 		getNewSize: function getNewSize() {
@@ -19797,7 +19797,7 @@
 			var evData = this.evData;
 			var imageAspect = evData.imageWidth / evData.imageHeight;
 
-			// New width.
+			// New size.
 			var newWidth = evData.cropStartWidth + evData.xDiffPc;
 
 			if (evData.xCrossOver) {

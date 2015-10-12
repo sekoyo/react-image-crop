@@ -123,7 +123,7 @@ var ReactCrop = React.createClass({
 			this.props.onChange(crop);
 		}
 
-		this.forceUpdate();
+		this.setState({ crop: crop });
 	},
 
 	getNewSize: function() {
@@ -131,7 +131,7 @@ var ReactCrop = React.createClass({
 		let evData = this.evData;
 		let imageAspect = evData.imageWidth / evData.imageHeight;
 
-		// New width.
+		// New size.
 		let newWidth = evData.cropStartWidth + evData.xDiffPc;
 
 		if (evData.xCrossOver) {
