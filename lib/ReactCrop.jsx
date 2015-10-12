@@ -74,10 +74,11 @@ var ReactCrop = React.createClass({
 	},
 
 	straightenYPath(clientX) {
-		let ord = this.mEventData.ord;
-		let cropOffset = this.mEventData.cropOffset;
-		let cropStartWidth = this.mEventData.cropStartWidth / 100 * this.mEventData.imageWidth;
-		let cropStartHeight = this.mEventData.cropStartHeight / 100 * this.mEventData.imageHeight;
+		let evData = this.evData;
+		let ord = evData.ord;
+		let cropOffset = evData.cropOffset;
+		let cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
+		let cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
 		let k, d;
 		
 		if (ord === 'nw' || ord === 'se') {
@@ -88,9 +89,7 @@ var ReactCrop = React.createClass({
 			d = (cropOffset.top + cropStartHeight) - cropOffset.left * k;
 		}
 
-		let clientY = k * clientX + d;
-
-		return clientY;
+		return k * clientX + d;
 	},
 
 	onDocMouseTouchMove(e) {
@@ -99,121 +98,23 @@ var ReactCrop = React.createClass({
 		}
 
 		let crop = this.state.crop;
-		let mEventData = this.mEventData;
-		let clientX, clientY;
+		let evData = this.evData;
+		let clientPos = this.getClientPos(e);
 
-		if (e.touches) {
-			clientX = e.touches[0].clientX;
-			clientY = e.touches[0].clientY;
-		} else {
-			clientX = e.clientX;
-			clientY = e.clientY;
+		if (evData.isResize && crop.aspect && evData.cropOffset) {
+			clientPos.y = this.straightenYPath(clientPos.x);
 		}
 
-		if (mEventData.isResize && crop.aspect && mEventData.cropOffset) {
-			clientY = this.straightenYPath(clientX);
-		}
+		let xDiffPx = clientPos.x - evData.clientStartX;
+		evData.xDiffPc = xDiffPx / evData.imageWidth * 100;
 
-		let xDiffPx = clientX - mEventData.clientStartX;
-		let xDiffPc = xDiffPx / mEventData.imageWidth * 100;
+		let yDiffPx = clientPos.y - evData.clientStartY;
+		evData.yDiffPc = yDiffPx / evData.imageHeight * 100;
 
-		let yDiffPx = clientY - mEventData.clientStartY;
-		let yDiffPc = yDiffPx / mEventData.imageHeight * 100;
-
-		if (mEventData.isResize) {
-			let ord = mEventData.ord;
-			let imageAspect = mEventData.imageWidth / mEventData.imageHeight;
-
-			// On the inverse change the diff so it's the same and
-			// the same algo applies.
-			if (mEventData.xInversed) {
-				xDiffPc -= mEventData.cropStartWidth * 2;
-			}
-			if (mEventData.yInversed) {
-				yDiffPc -= mEventData.cropStartHeight * 2;
-			}
-
-			// New width.
-			let newWidth = mEventData.cropStartWidth + xDiffPc;
-
-			if (mEventData.xCrossOver) {
-				newWidth = Math.abs(newWidth);
-			}
-
-			// Stop the box expanding on the opposite side when some edges are hit.
-			let maxWidth = this.state.newCropIsBeingDrawn ? 100 :
-				(['nw', 'w', 'sw'].indexOf(mEventData.inversedXOrd || mEventData.ord) > -1) ?
-					mEventData.cropStartX :
-					100 - mEventData.cropStartX;
-
-			newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
-
-			// New height.
-			let newHeight;
-
-			if (crop.aspect) {
-				newHeight = (newWidth / crop.aspect) * imageAspect;
-			} else {
-				newHeight = mEventData.cropStartHeight + yDiffPc;
-			}
-
-			if (mEventData.yCrossOver) {
-				newHeight = Math.abs(newHeight);
-				// Cap if polarity is inversed and the shape fills the y space.
-				newHeight = Math.min(newHeight, mEventData.cropStartY);
-			}
-
-			// Stop the box expanding on the opposite side when some edges are hit.
-			let maxHeight = this.state.newCropIsBeingDrawn ? 100 :
-				(['nw', 'n', 'ne'].indexOf(mEventData.inversedYOrd || mEventData.ord) > -1) ?
-					mEventData.cropStartY :
-					100 - mEventData.cropStartY;
-
-			newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
-
-			if (crop.aspect) {
-				newWidth = (newHeight * crop.aspect) / imageAspect;
-			}
-
-			// Adjust x/y to give illusion of 'staticness' as width/height is increased
-			// when polarity is inversed.
-			let newX = mEventData.cropStartX;
-			let newY = mEventData.cropStartY;
-
-			if (mEventData.xCrossOver) {
-				newX = crop.x + (crop.width - newWidth);
-			}
-
-			if (mEventData.yCrossOver) {
-				// This not only removes the little "shake" when inverting at a diagonal, but for some
-				// reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
-				// figure out why.
-				if (mEventData.lastYCrossover === false) {
-					newY = crop.y - newHeight;
-				} else {
-					newY = crop.y + (crop.height - newHeight);
-				}
-			}
-
-			crop.x = this.clamp(newX, 0, 100 - newWidth);
-			crop.y = this.clamp(newY, 0, 100 - newHeight);
-
-			// Apply width/height changes depending on ordinate.
-			if (this.xyOrds.indexOf(ord) > -1) {
-				crop.width = newWidth;
-				crop.height = newHeight;
-			} else if (this.xOrds.indexOf(ord) > -1) {
-				crop.width = newWidth;
-			} else if (this.yOrds.indexOf(ord) > -1) {
-				crop.height = newHeight;
-			}
-
-			mEventData.lastYCrossover = mEventData.yCrossOver;
-			this.crossOverCheck(xDiffPc, yDiffPc);
-
+		if (evData.isResize) {
+			this.resizeCrop();
 		} else {
-			crop.x = this.clamp(mEventData.cropStartX + xDiffPc, 0, 100 - crop.width);
-			crop.y = this.clamp(mEventData.cropStartY + yDiffPc, 0, 100 - crop.height);
+			this.dragCrop();
 		}
 
 		this.cropInvalid = false;
@@ -222,7 +123,126 @@ var ReactCrop = React.createClass({
 			this.props.onChange(crop);
 		}
 
-		this.setState({ crop: crop });
+		this.forceUpdate();
+	},
+
+	getNewSize: function() {
+		let crop = this.state.crop;
+		let evData = this.evData;
+		let imageAspect = evData.imageWidth / evData.imageHeight;
+
+		// New width.
+		let newWidth = evData.cropStartWidth + evData.xDiffPc;
+
+		if (evData.xCrossOver) {
+			newWidth = Math.abs(newWidth);
+		}
+
+		let maxWidth = 100;
+
+		// Stop the box expanding on the opposite side when some edges are hit.
+		if (!this.state.newCropIsBeingDrawn) {
+			maxWidth = (['nw', 'w', 'sw'].indexOf(evData.inversedXOrd || evData.ord) > -1) ?
+				evData.cropStartX :
+				100 - evData.cropStartX;
+		}
+
+		newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
+
+		// New height.
+		let newHeight;
+
+		if (crop.aspect) {
+			newHeight = (newWidth / crop.aspect) * imageAspect;
+		} else {
+			newHeight = evData.cropStartHeight + evData.yDiffPc;
+		}
+
+		if (evData.yCrossOver) {
+			// Cap if polarity is inversed and the shape fills the y space.
+			newHeight = Math.min(Math.abs(newHeight), evData.cropStartY);
+		}
+
+		let maxHeight = 100;
+
+		// Stop the box expanding on the opposite side when some edges are hit.
+		if (!this.state.newCropIsBeingDrawn) {
+			maxHeight = (['nw', 'n', 'ne'].indexOf(evData.inversedYOrd || evData.ord) > -1) ?
+				evData.cropStartY :
+				100 - evData.cropStartY;
+		}
+
+		newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
+
+		if (crop.aspect) {
+			newWidth = (newHeight * crop.aspect) / imageAspect;
+		}
+
+		return {
+			width: newWidth,
+			height: newHeight
+		};
+	},
+
+	resizeCrop: function() {
+		let crop = this.state.crop;
+		let evData = this.evData;
+		let ord = evData.ord;
+
+		// On the inverse change the diff so it's the same and
+		// the same algo applies.
+		if (evData.xInversed) {
+			evData.xDiffPc -= evData.cropStartWidth * 2;
+		}
+		if (evData.yInversed) {
+			evData.yDiffPc -= evData.cropStartHeight * 2;
+		}
+
+		// New width.
+		let newSize = this.getNewSize();
+
+		// Adjust x/y to give illusion of 'staticness' as width/height is increased
+		// when polarity is inversed.
+		let newX = evData.cropStartX;
+		let newY = evData.cropStartY;
+
+		if (evData.xCrossOver) {
+			newX = crop.x + (crop.width - newSize.width);
+		}
+
+		if (evData.yCrossOver) {
+			// This not only removes the little "shake" when inverting at a diagonal, but for some
+			// reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
+			// figure out why.
+			if (evData.lastYCrossover === false) {
+				newY = crop.y - newSize.height;
+			} else {
+				newY = crop.y + (crop.height - newSize.height);
+			}
+		}
+
+		crop.x = this.clamp(newX, 0, 100 - newSize.width);
+		crop.y = this.clamp(newY, 0, 100 - newSize.height);
+
+		// Apply width/height changes depending on ordinate.
+		if (this.xyOrds.indexOf(ord) > -1) {
+			crop.width = newSize.width;
+			crop.height = newSize.height;
+		} else if (this.xOrds.indexOf(ord) > -1) {
+			crop.width = newSize.width;
+		} else if (this.yOrds.indexOf(ord) > -1) {
+			crop.height = newSize.height;
+		}
+
+		evData.lastYCrossover = evData.yCrossOver;
+		this.crossOverCheck();
+	},
+
+	dragCrop: function() {
+		let crop = this.state.crop;
+		let evData = this.evData;
+		crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
+		crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
 	},
 
 	inverseOrd: function(ord) {
@@ -240,39 +260,31 @@ var ReactCrop = React.createClass({
 		return inverseOrd;
 	},
 
-	crossOverCheck(xDiffPc, yDiffPc) {
-		let mEventData = this.mEventData;
+	crossOverCheck() {
+		let evData = this.evData;
 
-		if ((!mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc >= 0) ||
-			(mEventData.xCrossOver && -Math.abs(mEventData.cropStartWidth) - xDiffPc <= 0)) {
-			mEventData.xCrossOver = !mEventData.xCrossOver;
+		if ((!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc >= 0) ||
+			(evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc <= 0)) {
+			evData.xCrossOver = !evData.xCrossOver;
 		}
 
-		if ((!mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc >= 0) ||
-			(mEventData.yCrossOver && -Math.abs(mEventData.cropStartHeight) - yDiffPc <= 0)) {
-			mEventData.yCrossOver = !mEventData.yCrossOver;
+		if ((!evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc >= 0) ||
+			(evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc <= 0)) {
+			evData.yCrossOver = !evData.yCrossOver;
 		}
 
-		let swapXOrd = mEventData.xCrossOver !== mEventData.startXCrossOver;
-		let swapYOrd = mEventData.yCrossOver !== mEventData.startYCrossOver;
+		let swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
+		let swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
 
-		mEventData.inversedXOrd = swapXOrd ? this.inverseOrd(mEventData.ord) : false;
-		mEventData.inversedYOrd = swapYOrd ? this.inverseOrd(mEventData.ord) : false;
+		evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
+		evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
 	},
 
 	onCropMouseTouchDown(e) {
 		e.preventDefault(); // Stop drag selection.
 
 		let crop = this.state.crop;
-		let clientX, clientY;
-
-		if (e.touches) {
-			clientX = e.touches[0].clientX;
-			clientY = e.touches[0].clientY;
-		} else {
-			clientX = e.clientX;
-			clientY = e.clientY;
-		}
+		let clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
 		this.refs.component.focus();
@@ -287,11 +299,11 @@ var ReactCrop = React.createClass({
 			cropOffset = this.getElementOffset(this.refs.cropSelect);
 		}
 
-		this.mEventData = {
+		this.evData = {
 			imageWidth: this.refs.image.width,
 			imageHeight: this.refs.image.height,
-			clientStartX: clientX,
-			clientStartY: clientY,
+			clientStartX: clientPos.x,
+			clientStartY: clientPos.y,
 			cropStartWidth: crop.width,
 			cropStartHeight: crop.height,
 			cropStartX: xInversed ? (crop.x + crop.width) : crop.x,
@@ -310,14 +322,7 @@ var ReactCrop = React.createClass({
 		this.mouseDownOnCrop = true;
 	},
 
-	onComponentMouseTouchDown(e) {
-		if (e.target !== this.refs.imageCopy) {
-			return;
-		}
-
-		e.preventDefault(); // Stop drag selection.
-
-		let crop = this.state.crop;
+	getClientPos: function(e) {
 		let clientX, clientY;
 
 		if (e.touches) {
@@ -328,23 +333,39 @@ var ReactCrop = React.createClass({
 			clientY = e.clientY;
 		}
 
+		return {
+			x: clientX,
+			y: clientY
+		}
+	},
+
+	onComponentMouseTouchDown(e) {
+		if (e.target !== this.refs.imageCopy) {
+			return;
+		}
+
+		e.preventDefault(); // Stop drag selection.
+
+		let crop = this.state.crop;
+		let clientPos = this.getClientPos(e);
+
 		// Focus for detecting keypress.
 		this.refs.component.focus();
 
 		let imageOffset = this.getElementOffset(this.refs.image);
-		let xPc = (clientX - imageOffset.left) / this.refs.image.width * 100;
-		let yPc = (clientY - imageOffset.top) / this.refs.image.height * 100;
+		let xPc = (clientPos.x - imageOffset.left) / this.refs.image.width * 100;
+		let yPc = (clientPos.y - imageOffset.top) / this.refs.image.height * 100;
 
 		crop.x = xPc;
 		crop.y = yPc;
 		crop.width = 0;
 		crop.height = 0;
 
-		this.mEventData = {
+		this.evData = {
 			imageWidth: this.refs.image.width,
 			imageHeight: this.refs.image.height,
-			clientStartX: clientX,
-			clientStartY: clientY,
+			clientStartX: clientPos.x,
+			clientStartY: clientPos.y,
 			cropStartWidth: crop.width,
 			cropStartHeight: crop.height,
 			cropStartX: crop.x,
