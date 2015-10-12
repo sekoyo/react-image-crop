@@ -19797,7 +19797,7 @@
 			var evData = this.evData;
 			var imageAspect = evData.imageWidth / evData.imageHeight;
 
-			// New size.
+			// New width.
 			var newWidth = evData.cropStartWidth + evData.xDiffPc;
 
 			if (evData.xCrossOver) {
@@ -19860,7 +19860,7 @@
 				evData.yDiffPc -= evData.cropStartHeight * 2;
 			}
 
-			// New width.
+			// New size.
 			var newSize = this.getNewSize();
 
 			// Adjust x/y to give illusion of 'staticness' as width/height is increased

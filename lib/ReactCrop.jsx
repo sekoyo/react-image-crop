@@ -131,7 +131,7 @@ var ReactCrop = React.createClass({
 		let evData = this.evData;
 		let imageAspect = evData.imageWidth / evData.imageHeight;
 
-		// New size.
+		// New width.
 		let newWidth = evData.cropStartWidth + evData.xDiffPc;
 
 		if (evData.xCrossOver) {
@@ -198,7 +198,7 @@ var ReactCrop = React.createClass({
 			evData.yDiffPc -= evData.cropStartHeight * 2;
 		}
 
-		// New width.
+		// New size.
 		let newSize = this.getNewSize();
 
 		// Adjust x/y to give illusion of 'staticness' as width/height is increased
