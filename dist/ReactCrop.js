@@ -15,7 +15,9 @@ var ReactCrop = _react2['default'].createClass({
 
 	propTypes: {
 		src: _react2['default'].PropTypes.string.isRequired,
-		crop: _react2['default'].PropTypes.object
+		crop: _react2['default'].PropTypes.object,
+		minWidth: _react2['default'].PropTypes.number,
+		minHeight: _react2['default'].PropTypes.number
 	},
 
 	xOrds: ['e', 'w'],
@@ -115,8 +117,16 @@ var ReactCrop = _react2['default'].createClass({
 
 		var crop = this.state.crop;
 		var mEventData = this.mEventData;
-		var clientX = e.clientX;
-		var clientY = e.clientY;
+		var clientX = undefined,
+		    clientY = undefined;
+
+		if (e.touches) {
+			clientX = e.touches[0].clientX;
+			clientY = e.touches[0].clientY;
+		} else {
+			clientX = e.clientX;
+			clientY = e.clientY;
+		}
 
 		if (mEventData.isResize && crop.aspect && mEventData.cropOffset) {
 			clientY = this.straightenYPath(clientX);

@@ -3,7 +3,9 @@ import React from 'react';
 var ReactCrop = React.createClass({
 	propTypes: {
 		src: React.PropTypes.string.isRequired,
-		crop: React.PropTypes.object
+		crop: React.PropTypes.object,
+		minWidth: React.PropTypes.number,
+		minHeight: React.PropTypes.number
 	},
 
 	xOrds: ['e', 'w'],
@@ -98,8 +100,15 @@ var ReactCrop = React.createClass({
 
 		let crop = this.state.crop;
 		let mEventData = this.mEventData;
-		let clientX = e.clientX;
-		let clientY = e.clientY;
+		let clientX, clientY;
+
+		if (e.touches) {
+			clientX = e.touches[0].clientX;
+			clientY = e.touches[0].clientY;
+		} else {
+			clientX = e.clientX;
+			clientY = e.clientY;
+		}
 
 		if (mEventData.isResize && crop.aspect && mEventData.cropOffset) {
 			clientY = this.straightenYPath(clientX);
