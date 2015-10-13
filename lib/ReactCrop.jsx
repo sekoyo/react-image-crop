@@ -571,6 +571,4 @@ var ReactCrop = React.createClass({
 	}
 });
 
-console.log("TEST");
-
 export default ReactCrop;
