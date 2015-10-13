@@ -80,7 +80,7 @@ var ReactCrop = React.createClass({
 		let cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
 		let cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
 		let k, d;
-		
+
 		if (ord === 'nw' || ord === 'se') {
 			k = cropStartHeight / cropStartWidth;
 			d = cropOffset.top - cropOffset.left * k;
@@ -126,7 +126,7 @@ var ReactCrop = React.createClass({
 		this.setState({ crop: crop });
 	},
 
-	getNewSize: function() {
+	getNewSize() {
 		let crop = this.state.crop;
 		let evData = this.evData;
 		let imageAspect = evData.imageWidth / evData.imageHeight;
@@ -184,7 +184,7 @@ var ReactCrop = React.createClass({
 		};
 	},
 
-	resizeCrop: function() {
+	resizeCrop() {
 		let crop = this.state.crop;
 		let evData = this.evData;
 		let ord = evData.ord;
@@ -238,14 +238,14 @@ var ReactCrop = React.createClass({
 		this.crossOverCheck();
 	},
 
-	dragCrop: function() {
+	dragCrop() {
 		let crop = this.state.crop;
 		let evData = this.evData;
 		crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
 		crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
 	},
 
-	inverseOrd: function(ord) {
+	inverseOrd(ord) {
 		let inverseOrd;
 
 		if (ord === 'n') inverseOrd = 's';
@@ -322,7 +322,7 @@ var ReactCrop = React.createClass({
 		this.mouseDownOnCrop = true;
 	},
 
-	getClientPos: function(e) {
+	getClientPos(e) {
 		let clientX, clientY;
 
 		if (e.touches) {
@@ -410,7 +410,7 @@ var ReactCrop = React.createClass({
 		if (nudged) {
 			crop.x = this.clamp(crop.x, 0, 100 - crop.width);
 			crop.y = this.clamp(crop.y, 0, 100 - crop.height);
-			
+
 			this.setState({ crop: crop });
 
 			if (this.props.onChange) {
@@ -554,8 +554,8 @@ var ReactCrop = React.createClass({
 			<div ref="component"
 				className={componentClasses.join(' ')}
 				onTouchStart={this.onComponentMouseTouchDown}
-				onMouseDown={this.onComponentMouseTouchDown} 
-				tabIndex="1" 
+				onMouseDown={this.onComponentMouseTouchDown}
+				tabIndex="1"
 				onKeyDown={this.onComponentKeyDown}>
 
 				<img ref='image' className='ReactCrop--image' src={this.props.src} onLoad={this.onImageLoad} />
