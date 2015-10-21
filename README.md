@@ -90,5 +90,7 @@ Example: https://gist.github.com/DominicTobias/6aa43d03bc12232ef723
 
 2. Keep an eye out for [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob) when this lands on more browsers, as it will be both faster and asynchronous.
 
+3. Another option to make the conversion faster is to scale the image down before converting it to a base64 (see example in gist).
+
 Example: https://gist.github.com/DominicTobias/b1fb501349893922ec7f
 
