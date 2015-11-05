@@ -19717,23 +19717,37 @@
 			height: 0
 		},
 
-		mergeObjects: function mergeObjects(obj1, obj2) {
-			var obj3 = {};
-			for (var attrname in obj1) {
-				obj3[attrname] = obj1[attrname];
+		objectAssign: function objectAssign(target, source) {
+			var from;
+			var to = target;
+			var symbols;
+
+			for (var s = 1; s < arguments.length; s++) {
+				from = Object(arguments[s]);
+
+				for (var key in from) {
+					if (Object.prototype.hasOwnProperty.call(from, key)) {
+						to[key] = from[key];
+					}
+				}
+
+				if (Object.getOwnPropertySymbols) {
+					symbols = Object.getOwnPropertySymbols(from);
+					for (var i = 0; i < symbols.length; i++) {
+						if (Object.prototype.propertyIsEnumerable.call(from, symbols[i])) {
+							to[symbols[i]] = from[symbols[i]];
+						}
+					}
+				}
 			}
-			for (var attrname in obj2) {
-				obj3[attrname] = obj2[attrname];
-			}
-			return obj3;
+
+			return to;
 		},
 
 		getInitialState: function getInitialState() {
-			var crop = this.mergeObjects(this.defaultCrop, this.props.crop);
+			var crop = this.objectAssign({}, this.defaultCrop, this.props.crop);
 
-			if (crop.width === 0 || crop.height === 0) {
-				this.cropInvalid = true;
-			}
+			this.cropInvalid = crop.width === 0 || crop.height === 0;
 
 			return {
 				crop: crop
@@ -19758,10 +19772,8 @@
 			document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
 		},
 
-		componentWillReceiveProps: function componentWillReceiveProps(props) {
-			this.setState({
-				crop: props.crop
-			});
+		componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+			this.setState(this.getInitialState(nextProps));
 		},
 
 		getCropStyle: function getCropStyle() {
