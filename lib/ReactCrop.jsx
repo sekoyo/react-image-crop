@@ -64,6 +64,14 @@ var ReactCrop = React.createClass({
 		document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
 	},
 
+	componentWillReceiveProps: function componentWillReceiveProps(props) {
+		if(props.crop !== this.state.crop) {
+			this.setState({
+				crop: props.crop
+			});
+		}
+	},
+
 	getCropStyle() {
 		return {
 			top: this.state.crop.y + '%',
