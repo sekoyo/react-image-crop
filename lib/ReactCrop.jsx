@@ -1,5 +1,32 @@
 import React from 'react';
 
+function objectAssign(target, source) {
+	let from;
+	let to = target;
+	let symbols;
+
+	for (let s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (let key in from) {
+			if (Object.prototype.hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (let i = 0; i < symbols.length; i++) {
+				if (Object.prototype.propertyIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+}
+
 var ReactCrop = React.createClass({
 	propTypes: {
 		src: React.PropTypes.string.isRequired,
@@ -27,35 +54,8 @@ var ReactCrop = React.createClass({
 		height: 0
 	},
 
-	objectAssign(target, source) {
-		var from;
-		var to = target;
-		var symbols;
-
-		for (var s = 1; s < arguments.length; s++) {
-			from = Object(arguments[s]);
-
-			for (var key in from) {
-				if (Object.prototype.hasOwnProperty.call(from, key)) {
-					to[key] = from[key];
-				}
-			}
-
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
-				for (var i = 0; i < symbols.length; i++) {
-					if (Object.prototype.propertyIsEnumerable.call(from, symbols[i])) {
-						to[symbols[i]] = from[symbols[i]];
-					}
-				}
-			}
-		}
-
-		return to;
-	},
-
 	getInitialState() {
-		let crop = this.objectAssign({}, this.defaultCrop, this.props.crop);
+		let crop = objectAssign({}, this.defaultCrop, this.props.crop);
 
 		this.cropInvalid = (crop.width === 0 || crop.height === 0);
 
