@@ -81,11 +81,9 @@ var ReactCrop = _react2['default'].createClass({
 	},
 
 	componentWillReceiveProps: function componentWillReceiveProps(props) {
-		if(props.crop !== this.state.crop) {
-			this.setState({
-				crop: props.crop
-			});
-		}
+		this.setState({
+			crop: props.crop
+		});
 	},
 
 	getCropStyle: function getCropStyle() {
@@ -148,7 +146,7 @@ var ReactCrop = _react2['default'].createClass({
 			this.props.onChange(crop);
 		}
 
-		this.forceUpdate();
+		this.setState({ crop: crop });
 	},
 
 	getNewSize: function getNewSize() {
@@ -219,7 +217,7 @@ var ReactCrop = _react2['default'].createClass({
 			evData.yDiffPc -= evData.cropStartHeight * 2;
 		}
 
-		// New width.
+		// New size.
 		var newSize = this.getNewSize();
 
 		// Adjust x/y to give illusion of 'staticness' as width/height is increased
