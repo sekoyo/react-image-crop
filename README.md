@@ -82,7 +82,7 @@ I wanted to keep this component focused so I didn't provide this. Normally a cro
 
 - You can fake a crop in pure CSS, but in order to do this you need to know the maximum width & height of the crop preview and then perform the calc again if the container size changes (since this technique is only possible using pixels). It's advantage is that it's instantaneous:
 
-Example: https://gist.github.com/DominicTobias/6aa43d03bc12232ef723
+[Example gist](https://gist.github.com/DominicTobias/6aa43d03bc12232ef723)
 
 - The other technique is to map the cropped image to a canvas, and then get the base64 of the canvas via [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) and set this as an image source. The advantage is that the preview behaves like a proper image and is responsive. Now this is important:
 
@@ -92,5 +92,5 @@ Example: https://gist.github.com/DominicTobias/6aa43d03bc12232ef723
 
 3. Another option to make the conversion faster is to scale the image down before converting it to a base64 (see example in gist).
 
-Example: https://gist.github.com/DominicTobias/b1fb501349893922ec7f
+[Example gist](https://gist.github.com/DominicTobias/b1fb501349893922ec7f)
 
