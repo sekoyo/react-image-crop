@@ -67,7 +67,9 @@ var ReactCrop = _react2['default'].createClass({
 	},
 
 	getInitialState: function getInitialState() {
-		var crop = objectAssign({}, this.defaultCrop, this.props.crop);
+		var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+
+		var crop = objectAssign({}, this.defaultCrop, props.crop);
 
 		this.cropInvalid = crop.width === 0 || crop.height === 0;
 
@@ -546,7 +548,7 @@ var ReactCrop = _react2['default'].createClass({
 			} else if (crop.height) {
 				crop.width = crop.height * crop.aspect / imageAspect;
 			}
-			this.cropInvalid = !crop.width && !crop.height;
+			this.cropInvalid = !crop.width || !crop.height;
 			this.setState({ crop: crop });
 		}
 	},
