@@ -10,6 +10,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactAddonsUpdate = require('react-addons-update');
+
+var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
+
 function objectAssign(target, source) {
 	var from = undefined;
 	var to = target;
@@ -42,6 +46,7 @@ var ReactCrop = _react2['default'].createClass({
 
 	propTypes: {
 		src: _react2['default'].PropTypes.string.isRequired,
+		style: _react2['default'].PropTypes.object,
 		crop: _react2['default'].PropTypes.object,
 		minWidth: _react2['default'].PropTypes.number,
 		minHeight: _react2['default'].PropTypes.number
@@ -59,22 +64,201 @@ var ReactCrop = _react2['default'].createClass({
 	},
 	nudgeStep: 0.2,
 
-	defaultCrop: {
-		x: 0,
-		y: 0,
-		width: 0,
-		height: 0
+	getDefaultProps: function getDefaultProps() {
+		return {
+			style: {},
+			crop: {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0
+			}
+		};
 	},
 
 	getInitialState: function getInitialState() {
 		var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 
-		var crop = objectAssign({}, this.defaultCrop, props.crop);
-
-		this.cropInvalid = crop.width === 0 || crop.height === 0;
+		this.cropInvalid = props.crop.width === 0 || props.crop.height === 0;
 
 		return {
-			crop: crop
+			crop: props.crop
+		};
+	},
+
+	getStyles: function getStyles() {
+		var marchingAntsColour = this.props.style.marchingAntsColour || 'rgba(255,255,255,0.7)';
+		var marchingAntsAltColour = this.props.style.marchingAntsAltColour || 'rgba(0,0,0,0.7)';
+
+		var dragHandleWidth = this.props.style.dragHandleWidth || 9;
+		var dragHandleHeight = this.props.style.dragHandleHeight || 9;
+		var dragHandleBackgroundColour = this.props.style.dragHandleBackgroundColour || 'rgba(0,0,0,0.2)';
+		var dragHandleBorder = this.props.style.dragHandleBorder || '1px solid rgba(255,255,255,0.7)';
+
+		var dragBarSize = 6;
+
+		var croppedAreaOverlayColor = 'rgba(0,0,0,0.6)';
+
+		return {
+			root: {
+				position: 'relative',
+				display: 'inline-block',
+				cursor: 'crosshair',
+				overflow: 'hidden',
+				outline: 'none'
+			},
+
+			image: {
+				display: 'block',
+				maxWidth: '100%'
+			},
+			imageCopy: {
+				maxWidth: '100%',
+				position: 'absolute',
+				top: 0,
+				left: 0
+			},
+
+			cropWrapper: {
+				position: 'absolute',
+				top: 0,
+				right: 0,
+				bottom: 0,
+				left: 0,
+				backgroundColor: croppedAreaOverlayColor
+			},
+
+			cropSelection: {
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				transform: 'translate3d(0,0,0)',
+				boxSizing: 'border-box',
+				cursor: 'move',
+
+				// Marching ants.
+				backgroundImage: 'linear-gradient(to right, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%),' + 'linear-gradient(to right, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%),' + 'linear-gradient(to bottom, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%),' + 'linear-gradient(to bottom, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%)',
+				padding: 1,
+				backgroundSize: '10px 1px, 10px 1px, 1px 10px, 1px 10px',
+				backgroundPosition: '0 0, 0 100%, 0 0, 100% 0',
+				backgroundRepeat: 'repeat-x, repeat-x, repeat-y, repeat-y',
+				animation: 'marching-ants 2s',
+				animationTimingFunction: 'linear',
+				animationIterationCount: 'infinite',
+				animationPlayState: 'running'
+			},
+
+			marchingAntsAnimation: '@keyframes marching-ants {\
+					0% {\
+						background-position: 0 0,  0 100%,  0 0,  100% 0;\
+					}\
+					100% {\
+						background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;\
+					}\
+				}',
+
+			dragHandle: {
+				position: 'absolute',
+				width: dragHandleWidth,
+				height: dragHandleHeight,
+				backgroundColor: dragHandleBackgroundColour,
+				border: dragHandleBorder,
+				boxSizing: 'border-box',
+
+				// This stops the borders disappearing when keyboard nudging.
+				outline: '1px solid transparent'
+			},
+
+			ordNW: {
+				top: 0,
+				left: 0,
+				marginTop: -Math.floor(dragHandleHeight / 2),
+				marginLeft: -Math.floor(dragHandleWidth / 2),
+				cursor: 'nw-resize'
+			},
+			ordN: {
+				top: 0,
+				left: '50%',
+				marginTop: -Math.floor(dragHandleHeight / 2),
+				marginLeft: -Math.floor(dragHandleWidth / 2),
+				cursor: 'n-resize'
+			},
+			ordNE: {
+				top: 0,
+				right: 0,
+				marginTop: -Math.floor(dragHandleHeight / 2),
+				marginRight: -Math.floor(dragHandleWidth / 2),
+				cursor: 'ne-resize'
+			},
+			ordE: {
+				top: '50%',
+				right: 0,
+				marginTop: -Math.floor(dragHandleHeight / 2),
+				marginRight: -Math.floor(dragHandleWidth / 2),
+				cursor: 'e-resize'
+			},
+			ordSE: {
+				bottom: 0,
+				right: 0,
+				marginBottom: -Math.floor(dragHandleHeight / 2),
+				marginRight: -Math.floor(dragHandleWidth / 2),
+				cursor: 'se-resize'
+			},
+			ordS: {
+				bottom: 0,
+				left: '50%',
+				marginBottom: -Math.floor(dragHandleHeight / 2),
+				marginLeft: -Math.floor(dragHandleWidth / 2),
+				cursor: 's-resize'
+			},
+			ordSW: {
+				bottom: 0,
+				left: 0,
+				marginBottom: -Math.floor(dragHandleHeight / 2),
+				marginLeft: -Math.floor(dragHandleWidth / 2),
+				cursor: 'sw-resize'
+			},
+			ordW: {
+				top: '50%',
+				left: 0,
+				marginTop: -Math.floor(dragHandleHeight / 2),
+				marginLeft: -Math.floor(dragHandleWidth / 2),
+				cursor: 'w-resize'
+			},
+
+			dragBarN: {
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				width: '100%',
+				height: dragBarSize,
+				marginTop: -(dragBarSize - 2)
+			},
+			dragBarE: {
+				position: 'absolute',
+				right: 0,
+				top: 0,
+				width: dragBarSize,
+				height: '100%',
+				marginRight: -(dragBarSize - 2)
+			},
+			dragBarS: {
+				position: 'absolute',
+				bottom: 0,
+				left: 0,
+				width: '100%',
+				height: dragBarSize,
+				marginBottom: -(dragBarSize - 2)
+			},
+			dragBarW: {
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				width: dragBarSize,
+				height: '100%',
+				marginLeft: -(dragBarSize - 2)
+			}
+
 		};
 	},
 
@@ -478,28 +662,35 @@ var ReactCrop = _react2['default'].createClass({
 		return Math.min(Math.max(num, min), max);
 	},
 
-	createCropSelection: function createCropSelection() {
-		var style = this.getCropStyle();
+	createCropSelection: function createCropSelection(newCrop, fixedAspect) {
+		var styles = this.getStyles();
 
 		return _react2['default'].createElement(
 			'div',
 			{ ref: 'cropSelect',
-				style: style,
-				className: 'ReactCrop--crop-selection',
+				style: objectAssign(styles.cropSelection, this.getCropStyle()),
 				onMouseDown: this.onCropMouseTouchDown,
 				onTouchStart: this.onCropMouseTouchDown },
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-			_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+			!newCrop && _react2['default'].createElement(
+				'div',
+				{ ref: 'cropHandles' },
+				!fixedAspect && _react2['default'].createElement(
+					'div',
+					{ ref: 'fixedAspectHandles' },
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordN }), 'data-ord': 'n' }),
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordE }), 'data-ord': 'e' }),
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordS }), 'data-ord': 's' }),
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordW }), 'data-ord': 'w' }),
+					_react2['default'].createElement('div', { style: styles.dragBarN, 'data-ord': 'n' }),
+					_react2['default'].createElement('div', { style: styles.dragBarE, 'data-ord': 'e' }),
+					_react2['default'].createElement('div', { style: styles.dragBarS, 'data-ord': 's' }),
+					_react2['default'].createElement('div', { style: styles.dragBarW, 'data-ord': 'w' })
+				),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordNW }), 'data-ord': 'nw' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordNE }), 'data-ord': 'ne' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordSE }), 'data-ord': 'se' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordSW }), 'data-ord': 'sw' })
+			)
 		);
 	},
 
@@ -554,36 +745,38 @@ var ReactCrop = _react2['default'].createClass({
 	},
 
 	render: function render() {
+		var styles = this.getStyles();
 		var cropSelection = undefined,
-		    imageClip = undefined;
+		    imageClipStyle = undefined;
+		var fixedAspect = !!this.state.crop.aspect;
+		var newCrop = this.state.newCropIsBeingDrawn;
 
 		if (!this.cropInvalid) {
-			cropSelection = this.createCropSelection();
-			imageClip = this.getImageClipStyle();
+			cropSelection = this.createCropSelection(newCrop, fixedAspect);
+			imageClipStyle = this.getImageClipStyle();
 		}
 
-		var componentClasses = ['ReactCrop'];
-
-		if (this.state.newCropIsBeingDrawn) {
-			componentClasses.push('ReactCrop-new-crop');
-		}
-		if (this.state.crop.aspect) {
-			componentClasses.push('ReactCrop-fixed-aspect');
-		}
+		var rootStyles = styles.root;
 
 		return _react2['default'].createElement(
 			'div',
-			{ ref: 'component',
-				className: componentClasses.join(' '),
+			{
+				ref: 'component',
+				style: objectAssign(rootStyles, this.props.style),
 				onTouchStart: this.onComponentMouseTouchDown,
 				onMouseDown: this.onComponentMouseTouchDown,
 				tabIndex: '1',
 				onKeyDown: this.onComponentKeyDown },
-			_react2['default'].createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
+			_react2['default'].createElement(
+				'style',
+				{ scoped: true, type: 'text/css' },
+				styles.marchingAntsAnimation
+			),
+			_react2['default'].createElement('img', { ref: 'image', style: styles.image, src: this.props.src, onLoad: this.onImageLoad }),
 			_react2['default'].createElement(
 				'div',
-				{ className: 'ReactCrop--crop-wrapper' },
-				_react2['default'].createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
+				{ style: styles.cropWrapper },
+				_react2['default'].createElement('img', { ref: 'imageCopy', style: objectAssign(styles.imageCopy, imageClipStyle), src: this.props.src }),
 				cropSelection
 			),
 			this.props.children

@@ -6,7 +6,6 @@ A responsive image cropping tool for React.
 
 ## Features
 
-- Responsive
 - Touch enabled
 - Free-form or fixed aspect crops
 - Keyboard support for nudging selection
@@ -21,8 +20,6 @@ var ReactCrop = require('react-image-crop');
 // or es6:
 import ReactCrop from 'react-image-crop';
 ```
-
-Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
 ## Props
 
