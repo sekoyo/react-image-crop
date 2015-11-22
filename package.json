@@ -7,10 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack --progress --colors --watch --config demo/webpack.config.js",
-    "release-js": "babel lib/ReactCrop.jsx --out-file dist/ReactCrop.js",
-    "release-css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
-    "release": "npm run release-js && npm run release-css",
-    "sass-watch": "node-sass lib/ReactCrop.scss dist/ReactCrop.css --watch"
+    "release": "babel lib/ReactCrop.jsx --out-file dist/ReactCrop.js"
   },
   "author": "Dominic Tobias <dominic.tobias@gmail.com>",
   "keywords": [

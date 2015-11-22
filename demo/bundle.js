@@ -20346,7 +20346,7 @@
 			return Math.min(Math.max(num, min), max);
 		},
 
-		createCropSelection: function createCropSelection() {
+		createCropSelection: function createCropSelection(fixedAspect) {
 			var styles = this.getStyles();
 
 			return _react2['default'].createElement(
@@ -20355,18 +20355,22 @@
 					style: objectAssign(styles.cropSelection, this.getCropStyle()),
 					onMouseDown: this.onCropMouseTouchDown,
 					onTouchStart: this.onCropMouseTouchDown },
-				_react2['default'].createElement('div', { style: styles.dragBarN, 'data-ord': 'n' }),
-				_react2['default'].createElement('div', { style: styles.dragBarE, 'data-ord': 'e' }),
-				_react2['default'].createElement('div', { style: styles.dragBarS, 'data-ord': 's' }),
-				_react2['default'].createElement('div', { style: styles.dragBarW, 'data-ord': 'w' }),
+				!fixedAspect && _react2['default'].createElement(
+					'div',
+					null,
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordN }), 'data-ord': 'n' }),
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordE }), 'data-ord': 'e' }),
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordS }), 'data-ord': 's' }),
+					_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordW }), 'data-ord': 'w' }),
+					_react2['default'].createElement('div', { style: styles.dragBarN, 'data-ord': 'n' }),
+					_react2['default'].createElement('div', { style: styles.dragBarE, 'data-ord': 'e' }),
+					_react2['default'].createElement('div', { style: styles.dragBarS, 'data-ord': 's' }),
+					_react2['default'].createElement('div', { style: styles.dragBarW, 'data-ord': 'w' })
+				),
 				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordNW }), 'data-ord': 'nw' }),
-				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordN }), 'data-ord': 'n' }),
 				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordNE }), 'data-ord': 'ne' }),
-				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordE }), 'data-ord': 'e' }),
 				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordSE }), 'data-ord': 'se' }),
-				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordS }), 'data-ord': 's' }),
-				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordSW }), 'data-ord': 'sw' }),
-				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordW }), 'data-ord': 'w' })
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordSW }), 'data-ord': 'sw' })
 			);
 		},
 
@@ -20424,20 +20428,16 @@
 			var styles = this.getStyles();
 			var cropSelection = undefined,
 			    imageClipStyle = undefined;
+			var fixedAspect = !!this.state.crop.aspect;
 
 			if (!this.cropInvalid) {
-				cropSelection = this.createCropSelection();
+				if (!this.state.newCropIsBeingDrawn) {
+					cropSelection = this.createCropSelection(fixedAspect);
+				}
 				imageClipStyle = this.getImageClipStyle();
 			}
 
 			var rootStyles = styles.root;
-
-			if (this.state.newCropIsBeingDrawn) {
-				objectAssign(rootStyles, styles.newCrop);
-			}
-			if (this.state.crop.aspect) {
-				objectAssign(rootStyles, styles.fixedAspect);
-			}
 
 			return _react2['default'].createElement(
 				'div',
