@@ -31,6 +31,7 @@ function objectAssign(target, source) {
 var ReactCrop = React.createClass({
 	propTypes: {
 		src: React.PropTypes.string.isRequired,
+		style: React.PropTypes.object,
 		crop: React.PropTypes.object,
 		minWidth: React.PropTypes.number,
 		minHeight: React.PropTypes.number
@@ -48,31 +49,34 @@ var ReactCrop = React.createClass({
 	},
 	nudgeStep: 0.2,
 
-	defaultCrop: {
-		x: 0,
-		y: 0,
-		width: 0,
-		height: 0
-	},
+  getDefaultProps: function() {
+    return {
+      style: {},
+			crop: {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0
+			},
+    };
+  },
 
 	getInitialState(props = this.props) {
-		let crop = objectAssign({}, this.defaultCrop, props.crop);
-
-		this.cropInvalid = (crop.width === 0 || crop.height === 0);
+		this.cropInvalid = (props.crop.width === 0 || props.crop.height === 0);
 
 		return {
-			crop: crop
+			crop: props.crop
 		};
 	},
 
 	getStyles() {
-		let marchingAntsColour = 'rgba(255,255,255,0.7)';
-		let marchingAntsAltColour = 'rgba(0,0,0,0.7)';
+		let marchingAntsColour = this.props.style.marchingAntsColour || 'rgba(255,255,255,0.7)';
+		let marchingAntsAltColour = this.props.style.marchingAntsAltColour || 'rgba(0,0,0,0.7)';
 
-		let dragHandleWidth = 9;
-		let dragHandleHeight = 9;
-		let dragHandleBackgroundColour = 'rgba(0,0,0,0.2)';
-		let dragHandleBorder = '1px solid rgba(255,255,255,0.7)';
+		let dragHandleWidth = this.props.style.dragHandleWidth || 9;
+		let dragHandleHeight = this.props.style.dragHandleHeight || 9;
+		let dragHandleBackgroundColour = this.props.style.dragHandleBackgroundColour || 'rgba(0,0,0,0.2)';
+		let dragHandleBorder = this.props.style.dragHandleBorder || '1px solid rgba(255,255,255,0.7)';
 
 		let dragBarSize = 6;
 
@@ -83,7 +87,8 @@ var ReactCrop = React.createClass({
 				position: 'relative',
 				display: 'inline-block',
 				cursor: 'crosshair',
-				overflow: 'hidden'
+				overflow: 'hidden',
+				outline: 'none'
 			},
 
 			image: {
