@@ -86,7 +86,7 @@
 			// height: 30,
 			aspect: 16 / 9
 		};
-		ReactDOM.render(React.createElement(ReactCrop, { style: { width: 1000 }, crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
+		ReactDOM.render(React.createElement(ReactCrop, { style: { width: '100%' }, crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
 	}
 
 	/**
@@ -19735,6 +19735,7 @@
 
 		propTypes: {
 			src: _react2['default'].PropTypes.string.isRequired,
+			style: _react2['default'].PropTypes.object,
 			crop: _react2['default'].PropTypes.object,
 			minWidth: _react2['default'].PropTypes.number,
 			minHeight: _react2['default'].PropTypes.number
@@ -19752,33 +19753,36 @@
 		},
 		nudgeStep: 0.2,
 
-		defaultCrop: {
-			x: 0,
-			y: 0,
-			width: 0,
-			height: 0
+		getDefaultProps: function getDefaultProps() {
+			return {
+				style: {},
+				crop: {
+					x: 0,
+					y: 0,
+					width: 0,
+					height: 0
+				}
+			};
 		},
 
 		getInitialState: function getInitialState() {
 			var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 
-			var crop = objectAssign({}, this.defaultCrop, props.crop);
-
-			this.cropInvalid = crop.width === 0 || crop.height === 0;
+			this.cropInvalid = props.crop.width === 0 || props.crop.height === 0;
 
 			return {
-				crop: crop
+				crop: props.crop
 			};
 		},
 
 		getStyles: function getStyles() {
-			var marchingAntsColour = 'rgba(255,255,255,0.7)';
-			var marchingAntsAltColour = 'rgba(0,0,0,0.7)';
+			var marchingAntsColour = this.props.style.marchingAntsColour || 'rgba(255,255,255,0.7)';
+			var marchingAntsAltColour = this.props.style.marchingAntsAltColour || 'rgba(0,0,0,0.7)';
 
-			var dragHandleWidth = 9;
-			var dragHandleHeight = 9;
-			var dragHandleBackgroundColour = 'rgba(0,0,0,0.2)';
-			var dragHandleBorder = '1px solid rgba(255,255,255,0.7)';
+			var dragHandleWidth = this.props.style.dragHandleWidth || 9;
+			var dragHandleHeight = this.props.style.dragHandleHeight || 9;
+			var dragHandleBackgroundColour = this.props.style.dragHandleBackgroundColour || 'rgba(0,0,0,0.2)';
+			var dragHandleBorder = this.props.style.dragHandleBorder || '1px solid rgba(255,255,255,0.7)';
 
 			var dragBarSize = 6;
 
@@ -19789,7 +19793,8 @@
 					position: 'relative',
 					display: 'inline-block',
 					cursor: 'crosshair',
-					overflow: 'hidden'
+					overflow: 'hidden',
+					outline: 'none'
 				},
 
 				image: {
