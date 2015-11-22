@@ -86,7 +86,7 @@
 			// height: 30,
 			aspect: 16 / 9
 		};
-		ReactDOM.render(React.createElement(ReactCrop, { crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
+		ReactDOM.render(React.createElement(ReactCrop, { style: { width: 1000 }, crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
 	}
 
 	/**
@@ -146,6 +146,7 @@
 	});
 
 	React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOM;
+	React.__SECRET_DOM_SERVER_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOMServer;
 
 	module.exports = React;
 
@@ -4439,11 +4440,12 @@
 	    var fakeNode = document.createElement('react');
 	    ReactErrorUtils.invokeGuardedCallback = function (name, func, a, b) {
 	      var boundFunc = func.bind(null, a, b);
-	      fakeNode.addEventListener(name, boundFunc, false);
+	      var evtType = 'react-' + name;
+	      fakeNode.addEventListener(evtType, boundFunc, false);
 	      var evt = document.createEvent('Event');
-	      evt.initEvent(name, false, false);
+	      evt.initEvent(evtType, false, false);
 	      fakeNode.dispatchEvent(evt);
-	      fakeNode.removeEventListener(name, boundFunc, false);
+	      fakeNode.removeEventListener(evtType, boundFunc, false);
 	    };
 	  }
 	}
@@ -5038,7 +5040,7 @@
 	var canDefineProperty = false;
 	if (process.env.NODE_ENV !== 'production') {
 	  try {
-	    Object.defineProperty({}, 'x', {});
+	    Object.defineProperty({}, 'x', { get: function () {} });
 	    canDefineProperty = true;
 	  } catch (x) {
 	    // IE will fail on defineProperty
@@ -10472,6 +10474,7 @@
 	    icon: null,
 	    id: MUST_USE_PROPERTY,
 	    inputMode: MUST_USE_ATTRIBUTE,
+	    integrity: null,
 	    is: MUST_USE_ATTRIBUTE,
 	    keyParams: MUST_USE_ATTRIBUTE,
 	    keyType: MUST_USE_ATTRIBUTE,
@@ -10494,6 +10497,7 @@
 	    multiple: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    muted: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    name: null,
+	    nonce: MUST_USE_ATTRIBUTE,
 	    noValidate: HAS_BOOLEAN_VALUE,
 	    open: HAS_BOOLEAN_VALUE,
 	    optimum: null,
@@ -10505,6 +10509,7 @@
 	    readOnly: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    rel: null,
 	    required: HAS_BOOLEAN_VALUE,
+	    reversed: HAS_BOOLEAN_VALUE,
 	    role: MUST_USE_ATTRIBUTE,
 	    rows: MUST_USE_ATTRIBUTE | HAS_POSITIVE_NUMERIC_VALUE,
 	    rowSpan: null,
@@ -10831,6 +10836,7 @@
 	// For quickly matching children type, to test if can be treated as content.
 	var CONTENT_TYPES = { 'string': true, 'number': true };
 
+	var CHILDREN = keyOf({ children: null });
 	var STYLE = keyOf({ style: null });
 	var HTML = keyOf({ __html: null });
 
@@ -11321,7 +11327,9 @@
 	        }
 	        var markup = null;
 	        if (this._tag != null && isCustomComponent(this._tag, props)) {
-	          markup = DOMPropertyOperations.createMarkupForCustomAttribute(propKey, propValue);
+	          if (propKey !== CHILDREN) {
+	            markup = DOMPropertyOperations.createMarkupForCustomAttribute(propKey, propValue);
+	          }
 	        } else {
 	          markup = DOMPropertyOperations.createMarkupForProperty(propKey, propValue);
 	        }
@@ -11580,6 +11588,9 @@
 	      } else if (isCustomComponent(this._tag, nextProps)) {
 	        if (!node) {
 	          node = ReactMount.getNode(this._rootNodeID);
+	        }
+	        if (propKey === CHILDREN) {
+	          nextProp = null;
 	        }
 	        DOMPropertyOperations.setValueForAttribute(node, propKey, nextProp);
 	      } else if (DOMProperty.properties[propKey] || DOMProperty.isCustomAttribute(propKey)) {
@@ -18701,7 +18712,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.1';
+	module.exports = '0.14.3';
 
 /***/ },
 /* 147 */
@@ -19688,6 +19699,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactAddonsUpdate = __webpack_require__(160);
+
+	var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
+
 	function objectAssign(target, source) {
 		var from = undefined;
 		var to = target;
@@ -19753,6 +19768,181 @@
 
 			return {
 				crop: crop
+			};
+		},
+
+		getStyles: function getStyles() {
+			var marchingAntsColour = 'rgba(255,255,255,0.7)';
+			var marchingAntsAltColour = 'rgba(0,0,0,0.7)';
+
+			var dragHandleWidth = 9;
+			var dragHandleHeight = 9;
+			var dragHandleBackgroundColour = 'rgba(0,0,0,0.2)';
+			var dragHandleBorder = '1px solid rgba(255,255,255,0.7)';
+
+			var dragBarSize = 6;
+
+			var croppedAreaOverlayColor = 'rgba(0,0,0,0.6)';
+
+			return {
+				root: {
+					position: 'relative',
+					display: 'inline-block',
+					cursor: 'crosshair',
+					overflow: 'hidden'
+				},
+
+				image: {
+					display: 'block',
+					maxWidth: '100%'
+				},
+				imageCopy: {
+					maxWidth: '100%',
+					position: 'absolute',
+					top: 0,
+					left: 0
+				},
+
+				cropWrapper: {
+					position: 'absolute',
+					top: 0,
+					right: 0,
+					bottom: 0,
+					left: 0,
+					backgroundColor: croppedAreaOverlayColor
+				},
+
+				cropSelection: {
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					transform: 'translate3d(0,0,0)',
+					boxSizing: 'border-box',
+					cursor: 'move',
+
+					// Marching ants.
+					backgroundImage: 'linear-gradient(to right, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%),' + 'linear-gradient(to right, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%),' + 'linear-gradient(to bottom, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%),' + 'linear-gradient(to bottom, ' + marchingAntsColour + ' 50%, ' + marchingAntsAltColour + ' 50%)',
+					padding: 1,
+					backgroundSize: '10px 1px, 10px 1px, 1px 10px, 1px 10px',
+					backgroundPosition: '0 0, 0 100%, 0 0, 100% 0',
+					backgroundRepeat: 'repeat-x, repeat-x, repeat-y, repeat-y',
+					animation: 'marching-ants 2s',
+					animationTimingFunction: 'linear',
+					animationIterationCount: 'infinite',
+					animationPlayState: 'running'
+				},
+
+				marchingAntsAnimation: '@keyframes marching-ants {\
+						0% {\
+							background-position: 0 0,  0 100%,  0 0,  100% 0;\
+						}\
+						100% {\
+							background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;\
+						}\
+					}',
+
+				dragHandle: {
+					position: 'absolute',
+					width: dragHandleWidth,
+					height: dragHandleHeight,
+					backgroundColor: dragHandleBackgroundColour,
+					border: dragHandleBorder,
+					boxSizing: 'border-box',
+
+					// This stops the borders disappearing when keyboard nudging.
+					outline: '1px solid transparent'
+				},
+
+				ordNW: {
+					top: 0,
+					left: 0,
+					marginTop: -Math.floor(dragHandleHeight / 2),
+					marginLeft: -Math.floor(dragHandleWidth / 2),
+					cursor: 'nw-resize'
+				},
+				ordN: {
+					top: 0,
+					left: '50%',
+					marginTop: -Math.floor(dragHandleHeight / 2),
+					marginLeft: -Math.floor(dragHandleWidth / 2),
+					cursor: 'n-resize'
+				},
+				ordNE: {
+					top: 0,
+					right: 0,
+					marginTop: -Math.floor(dragHandleHeight / 2),
+					marginRight: -Math.floor(dragHandleWidth / 2),
+					cursor: 'ne-resize'
+				},
+				ordE: {
+					top: '50%',
+					right: 0,
+					marginTop: -Math.floor(dragHandleHeight / 2),
+					marginRight: -Math.floor(dragHandleWidth / 2),
+					cursor: 'e-resize'
+				},
+				ordSE: {
+					bottom: 0,
+					right: 0,
+					marginBottom: -Math.floor(dragHandleHeight / 2),
+					marginRight: -Math.floor(dragHandleWidth / 2),
+					cursor: 'se-resize'
+				},
+				ordS: {
+					bottom: 0,
+					left: '50%',
+					marginBottom: -Math.floor(dragHandleHeight / 2),
+					marginLeft: -Math.floor(dragHandleWidth / 2),
+					cursor: 's-resize'
+				},
+				ordSW: {
+					bottom: 0,
+					left: 0,
+					marginBottom: -Math.floor(dragHandleHeight / 2),
+					marginLeft: -Math.floor(dragHandleWidth / 2),
+					cursor: 'sw-resize'
+				},
+				ordW: {
+					top: '50%',
+					left: 0,
+					marginTop: -Math.floor(dragHandleHeight / 2),
+					marginLeft: -Math.floor(dragHandleWidth / 2),
+					cursor: 'w-resize'
+				},
+
+				dragBarN: {
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: '100%',
+					height: dragBarSize,
+					marginTop: -(dragBarSize - 2)
+				},
+				dragBarE: {
+					position: 'absolute',
+					right: 0,
+					top: 0,
+					width: dragBarSize,
+					height: '100%',
+					marginRight: -(dragBarSize - 2)
+				},
+				dragBarS: {
+					position: 'absolute',
+					bottom: 0,
+					left: 0,
+					width: '100%',
+					height: dragBarSize,
+					marginBottom: -(dragBarSize - 2)
+				},
+				dragBarW: {
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: dragBarSize,
+					height: '100%',
+					marginLeft: -(dragBarSize - 2)
+				}
+
 			};
 		},
 
@@ -20157,27 +20347,26 @@
 		},
 
 		createCropSelection: function createCropSelection() {
-			var style = this.getCropStyle();
+			var styles = this.getStyles();
 
 			return _react2['default'].createElement(
 				'div',
 				{ ref: 'cropSelect',
-					style: style,
-					className: 'ReactCrop--crop-selection',
+					style: objectAssign(styles.cropSelection, this.getCropStyle()),
 					onMouseDown: this.onCropMouseTouchDown,
 					onTouchStart: this.onCropMouseTouchDown },
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+				_react2['default'].createElement('div', { style: styles.dragBarN, 'data-ord': 'n' }),
+				_react2['default'].createElement('div', { style: styles.dragBarE, 'data-ord': 'e' }),
+				_react2['default'].createElement('div', { style: styles.dragBarS, 'data-ord': 's' }),
+				_react2['default'].createElement('div', { style: styles.dragBarW, 'data-ord': 'w' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordNW }), 'data-ord': 'nw' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordN }), 'data-ord': 'n' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordNE }), 'data-ord': 'ne' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordE }), 'data-ord': 'e' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordSE }), 'data-ord': 'se' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordS }), 'data-ord': 's' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordSW }), 'data-ord': 'sw' }),
+				_react2['default'].createElement('div', { style: (0, _reactAddonsUpdate2['default'])(styles.dragHandle, { $merge: styles.ordW }), 'data-ord': 'w' })
 			);
 		},
 
@@ -20232,36 +20421,43 @@
 		},
 
 		render: function render() {
+			var styles = this.getStyles();
 			var cropSelection = undefined,
-			    imageClip = undefined;
+			    imageClipStyle = undefined;
 
 			if (!this.cropInvalid) {
 				cropSelection = this.createCropSelection();
-				imageClip = this.getImageClipStyle();
+				imageClipStyle = this.getImageClipStyle();
 			}
 
-			var componentClasses = ['ReactCrop'];
+			var rootStyles = styles.root;
 
 			if (this.state.newCropIsBeingDrawn) {
-				componentClasses.push('ReactCrop-new-crop');
+				objectAssign(rootStyles, styles.newCrop);
 			}
 			if (this.state.crop.aspect) {
-				componentClasses.push('ReactCrop-fixed-aspect');
+				objectAssign(rootStyles, styles.fixedAspect);
 			}
 
 			return _react2['default'].createElement(
 				'div',
-				{ ref: 'component',
-					className: componentClasses.join(' '),
+				{
+					ref: 'component',
+					style: objectAssign(rootStyles, this.props.style),
 					onTouchStart: this.onComponentMouseTouchDown,
 					onMouseDown: this.onComponentMouseTouchDown,
 					tabIndex: '1',
 					onKeyDown: this.onComponentKeyDown },
-				_react2['default'].createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
+				_react2['default'].createElement(
+					'style',
+					{ scoped: true, type: 'text/css' },
+					styles.marchingAntsAnimation
+				),
+				_react2['default'].createElement('img', { ref: 'image', style: styles.image, src: this.props.src, onLoad: this.onImageLoad }),
 				_react2['default'].createElement(
 					'div',
-					{ className: 'ReactCrop--crop-wrapper' },
-					_react2['default'].createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
+					{ style: styles.cropWrapper },
+					_react2['default'].createElement('img', { ref: 'imageCopy', style: objectAssign(styles.imageCopy, imageClipStyle), src: this.props.src }),
 					cropSelection
 				),
 				this.props.children
@@ -20271,6 +20467,125 @@
 
 	exports['default'] = ReactCrop;
 	module.exports = exports['default'];
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(161);
+
+/***/ },
+/* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule update
+	 */
+
+	/* global hasOwnProperty:true */
+
+	'use strict';
+
+	var assign = __webpack_require__(39);
+	var keyOf = __webpack_require__(79);
+	var invariant = __webpack_require__(13);
+	var hasOwnProperty = ({}).hasOwnProperty;
+
+	function shallowCopy(x) {
+	  if (Array.isArray(x)) {
+	    return x.concat();
+	  } else if (x && typeof x === 'object') {
+	    return assign(new x.constructor(), x);
+	  } else {
+	    return x;
+	  }
+	}
+
+	var COMMAND_PUSH = keyOf({ $push: null });
+	var COMMAND_UNSHIFT = keyOf({ $unshift: null });
+	var COMMAND_SPLICE = keyOf({ $splice: null });
+	var COMMAND_SET = keyOf({ $set: null });
+	var COMMAND_MERGE = keyOf({ $merge: null });
+	var COMMAND_APPLY = keyOf({ $apply: null });
+
+	var ALL_COMMANDS_LIST = [COMMAND_PUSH, COMMAND_UNSHIFT, COMMAND_SPLICE, COMMAND_SET, COMMAND_MERGE, COMMAND_APPLY];
+
+	var ALL_COMMANDS_SET = {};
+
+	ALL_COMMANDS_LIST.forEach(function (command) {
+	  ALL_COMMANDS_SET[command] = true;
+	});
+
+	function invariantArrayCase(value, spec, command) {
+	  !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected target of %s to be an array; got %s.', command, value) : invariant(false) : undefined;
+	  var specValue = spec[command];
+	  !Array.isArray(specValue) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array; got %s. ' + 'Did you forget to wrap your parameter in an array?', command, specValue) : invariant(false) : undefined;
+	}
+
+	function update(value, spec) {
+	  !(typeof spec === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): You provided a key path to update() that did not contain one ' + 'of %s. Did you forget to include {%s: ...}?', ALL_COMMANDS_LIST.join(', '), COMMAND_SET) : invariant(false) : undefined;
+
+	  if (hasOwnProperty.call(spec, COMMAND_SET)) {
+	    !(Object.keys(spec).length === 1) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Cannot have more than one key in an object with %s', COMMAND_SET) : invariant(false) : undefined;
+
+	    return spec[COMMAND_SET];
+	  }
+
+	  var nextValue = shallowCopy(value);
+
+	  if (hasOwnProperty.call(spec, COMMAND_MERGE)) {
+	    var mergeObj = spec[COMMAND_MERGE];
+	    !(mergeObj && typeof mergeObj === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a spec of type \'object\'; got %s', COMMAND_MERGE, mergeObj) : invariant(false) : undefined;
+	    !(nextValue && typeof nextValue === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a target of type \'object\'; got %s', COMMAND_MERGE, nextValue) : invariant(false) : undefined;
+	    assign(nextValue, spec[COMMAND_MERGE]);
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_PUSH)) {
+	    invariantArrayCase(value, spec, COMMAND_PUSH);
+	    spec[COMMAND_PUSH].forEach(function (item) {
+	      nextValue.push(item);
+	    });
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_UNSHIFT)) {
+	    invariantArrayCase(value, spec, COMMAND_UNSHIFT);
+	    spec[COMMAND_UNSHIFT].forEach(function (item) {
+	      nextValue.unshift(item);
+	    });
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_SPLICE)) {
+	    !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Expected %s target to be an array; got %s', COMMAND_SPLICE, value) : invariant(false) : undefined;
+	    !Array.isArray(spec[COMMAND_SPLICE]) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. ' + 'Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : invariant(false) : undefined;
+	    spec[COMMAND_SPLICE].forEach(function (args) {
+	      !Array.isArray(args) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. ' + 'Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : invariant(false) : undefined;
+	      nextValue.splice.apply(nextValue, args);
+	    });
+	  }
+
+	  if (hasOwnProperty.call(spec, COMMAND_APPLY)) {
+	    !(typeof spec[COMMAND_APPLY] === 'function') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be a function; got %s.', COMMAND_APPLY, spec[COMMAND_APPLY]) : invariant(false) : undefined;
+	    nextValue = spec[COMMAND_APPLY](nextValue);
+	  }
+
+	  for (var k in spec) {
+	    if (!(ALL_COMMANDS_SET.hasOwnProperty(k) && ALL_COMMANDS_SET[k])) {
+	      nextValue[k] = update(value[k], spec[k]);
+	    }
+	  }
+
+	  return nextValue;
+	}
+
+	module.exports = update;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }
 /******/ ]);
