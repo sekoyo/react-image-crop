@@ -657,7 +657,7 @@ var ReactCrop = React.createClass({
 		return Math.min(Math.max(num, min), max);
 	},
 
-	createCropSelection(fixedAspect) {
+	createCropSelection(newCrop, fixedAspect) {
 		let styles = this.getStyles();
 
 		return (
@@ -666,23 +666,27 @@ var ReactCrop = React.createClass({
 				onMouseDown={this.onCropMouseTouchDown}
 				onTouchStart={this.onCropMouseTouchDown}>
 
-				{!fixedAspect &&
-					<div>
-						<div style={update(styles.dragHandle, {$merge: styles.ordN})} data-ord='n'></div>
-						<div style={update(styles.dragHandle, {$merge: styles.ordE})} data-ord='e'></div>
-						<div style={update(styles.dragHandle, {$merge: styles.ordS})} data-ord='s'></div>
-						<div style={update(styles.dragHandle, {$merge: styles.ordW})} data-ord='w'></div>
-						<div style={styles.dragBarN} data-ord='n'></div>
-						<div style={styles.dragBarE} data-ord='e'></div>
-						<div style={styles.dragBarS} data-ord='s'></div>
-						<div style={styles.dragBarW} data-ord='w'></div>
+				{!newCrop &&
+					<div ref='cropHandles'>
+						{!fixedAspect &&
+							<div ref='fixedAspectHandles'>
+								<div style={update(styles.dragHandle, {$merge: styles.ordN})} data-ord='n'></div>
+								<div style={update(styles.dragHandle, {$merge: styles.ordE})} data-ord='e'></div>
+								<div style={update(styles.dragHandle, {$merge: styles.ordS})} data-ord='s'></div>
+								<div style={update(styles.dragHandle, {$merge: styles.ordW})} data-ord='w'></div>
+								<div style={styles.dragBarN} data-ord='n'></div>
+								<div style={styles.dragBarE} data-ord='e'></div>
+								<div style={styles.dragBarS} data-ord='s'></div>
+								<div style={styles.dragBarW} data-ord='w'></div>
+							</div>
+						}
+
+						<div style={update(styles.dragHandle, {$merge: styles.ordNW})} data-ord='nw'></div>
+						<div style={update(styles.dragHandle, {$merge: styles.ordNE})} data-ord='ne'></div>
+						<div style={update(styles.dragHandle, {$merge: styles.ordSE})} data-ord='se'></div>
+						<div style={update(styles.dragHandle, {$merge: styles.ordSW})} data-ord='sw'></div>
 					</div>
 				}
-
-				<div style={update(styles.dragHandle, {$merge: styles.ordNW})} data-ord='nw'></div>
-				<div style={update(styles.dragHandle, {$merge: styles.ordNE})} data-ord='ne'></div>
-				<div style={update(styles.dragHandle, {$merge: styles.ordSE})} data-ord='se'></div>
-				<div style={update(styles.dragHandle, {$merge: styles.ordSW})} data-ord='sw'></div>
 			</div>
 		);
 	},
@@ -744,11 +748,10 @@ var ReactCrop = React.createClass({
 		let styles = this.getStyles();
 		let cropSelection, imageClipStyle;
 		let fixedAspect = !!this.state.crop.aspect;
+		let newCrop = this.state.newCropIsBeingDrawn;
 
 		if (!this.cropInvalid) {
-			if (!this.state.newCropIsBeingDrawn) {
-				cropSelection = this.createCropSelection(fixedAspect);
-			}
+			cropSelection = this.createCropSelection(newCrop, fixedAspect);
 			imageClipStyle = this.getImageClipStyle();
 		}
 
