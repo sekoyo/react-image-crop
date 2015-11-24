@@ -148,14 +148,7 @@ var ReactCrop = _react2['default'].createClass({
 				animationPlayState: 'running'
 			},
 
-			marchingAntsAnimation: '@keyframes marching-ants {\
-					0% {\
-						background-position: 0 0,  0 100%,  0 0,  100% 0;\
-					}\
-					100% {\
-						background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;\
-					}\
-				}',
+			marchingAntsAnimation: '@keyframes marching-ants {\n\t\t\t\t\t0% {\n\t\t\t\t\t\tbackground-position: 0 0,  0 100%,  0 0,  100% 0;\n\t\t\t\t\t}\n\t\t\t\t\t100% {\n\t\t\t\t\t\tbackground-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;\n\t\t\t\t\t}\n\t\t\t\t}',
 
 			dragHandle: {
 				position: 'absolute',

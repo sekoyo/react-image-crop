@@ -136,14 +136,14 @@ var ReactCrop = React.createClass({
 			},
 
 			marchingAntsAnimation:
-				'@keyframes marching-ants {\
-					0% {\
-						background-position: 0 0,  0 100%,  0 0,  100% 0;\
-					}\
-					100% {\
-						background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;\
-					}\
-				}',
+				`@keyframes marching-ants {
+					0% {
+						background-position: 0 0,  0 100%,  0 0,  100% 0;
+					}
+					100% {
+						background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
+					}
+				}`,
 
 			dragHandle: {
 				position: 'absolute',
@@ -760,7 +760,7 @@ var ReactCrop = React.createClass({
 			imageClipStyle = this.getImageClipStyle();
 		}
 
-		let rootStyles = styles.root
+		let rootStyles = styles.root;
 
 		return (
 			<div
