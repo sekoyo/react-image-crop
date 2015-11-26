@@ -1,22 +1,26 @@
 {
-  "name": "react-image-crop",
-  "version": "0.0.12",
+  "name": "react-image-crop-inline-styles",
+  "version": "0.1.1",
   "description": "A responsive image cropping tool for React",
-  "repository": "https://github.com/DominicTobias/react-image-crop",
+  "repository": "https://github.com/DanlanNZ/react-image-crop",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack --progress --colors --watch --config demo/webpack.config.js",
-    "release-js": "babel lib/ReactCrop.jsx --out-file dist/ReactCrop.js",
-    "release-css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
-    "release": "npm run release-js && npm run release-css",
-    "sass-watch": "node-sass lib/ReactCrop.scss dist/ReactCrop.css --watch"
+    "release": "babel lib/ReactCrop.jsx --out-file dist/ReactCrop.js"
   },
   "author": "Dominic Tobias <dominic.tobias@gmail.com>",
+  "contributors": [
+    {
+      "name" : "Daniel Landers",
+      "email" : "daniel.landers@outlook.com"
+    }
+  ],
   "keywords": [
     "react",
     "image",
     "crop",
+    "inline-style",
     "react-component"
   ],
   "license": "ISC",
@@ -26,6 +30,7 @@
     "webpack": "^1.12.1"
   },
   "dependencies": {
-    "react": "^0.14"
+    "react": "^0.14",
+    "react-addons-update": "^0.14.3"
   }
 }
