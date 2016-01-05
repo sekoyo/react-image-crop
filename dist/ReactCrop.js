@@ -311,7 +311,7 @@ var ReactCrop = _react2['default'].createClass({
 		var clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
-		this.refs.component.focus();
+		this.refs.component.getDOMNode().focus();
 
 		var ord = e.target.dataset.ord;
 		var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
@@ -320,12 +320,12 @@ var ReactCrop = _react2['default'].createClass({
 		var cropOffset = undefined;
 
 		if (crop.aspect) {
-			cropOffset = this.getElementOffset(this.refs.cropSelect);
+			cropOffset = this.getElementOffset(this.refs.cropSelect.getDOMNode());
 		}
 
 		this.evData = {
-			imageWidth: this.refs.image.width,
-			imageHeight: this.refs.image.height,
+			imageWidth: this.refs.image.getDOMNode().width,
+			imageHeight: this.refs.image.getDOMNode().height,
 			clientStartX: clientPos.x,
 			clientStartY: clientPos.y,
 			cropStartWidth: crop.width,
@@ -338,7 +338,7 @@ var ReactCrop = _react2['default'].createClass({
 			yCrossOver: yInversed,
 			startXCrossOver: xInversed,
 			startYCrossOver: yInversed,
-			isResize: e.target !== this.refs.cropSelect,
+			isResize: e.target !== this.refs.cropSelect.getDOMNode(),
 			ord: ord,
 			cropOffset: cropOffset
 		};
@@ -365,7 +365,7 @@ var ReactCrop = _react2['default'].createClass({
 	},
 
 	onComponentMouseTouchDown: function onComponentMouseTouchDown(e) {
-		if (e.target !== this.refs.imageCopy) {
+		if (e.target !== this.refs.imageCopy.getDOMNode()) {
 			return;
 		}
 
@@ -375,11 +375,11 @@ var ReactCrop = _react2['default'].createClass({
 		var clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
-		this.refs.component.focus();
+		this.refs.component.getDOMNode().focus();
 
-		var imageOffset = this.getElementOffset(this.refs.image);
-		var xPc = (clientPos.x - imageOffset.left) / this.refs.image.width * 100;
-		var yPc = (clientPos.y - imageOffset.top) / this.refs.image.height * 100;
+		var imageOffset = this.getElementOffset(this.refs.image.getDOMNode());
+		var xPc = (clientPos.x - imageOffset.left) / this.refs.image.getDOMNode().width * 100;
+		var yPc = (clientPos.y - imageOffset.top) / this.refs.image.getDOMNode().height * 100;
 
 		crop.x = xPc;
 		crop.y = yPc;
@@ -387,8 +387,8 @@ var ReactCrop = _react2['default'].createClass({
 		crop.height = 0;
 
 		this.evData = {
-			imageWidth: this.refs.image.width,
-			imageHeight: this.refs.image.height,
+			imageWidth: this.refs.image.getDOMNode().width,
+			imageHeight: this.refs.image.getDOMNode().height,
 			clientStartX: clientPos.x,
 			clientStartY: clientPos.y,
 			cropStartWidth: crop.width,
