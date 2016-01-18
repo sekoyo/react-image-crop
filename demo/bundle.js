@@ -46,9 +46,19 @@
 
 	'use strict';
 
-	var React = __webpack_require__(1);
-	var ReactDOM = __webpack_require__(158);
-	var ReactCrop = __webpack_require__(159);
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _ReactCrop = __webpack_require__(159);
+
+	var _ReactCrop2 = _interopRequireDefault(_ReactCrop);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/**
 	 * Select an image file.
@@ -86,7 +96,7 @@
 			height: 30,
 			aspect: 16 / 9
 		};
-		ReactDOM.render(React.createElement(ReactCrop, { crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
+		_reactDom2.default.render(_react2.default.createElement(_ReactCrop2.default, { crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
 	}
 
 	/**
@@ -146,6 +156,7 @@
 	});
 
 	React.__SECRET_DOM_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOM;
+	React.__SECRET_DOM_SERVER_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = ReactDOMServer;
 
 	module.exports = React;
 
@@ -1110,7 +1121,7 @@
 	 * will remain to ensure logic does not differ in production.
 	 */
 
-	var invariant = function (condition, format, a, b, c, d, e, f) {
+	function invariant(condition, format, a, b, c, d, e, f) {
 	  if (process.env.NODE_ENV !== 'production') {
 	    if (format === undefined) {
 	      throw new Error('invariant requires an error message argument');
@@ -1124,15 +1135,16 @@
 	    } else {
 	      var args = [a, b, c, d, e, f];
 	      var argIndex = 0;
-	      error = new Error('Invariant Violation: ' + format.replace(/%s/g, function () {
+	      error = new Error(format.replace(/%s/g, function () {
 	        return args[argIndex++];
 	      }));
+	      error.name = 'Invariant Violation';
 	    }
 
 	    error.framesToPop = 1; // we don't care about invariant's own frame
 	    throw error;
 	  }
-	};
+	}
 
 	module.exports = invariant;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
@@ -4439,11 +4451,12 @@
 	    var fakeNode = document.createElement('react');
 	    ReactErrorUtils.invokeGuardedCallback = function (name, func, a, b) {
 	      var boundFunc = func.bind(null, a, b);
-	      fakeNode.addEventListener(name, boundFunc, false);
+	      var evtType = 'react-' + name;
+	      fakeNode.addEventListener(evtType, boundFunc, false);
 	      var evt = document.createEvent('Event');
-	      evt.initEvent(name, false, false);
+	      evt.initEvent(evtType, false, false);
 	      fakeNode.dispatchEvent(evt);
-	      fakeNode.removeEventListener(name, boundFunc, false);
+	      fakeNode.removeEventListener(evtType, boundFunc, false);
 	    };
 	  }
 	}
@@ -5038,7 +5051,7 @@
 	var canDefineProperty = false;
 	if (process.env.NODE_ENV !== 'production') {
 	  try {
-	    Object.defineProperty({}, 'x', {});
+	    Object.defineProperty({}, 'x', { get: function () {} });
 	    canDefineProperty = true;
 	  } catch (x) {
 	    // IE will fail on defineProperty
@@ -10472,6 +10485,7 @@
 	    icon: null,
 	    id: MUST_USE_PROPERTY,
 	    inputMode: MUST_USE_ATTRIBUTE,
+	    integrity: null,
 	    is: MUST_USE_ATTRIBUTE,
 	    keyParams: MUST_USE_ATTRIBUTE,
 	    keyType: MUST_USE_ATTRIBUTE,
@@ -10494,6 +10508,7 @@
 	    multiple: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    muted: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    name: null,
+	    nonce: MUST_USE_ATTRIBUTE,
 	    noValidate: HAS_BOOLEAN_VALUE,
 	    open: HAS_BOOLEAN_VALUE,
 	    optimum: null,
@@ -10505,6 +10520,7 @@
 	    readOnly: MUST_USE_PROPERTY | HAS_BOOLEAN_VALUE,
 	    rel: null,
 	    required: HAS_BOOLEAN_VALUE,
+	    reversed: HAS_BOOLEAN_VALUE,
 	    role: MUST_USE_ATTRIBUTE,
 	    rows: MUST_USE_ATTRIBUTE | HAS_POSITIVE_NUMERIC_VALUE,
 	    rowSpan: null,
@@ -10555,8 +10571,8 @@
 	     */
 	    // autoCapitalize and autoCorrect are supported in Mobile Safari for
 	    // keyboard hints.
-	    autoCapitalize: null,
-	    autoCorrect: null,
+	    autoCapitalize: MUST_USE_ATTRIBUTE,
+	    autoCorrect: MUST_USE_ATTRIBUTE,
 	    // autoSave allows WebKit/Blink to persist values of input fields on page reloads
 	    autoSave: null,
 	    // color is for Safari mask-icon link
@@ -10587,9 +10603,7 @@
 	    httpEquiv: 'http-equiv'
 	  },
 	  DOMPropertyNames: {
-	    autoCapitalize: 'autocapitalize',
 	    autoComplete: 'autocomplete',
-	    autoCorrect: 'autocorrect',
 	    autoFocus: 'autofocus',
 	    autoPlay: 'autoplay',
 	    autoSave: 'autosave',
@@ -10831,6 +10845,7 @@
 	// For quickly matching children type, to test if can be treated as content.
 	var CONTENT_TYPES = { 'string': true, 'number': true };
 
+	var CHILDREN = keyOf({ children: null });
 	var STYLE = keyOf({ style: null });
 	var HTML = keyOf({ __html: null });
 
@@ -11321,7 +11336,9 @@
 	        }
 	        var markup = null;
 	        if (this._tag != null && isCustomComponent(this._tag, props)) {
-	          markup = DOMPropertyOperations.createMarkupForCustomAttribute(propKey, propValue);
+	          if (propKey !== CHILDREN) {
+	            markup = DOMPropertyOperations.createMarkupForCustomAttribute(propKey, propValue);
+	          }
 	        } else {
 	          markup = DOMPropertyOperations.createMarkupForProperty(propKey, propValue);
 	        }
@@ -11580,6 +11597,9 @@
 	      } else if (isCustomComponent(this._tag, nextProps)) {
 	        if (!node) {
 	          node = ReactMount.getNode(this._rootNodeID);
+	        }
+	        if (propKey === CHILDREN) {
+	          nextProp = null;
 	        }
 	        DOMPropertyOperations.setValueForAttribute(node, propKey, nextProp);
 	      } else if (DOMProperty.properties[propKey] || DOMProperty.isCustomAttribute(propKey)) {
@@ -13662,7 +13682,7 @@
 	    var value = LinkedValueUtils.getValue(props);
 
 	    if (value != null) {
-	      updateOptions(this, props, value);
+	      updateOptions(this, Boolean(props.multiple), value);
 	    }
 	  }
 	}
@@ -16697,11 +16717,14 @@
 	 * @typechecks
 	 */
 
+	/* eslint-disable fb-www/typeof-undefined */
+
 	/**
 	 * Same as document.activeElement but wraps in a try-catch block. In IE it is
 	 * not safe to call document.activeElement if there is nothing focused.
 	 *
-	 * The activeElement will be null only if the document or document body is not yet defined.
+	 * The activeElement will be null only if the document or document body is not
+	 * yet defined.
 	 */
 	'use strict';
 
@@ -16709,7 +16732,6 @@
 	  if (typeof document === 'undefined') {
 	    return null;
 	  }
-
 	  try {
 	    return document.activeElement || document.body;
 	  } catch (e) {
@@ -18449,7 +18471,9 @@
 	  'setValueForProperty': 'update attribute',
 	  'setValueForAttribute': 'update attribute',
 	  'deleteValueForProperty': 'remove attribute',
-	  'dangerouslyReplaceNodeWithMarkupByID': 'replace'
+	  'setValueForStyles': 'update styles',
+	  'replaceNodeWithMarkup': 'replace',
+	  'updateTextContent': 'set textContent'
 	};
 
 	function getTotalTime(measurements) {
@@ -18641,18 +18665,23 @@
 	'use strict';
 
 	var performance = __webpack_require__(145);
-	var curPerformance = performance;
+
+	var performanceNow;
 
 	/**
 	 * Detect if we can use `window.performance.now()` and gracefully fallback to
 	 * `Date.now()` if it doesn't exist. We need to support Firefox < 15 for now
 	 * because of Facebook's testing infrastructure.
 	 */
-	if (!curPerformance || !curPerformance.now) {
-	  curPerformance = Date;
+	if (performance.now) {
+	  performanceNow = function () {
+	    return performance.now();
+	  };
+	} else {
+	  performanceNow = function () {
+	    return Date.now();
+	  };
 	}
-
-	var performanceNow = curPerformance.now.bind(curPerformance);
 
 	module.exports = performanceNow;
 
@@ -18701,7 +18730,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.1';
+	module.exports = '0.14.6';
 
 /***/ },
 /* 147 */
@@ -19678,15 +19707,15 @@
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function objectAssign(target, source) {
 		var from = undefined;
@@ -19715,14 +19744,14 @@
 		return to;
 	}
 
-	var ReactCrop = _react2['default'].createClass({
+	var ReactCrop = _react2.default.createClass({
 		displayName: 'ReactCrop',
 
 		propTypes: {
-			src: _react2['default'].PropTypes.string.isRequired,
-			crop: _react2['default'].PropTypes.object,
-			minWidth: _react2['default'].PropTypes.number,
-			minHeight: _react2['default'].PropTypes.number
+			src: _react2.default.PropTypes.string.isRequired,
+			crop: _react2.default.PropTypes.object,
+			minWidth: _react2.default.PropTypes.number,
+			minHeight: _react2.default.PropTypes.number
 		},
 
 		xOrds: ['e', 'w'],
@@ -19755,7 +19784,6 @@
 				crop: crop
 			};
 		},
-
 		componentDidMount: function componentDidMount() {
 			document.addEventListener('mousemove', this.onDocMouseTouchMove);
 			document.addEventListener('touchmove', this.onDocMouseTouchMove);
@@ -19764,7 +19792,6 @@
 			document.addEventListener('touchend', this.onDocMouseTouchEnd);
 			document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 		},
-
 		componentWillUnmount: function componentWillUnmount() {
 			document.removeEventListener('mousemove', this.onDocMouseTouchMove);
 			document.removeEventListener('touchmove', this.onDocMouseTouchMove);
@@ -19773,11 +19800,9 @@
 			document.removeEventListener('touchend', this.onDocMouseTouchEnd);
 			document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
 		},
-
 		componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 			this.setState(this.getInitialState(nextProps));
 		},
-
 		getCropStyle: function getCropStyle() {
 			return {
 				top: this.state.crop.y + '%',
@@ -19786,7 +19811,6 @@
 				height: this.state.crop.height + '%'
 			};
 		},
-
 		straightenYPath: function straightenYPath(clientX) {
 			var evData = this.evData;
 			var ord = evData.ord;
@@ -19806,7 +19830,6 @@
 
 			return k * clientX + d;
 		},
-
 		onDocMouseTouchMove: function onDocMouseTouchMove(e) {
 			if (!this.mouseDownOnCrop) {
 				return;
@@ -19840,7 +19863,6 @@
 
 			this.setState({ crop: crop });
 		},
-
 		getNewSize: function getNewSize() {
 			var crop = this.state.crop;
 			var evData = this.evData;
@@ -19894,7 +19916,6 @@
 				height: newHeight
 			};
 		},
-
 		resizeCrop: function resizeCrop() {
 			var crop = this.state.crop;
 			var evData = this.evData;
@@ -19948,14 +19969,12 @@
 			evData.lastYCrossover = evData.yCrossOver;
 			this.crossOverCheck();
 		},
-
 		dragCrop: function dragCrop() {
 			var crop = this.state.crop;
 			var evData = this.evData;
 			crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
 			crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
 		},
-
 		inverseOrd: function inverseOrd(ord) {
 			var inverseOrd = undefined;
 
@@ -19963,7 +19982,6 @@
 
 			return inverseOrd;
 		},
-
 		crossOverCheck: function crossOverCheck() {
 			var evData = this.evData;
 
@@ -19981,7 +19999,6 @@
 			evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
 			evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
 		},
-
 		onCropMouseTouchDown: function onCropMouseTouchDown(e) {
 			e.preventDefault(); // Stop drag selection.
 
@@ -20023,7 +20040,6 @@
 
 			this.mouseDownOnCrop = true;
 		},
-
 		getClientPos: function getClientPos(e) {
 			var clientX = undefined,
 			    clientY = undefined;
@@ -20041,7 +20057,6 @@
 				y: clientY
 			};
 		},
-
 		onComponentMouseTouchDown: function onComponentMouseTouchDown(e) {
 			if (e.target !== this.refs.imageCopy) {
 				return;
@@ -20086,7 +20101,6 @@
 			this.mouseDownOnCrop = true;
 			this.setState({ newCropIsBeingDrawn: true });
 		},
-
 		onComponentKeyDown: function onComponentKeyDown(e) {
 			var keyCode = e.which;
 			var crop = this.state.crop;
@@ -20124,7 +20138,6 @@
 				}
 			}
 		},
-
 		onDocMouseTouchEnd: function onDocMouseTouchEnd(e) {
 			if (this.mouseDownOnCrop) {
 
@@ -20138,7 +20151,6 @@
 				this.setState({ newCropIsBeingDrawn: false });
 			}
 		},
-
 		getElementOffset: function getElementOffset(el) {
 			var rect = el.getBoundingClientRect();
 			var docEl = document.documentElement;
@@ -20151,43 +20163,39 @@
 				left: rectLeft
 			};
 		},
-
 		clamp: function clamp(num, min, max) {
 			return Math.min(Math.max(num, min), max);
 		},
-
 		createCropSelection: function createCropSelection() {
 			var style = this.getCropStyle();
 
-			return _react2['default'].createElement(
+			return _react2.default.createElement(
 				'div',
 				{ ref: 'cropSelect',
 					style: style,
 					className: 'ReactCrop--crop-selection',
 					onMouseDown: this.onCropMouseTouchDown,
 					onTouchStart: this.onCropMouseTouchDown },
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-				_react2['default'].createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
+				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
 			);
 		},
-
 		arrayToPercent: function arrayToPercent(arr, delimeter) {
 			delimeter = delimeter || ' ';
 			return arr.map(function (number) {
 				return number + '%';
 			}).join(delimeter);
 		},
-
 		getImageClipStyle: function getImageClipStyle() {
 			var crop = this.state.crop;
 
@@ -20211,7 +20219,6 @@
 				clipPath: insetVal
 			};
 		},
-
 		onImageLoad: function onImageLoad(e) {
 			var crop = this.state.crop;
 			var imageWidth = e.target.naturalWidth;
@@ -20230,7 +20237,6 @@
 				this.setState({ crop: crop });
 			}
 		},
-
 		render: function render() {
 			var cropSelection = undefined,
 			    imageClip = undefined;
@@ -20249,7 +20255,7 @@
 				componentClasses.push('ReactCrop-fixed-aspect');
 			}
 
-			return _react2['default'].createElement(
+			return _react2.default.createElement(
 				'div',
 				{ ref: 'component',
 					className: componentClasses.join(' '),
@@ -20257,11 +20263,11 @@
 					onMouseDown: this.onComponentMouseTouchDown,
 					tabIndex: '1',
 					onKeyDown: this.onComponentKeyDown },
-				_react2['default'].createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
-				_react2['default'].createElement(
+				_react2.default.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
+				_react2.default.createElement(
 					'div',
 					{ className: 'ReactCrop--crop-wrapper' },
-					_react2['default'].createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
+					_react2.default.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
 					cropSelection
 				),
 				this.props.children
@@ -20269,8 +20275,7 @@
 		}
 	});
 
-	exports['default'] = ReactCrop;
-	module.exports = exports['default'];
+	exports.default = ReactCrop;
 
 /***/ }
 /******/ ]);

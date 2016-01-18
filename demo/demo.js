@@ -1,6 +1,6 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-var ReactCrop = require('../lib/ReactCrop.jsx');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactCrop from '../lib/ReactCrop.jsx';
 
 /**
  * Select an image file.

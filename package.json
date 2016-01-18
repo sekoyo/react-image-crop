@@ -22,9 +22,12 @@
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.4.0",
+    "babel-core": "^6.4.0",
+    "babel-loader": "^6.2.1",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "node-sass": "^3.4.2",
+    "react-dom": "^0.14",
     "webpack": "^1.12.1"
   },
   "dependencies": {
