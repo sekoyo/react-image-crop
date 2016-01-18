@@ -82,8 +82,8 @@
 		var crop = {
 			x: 35,
 			y: 10,
-			// width: 20,
-			// height: 30,
+			width: 20,
+			height: 30,
 			aspect: 16 / 9
 		};
 		ReactDOM.render(React.createElement(ReactCrop, { crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
