@@ -20064,7 +20064,7 @@
 
 			e.preventDefault(); // Stop drag selection.
 
-			var crop = this.state.crop;
+			var crop = {};
 			var clientPos = this.getClientPos(e);
 
 			// Focus for detecting keypress.
