@@ -44,7 +44,8 @@ var ReactCrop = _react2.default.createClass({
 		src: _react2.default.PropTypes.string.isRequired,
 		crop: _react2.default.PropTypes.object,
 		minWidth: _react2.default.PropTypes.number,
-		minHeight: _react2.default.PropTypes.number
+		minHeight: _react2.default.PropTypes.number,
+		keepSelection: _react2.default.PropTypes.bool
 	},
 
 	xOrds: ['e', 'w'],
@@ -357,7 +358,7 @@ var ReactCrop = _react2.default.createClass({
 
 		e.preventDefault(); // Stop drag selection.
 
-		var crop = this.state.crop;
+		var crop = this.props.keepSelection === true ? {} : this.state.crop;
 		var clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
