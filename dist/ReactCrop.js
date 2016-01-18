@@ -357,7 +357,7 @@ var ReactCrop = _react2.default.createClass({
 
 		e.preventDefault(); // Stop drag selection.
 
-		var crop = {};
+		var crop = this.state.crop;
 		var clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
