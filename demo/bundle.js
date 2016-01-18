@@ -96,7 +96,6 @@
 			height: 30,
 			aspect: 16 / 9
 		};
-		console.log(_ReactCrop2.default);
 		_reactDom2.default.render(_react2.default.createElement(_ReactCrop2.default, { crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
 	}
 
