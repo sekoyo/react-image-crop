@@ -62,6 +62,10 @@ var crop = {
 
 ..Or you can omit both and only specify the aspect.
 
+#### keepSelection (optional)
+
+If true is passed into the selection can't be disabled if the user clicks outside the selection area.
+
 #### minWidth (optional)
 
 A minimum crop width.
@@ -95,4 +99,3 @@ I wanted to keep this component focused so I didn't provide this. Normally a cro
 3. Another option to make the conversion faster is to scale the image down before converting it to a base64 (see example in gist).
 
 [Example gist](https://gist.github.com/DominicTobias/b1fb501349893922ec7f)
-

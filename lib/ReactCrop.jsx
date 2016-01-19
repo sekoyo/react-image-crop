@@ -32,7 +32,8 @@ var ReactCrop = React.createClass({
 		src: React.PropTypes.string.isRequired,
 		crop: React.PropTypes.object,
 		minWidth: React.PropTypes.number,
-		minHeight: React.PropTypes.number
+		minHeight: React.PropTypes.number,
+		keepSelection: React.PropTypes.bool
 	},
 
 	xOrds: ['e', 'w'],
@@ -368,7 +369,7 @@ var ReactCrop = React.createClass({
 
 		e.preventDefault(); // Stop drag selection.
 
-		let crop = this.state.crop;
+		let crop = this.props.keepSelection === true ? {} : this.state.crop;
 		let clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
