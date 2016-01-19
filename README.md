@@ -62,10 +62,6 @@ var crop = {
 
 ..Or you can omit both and only specify the aspect.
 
-#### keepSelection (optional)
-
-If true is passed into the selection can't be disabled if the user clicks outside the selection area.
-
 #### minWidth (optional)
 
 A minimum crop width.
@@ -73,6 +69,10 @@ A minimum crop width.
 #### minHeight (optional)
 
 A minimum crop height.
+
+#### keepSelection (optional)
+
+If true is passed then selection can't be disabled if the user clicks outside the selection area.
 
 #### onChange(crop) (optional)
 
