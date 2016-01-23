@@ -33,7 +33,10 @@ var ReactCrop = React.createClass({
 		crop: React.PropTypes.object,
 		minWidth: React.PropTypes.number,
 		minHeight: React.PropTypes.number,
-		keepSelection: React.PropTypes.bool
+		keepSelection: React.PropTypes.bool,
+		onChange: React.PropTypes.func,
+		onComplete: React.PropTypes.func,
+		onImageLoaded: React.PropTypes.func
 	},
 
 	xOrds: ['e', 'w'],
@@ -553,6 +556,9 @@ var ReactCrop = React.createClass({
 			}
 			this.cropInvalid = !crop.width || !crop.height;
 			this.setState({ crop: crop });
+		}
+		if (this.props.onImageLoaded) {
+			this.props.onImageLoaded(crop);
 		}
 	},
 

@@ -82,6 +82,10 @@ A callback which happens for every change of the crop (i.e. many times as you ar
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
 
+#### onImageLoaded(crop) (optional)
+
+A callback which happens when the image is loaded. Passes the current crop state object.
+
 ## What about showing the crop on the client?
 
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend. However here are some tips for client-side crop previews:

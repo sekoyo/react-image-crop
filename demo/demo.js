@@ -38,7 +38,11 @@ function loadEditView(dataUrl) {
 		height: 30,
 		aspect: 16/9
 	};
-	ReactDOM.render(<ReactCrop crop={crop} src={dataUrl} onComplete={onCropComplete} />, cropEditor);
+	ReactDOM.render(<ReactCrop crop={crop} src={dataUrl} onImageLoaded={onImageLoaded} onComplete={onCropComplete} />, cropEditor);
+}
+
+function onImageLoaded(crop) {
+	console.log("Image was loaded. Crop:", crop);
 }
 
 /**

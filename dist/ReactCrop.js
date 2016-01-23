@@ -45,7 +45,10 @@ var ReactCrop = _react2.default.createClass({
 		crop: _react2.default.PropTypes.object,
 		minWidth: _react2.default.PropTypes.number,
 		minHeight: _react2.default.PropTypes.number,
-		keepSelection: _react2.default.PropTypes.bool
+		keepSelection: _react2.default.PropTypes.bool,
+		onChange: _react2.default.PropTypes.func,
+		onComplete: _react2.default.PropTypes.func,
+		onImageLoaded: _react2.default.PropTypes.func
 	},
 
 	xOrds: ['e', 'w'],
@@ -529,6 +532,9 @@ var ReactCrop = _react2.default.createClass({
 			}
 			this.cropInvalid = !crop.width || !crop.height;
 			this.setState({ crop: crop });
+		}
+		if (this.props.onImageLoaded) {
+			this.props.onImageLoaded(crop);
 		}
 	},
 	render: function render() {

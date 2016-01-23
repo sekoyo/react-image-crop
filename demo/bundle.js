@@ -96,7 +96,11 @@
 			height: 30,
 			aspect: 16 / 9
 		};
-		_reactDom2.default.render(_react2.default.createElement(_ReactCrop2.default, { crop: crop, src: dataUrl, onComplete: onCropComplete }), cropEditor);
+		_reactDom2.default.render(_react2.default.createElement(_ReactCrop2.default, { crop: crop, src: dataUrl, onImageLoaded: onImageLoaded, onComplete: onCropComplete }), cropEditor);
+	}
+
+	function onImageLoaded(crop) {
+		console.log("Image was loaded. Crop:", crop);
 	}
 
 	/**
@@ -19752,7 +19756,10 @@
 			crop: _react2.default.PropTypes.object,
 			minWidth: _react2.default.PropTypes.number,
 			minHeight: _react2.default.PropTypes.number,
-			keepSelection: _react2.default.PropTypes.bool
+			keepSelection: _react2.default.PropTypes.bool,
+			onChange: _react2.default.PropTypes.func,
+			onComplete: _react2.default.PropTypes.func,
+			onImageLoaded: _react2.default.PropTypes.func
 		},
 
 		xOrds: ['e', 'w'],
@@ -20236,6 +20243,9 @@
 				}
 				this.cropInvalid = !crop.width || !crop.height;
 				this.setState({ crop: crop });
+			}
+			if (this.props.onImageLoaded) {
+				this.props.onImageLoaded(crop);
 			}
 		},
 		render: function render() {
