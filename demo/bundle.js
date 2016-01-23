@@ -90,11 +90,10 @@
 	function loadEditView(dataUrl) {
 		// Pass in with crop={crop}.
 		var crop = {
-			x: 35,
+			x: 20,
 			y: 10,
-			width: 20,
-			height: 30,
-			aspect: 16 / 9
+			width: 60,
+			aspect: 3 / 4
 		};
 		_reactDom2.default.render(_react2.default.createElement(_ReactCrop2.default, { crop: crop, src: dataUrl, onImageLoaded: onImageLoaded, onComplete: onCropComplete }), cropEditor);
 	}
@@ -20241,11 +20240,22 @@
 				} else if (crop.height) {
 					crop.width = crop.height * crop.aspect / imageAspect;
 				}
+				this.adjustOnImageLoadCrop(crop, imageAspect);
 				this.cropInvalid = !crop.width || !crop.height;
 				this.setState({ crop: crop });
 			}
 			if (this.props.onImageLoaded) {
 				this.props.onImageLoaded(crop);
+			}
+		},
+		adjustOnImageLoadCrop: function adjustOnImageLoadCrop(crop, imageAspect) {
+			if (crop.y + crop.height > 100) {
+				crop.height = 100 - crop.y;
+				crop.width = crop.height * crop.aspect / imageAspect;
+			}
+			if (crop.x + crop.width > 100) {
+				crop.width = 100 - crop.x;
+				crop.height = crop.width / crop.aspect * imageAspect;
 			}
 		},
 		render: function render() {

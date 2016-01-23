@@ -62,6 +62,8 @@ var crop = {
 
 ..Or you can omit both and only specify the aspect.
 
+Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
+
 #### minWidth (optional)
 
 A minimum crop width.

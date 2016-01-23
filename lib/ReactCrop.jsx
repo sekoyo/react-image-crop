@@ -554,11 +554,23 @@ var ReactCrop = React.createClass({
 			} else if (crop.height) {
 				crop.width = (crop.height * crop.aspect) / imageAspect;
 			}
+			this.adjustOnImageLoadCrop(crop, imageAspect);
 			this.cropInvalid = !crop.width || !crop.height;
 			this.setState({ crop: crop });
 		}
 		if (this.props.onImageLoaded) {
 			this.props.onImageLoaded(crop);
+		}
+	},
+
+	adjustOnImageLoadCrop(crop, imageAspect) {
+		if (crop.y + crop.height > 100) {
+			crop.height = 100 - crop.y;
+			crop.width = (crop.height * crop.aspect) / imageAspect;
+		}
+		if (crop.x + crop.width > 100) {
+			crop.width = 100 - crop.x;
+			crop.height = (crop.width / crop.aspect) * imageAspect;
 		}
 	},
 
