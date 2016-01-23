@@ -45,7 +45,10 @@ var ReactCrop = _react2.default.createClass({
 		crop: _react2.default.PropTypes.object,
 		minWidth: _react2.default.PropTypes.number,
 		minHeight: _react2.default.PropTypes.number,
-		keepSelection: _react2.default.PropTypes.bool
+		keepSelection: _react2.default.PropTypes.bool,
+		onChange: _react2.default.PropTypes.func,
+		onComplete: _react2.default.PropTypes.func,
+		onImageLoaded: _react2.default.PropTypes.func
 	},
 
 	xOrds: ['e', 'w'],
@@ -527,8 +530,22 @@ var ReactCrop = _react2.default.createClass({
 			} else if (crop.height) {
 				crop.width = crop.height * crop.aspect / imageAspect;
 			}
+			this.adjustOnImageLoadCrop(crop, imageAspect);
 			this.cropInvalid = !crop.width || !crop.height;
 			this.setState({ crop: crop });
+		}
+		if (this.props.onImageLoaded) {
+			this.props.onImageLoaded(crop);
+		}
+	},
+	adjustOnImageLoadCrop: function adjustOnImageLoadCrop(crop, imageAspect) {
+		if (crop.y + crop.height > 100) {
+			crop.height = 100 - crop.y;
+			crop.width = crop.height * crop.aspect / imageAspect;
+		}
+		if (crop.x + crop.width > 100) {
+			crop.width = 100 - crop.x;
+			crop.height = crop.width / crop.aspect * imageAspect;
 		}
 	},
 	render: function render() {

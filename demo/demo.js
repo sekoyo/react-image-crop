@@ -32,13 +32,16 @@ var cropEditor = document.querySelector('#crop-editor');
 function loadEditView(dataUrl) {
 	// Pass in with crop={crop}.
 	var crop = {
-		x: 35,
+		x: 20,
 		y: 10,
-		width: 20,
-		height: 30,
-		aspect: 16/9
+		width: 60,
+		aspect: 3/4
 	};
-	ReactDOM.render(<ReactCrop crop={crop} src={dataUrl} onComplete={onCropComplete} />, cropEditor);
+	ReactDOM.render(<ReactCrop crop={crop} src={dataUrl} onImageLoaded={onImageLoaded} onComplete={onCropComplete} />, cropEditor);
+}
+
+function onImageLoaded(crop) {
+	console.log("Image was loaded. Crop:", crop);
 }
 
 /**

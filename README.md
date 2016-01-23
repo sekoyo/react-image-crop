@@ -62,6 +62,8 @@ var crop = {
 
 ..Or you can omit both and only specify the aspect.
 
+Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
+
 #### minWidth (optional)
 
 A minimum crop width.
@@ -81,6 +83,10 @@ A callback which happens for every change of the crop (i.e. many times as you ar
 #### onComplete(crop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
+
+#### onImageLoaded(crop) (optional)
+
+A callback which happens when the image is loaded. Passes the current crop state object.
 
 ## What about showing the crop on the client?
 
