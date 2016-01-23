@@ -1,3 +1,8 @@
+0.0.15
+
+	- Add onImageLoaded
+	- Adjust crop when used with aspect if the missing dimension exceeds bounds
+
 0.0.14
 
 	- Add `keepSelection` option (See Readme for desc)
