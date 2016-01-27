@@ -1,3 +1,7 @@
+0.1.0
+
+	- Bugfix: Position calc of mouse/touch was incorrect on windows with scrollbars
+
 0.0.15
 
 	- Add onImageLoaded
