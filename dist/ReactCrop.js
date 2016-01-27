@@ -338,20 +338,20 @@ var ReactCrop = _react2.default.createClass({
 		this.mouseDownOnCrop = true;
 	},
 	getClientPos: function getClientPos(e) {
-		var clientX = undefined,
-		    clientY = undefined;
+		var pageX = undefined,
+		    pageY = undefined;
 
 		if (e.touches) {
-			clientX = e.touches[0].clientX;
-			clientY = e.touches[0].clientY;
+			pageX = e.touches[0].pageX;
+			pageY = e.touches[0].pageY;
 		} else {
-			clientX = e.clientX;
-			clientY = e.clientY;
+			pageX = e.pageX;
+			pageY = e.pageY;
 		}
 
 		return {
-			x: clientX,
-			y: clientY
+			x: pageX,
+			y: pageY
 		};
 	},
 	onComponentMouseTouchDown: function onComponentMouseTouchDown(e) {
