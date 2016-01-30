@@ -13,9 +13,9 @@ fileInput.addEventListener('change', function(e) {
 
 	if (!file || !imageType.test(file.type)) {
 		return;
-    }
+	}
 
-    var reader = new FileReader();
+	var reader = new FileReader();
 
 	reader.onload = function(e) {
 		loadEditView(e.target.result);
