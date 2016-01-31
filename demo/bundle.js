@@ -20132,6 +20132,9 @@
 			}
 
 			if (nudged) {
+				if (e) {
+					e.preventDefault();
+				}
 				crop.x = this.clamp(crop.x, 0, 100 - crop.width);
 				crop.y = this.clamp(crop.y, 0, 100 - crop.height);
 
