@@ -1,3 +1,7 @@
+0.1.1
+
+	- Fixed bug that allows window to scroll when arrows are pressed
+
 0.1.0
 
 	- Bugfix: Position calc of mouse/touch was incorrect on windows with scrollbars
