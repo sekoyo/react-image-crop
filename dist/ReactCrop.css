@@ -3,6 +3,10 @@
   display: inline-block;
   cursor: crosshair;
   overflow: hidden; }
+  
+.ReactCrop img {
+	width: 100%;
+}
 
 .ReactCrop:focus {
   outline: none; }
