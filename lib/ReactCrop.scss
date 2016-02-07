@@ -22,6 +22,10 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 	overflow: hidden;
 }
 
+.ReactCrop img {
+	width: 100%;
+}
+
 .ReactCrop:focus {
 	outline: none;
 }
