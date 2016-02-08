@@ -15,7 +15,6 @@
   top: 0;
   left: 0; }
 
-/* Responsive criooer image */  
 .ReactCrop--image,
 .ReactCrop--image-copy {
 	max-width: 100%;
