@@ -11,13 +11,13 @@
   display: block; }
 
 .ReactCrop--image-copy {
- 	position: absolute;
+  position: absolute;
   top: 0;
   left: 0; }
 
 .ReactCrop--image,
 .ReactCrop--image-copy {
-	max-width: 100%;
+  max-width: 100%;
 }
 
 .ReactCrop--crop-wrapper {
