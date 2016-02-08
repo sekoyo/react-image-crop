@@ -3,10 +3,6 @@
   display: inline-block;
   cursor: crosshair;
   overflow: hidden; }
-  
-.ReactCrop img {
-	width: 100%;
-}
 
 .ReactCrop:focus {
   outline: none; }
@@ -15,9 +11,14 @@
   display: block; }
 
 .ReactCrop--image-copy {
-  position: absolute;
+ 	position: absolute;
   top: 0;
   left: 0; }
+  
+.ReactCrop--image,
+.ReactCrop--image-copy {
+	max-width: 100%;
+}
 
 .ReactCrop--crop-wrapper {
   position: absolute;
