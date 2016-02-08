@@ -509,37 +509,54 @@ var ReactCrop = React.createClass({
 		);
 	},
 
+	arrayDividedBy100(arr, delimeter) {
+		delimeter = delimeter || ' ';
+		return arr.map(number => number / 100).join(delimeter);
+	},
+
 	arrayToPercent(arr, delimeter) {
 		delimeter = delimeter || ' ';
 		return arr.map(number => number + '%').join(delimeter);
 	},
 
-	getImageClipStyle() {
+	getPolygonValues(forSvg) {
 		let crop = this.state.crop;
+		let pTopLeft = [ crop.x, crop.y ];
+		let pTopRight = [ crop.x + crop.width, crop.y ];
+		let pBottomLeft = [ crop.x, crop.y + crop.height ];
+		let pBottomRight = [ crop.x + crop.width, crop.y + crop.height ];
 
-		let right = 100 - (crop.x + crop.width);
-		let bottom = 100 - (crop.y + crop.height);
-
-		// Safari doesn't like it if values add up to exactly
-		// 100 (it doesn't draw the clip). I have submitted a bug.
-		if (crop.x + right === 100) {
-			right -= 0.00001;
+		if(forSvg) {
+			pTopLeft = this.arrayDividedBy100(pTopLeft);
+			pTopRight = this.arrayDividedBy100(pTopRight);
+			pBottomLeft = this.arrayDividedBy100(pBottomLeft);
+			pBottomRight = this.arrayDividedBy100(pBottomRight);
+		} else {
+			pTopLeft = this.arrayToPercent(pTopLeft);
+			pTopRight = this.arrayToPercent(pTopRight);
+			pBottomLeft = this.arrayToPercent(pBottomLeft);
+			pBottomRight = this.arrayToPercent(pBottomRight);
 		}
+		return {
+			top: {
+				left: pTopLeft,
+				right: pTopRight
+			},
+			bottom: {
+				left: pBottomLeft,
+				right: pBottomRight
+			}
+		};
+	},
 
-		if (crop.y + bottom === 100) {
-			bottom -= 0.00001;
-		}
+	getImageClipStyle() {
+		let polygon = this.getPolygonValues();
 
-		let insetVal = 'inset(' + this.arrayToPercent([
-			crop.y,
-			right,
-			bottom,
-			crop.x
-		]) +')';
+		let polygonVal = `polygon(${polygon.top.left}, ${polygon.top.right}, ${polygon.bottom.right}, ${polygon.bottom.left})`;
 
 		return {
-			WebkitClipPath: insetVal,
-			clipPath: insetVal
+			WebkitClipPath: polygonVal,
+			clipPath: 'url("#ReactCropperClipPolygon")'
 		};
 	},
 
@@ -577,6 +594,24 @@ var ReactCrop = React.createClass({
 		}
 	},
 
+	getClipPathHtml() {
+		let polygon = this.getPolygonValues(true);
+		// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
+		return {
+			__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">' +
+						`<polygon points="${polygon.top.left}, ${polygon.top.right}, ${polygon.bottom.right}, ${polygon.bottom.left}" />` +
+					'</clipPath>'
+		};
+	},
+
+	renderSvg() {
+		return (
+			<svg width="0" height="0" style={{ position: 'absolute', top: '0', left: '0' }}>
+				<defs dangerouslySetInnerHTML={ this.getClipPathHtml() } />
+			</svg>
+		);
+	},
+
 	render() {
 		let cropSelection, imageClip;
 
@@ -601,6 +636,7 @@ var ReactCrop = React.createClass({
 				onMouseDown={this.onComponentMouseTouchDown}
 				tabIndex="1"
 				onKeyDown={this.onComponentKeyDown}>
+				{ this.renderSvg() }
 
 				<img ref='image' className='ReactCrop--image' src={this.props.src} onLoad={this.onImageLoad} />
 

@@ -9366,6 +9366,7 @@
 	 */
 	var EventInterface = {
 	  type: null,
+	  target: null,
 	  // currentTarget is set when dispatching; no use in copying it here
 	  currentTarget: emptyFunction.thatReturnsNull,
 	  eventPhase: null,
@@ -9399,8 +9400,6 @@
 	  this.dispatchConfig = dispatchConfig;
 	  this.dispatchMarker = dispatchMarker;
 	  this.nativeEvent = nativeEvent;
-	  this.target = nativeEventTarget;
-	  this.currentTarget = nativeEventTarget;
 
 	  var Interface = this.constructor.Interface;
 	  for (var propName in Interface) {
@@ -9411,7 +9410,11 @@
 	    if (normalize) {
 	      this[propName] = normalize(nativeEvent);
 	    } else {
-	      this[propName] = nativeEvent[propName];
+	      if (propName === 'target') {
+	        this.target = nativeEventTarget;
+	      } else {
+	        this[propName] = nativeEvent[propName];
+	      }
 	    }
 	  }
 
@@ -13260,7 +13263,10 @@
 	      }
 	    });
 
-	    nativeProps.children = content;
+	    if (content) {
+	      nativeProps.children = content;
+	    }
+
 	    return nativeProps;
 	  }
 
@@ -18733,7 +18739,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.6';
+	module.exports = '0.14.7';
 
 /***/ },
 /* 147 */
@@ -20200,33 +20206,55 @@
 				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
 			);
 		},
+		arrayDividedBy100: function arrayDividedBy100(arr, delimeter) {
+			delimeter = delimeter || ' ';
+			return arr.map(function (number) {
+				return number / 100;
+			}).join(delimeter);
+		},
 		arrayToPercent: function arrayToPercent(arr, delimeter) {
 			delimeter = delimeter || ' ';
 			return arr.map(function (number) {
 				return number + '%';
 			}).join(delimeter);
 		},
-		getImageClipStyle: function getImageClipStyle() {
+		getPolygonValues: function getPolygonValues(forSvg) {
 			var crop = this.state.crop;
+			var pTopLeft = [crop.x, crop.y];
+			var pTopRight = [crop.x + crop.width, crop.y];
+			var pBottomLeft = [crop.x, crop.y + crop.height];
+			var pBottomRight = [crop.x + crop.width, crop.y + crop.height];
 
-			var right = 100 - (crop.x + crop.width);
-			var bottom = 100 - (crop.y + crop.height);
-
-			// Safari doesn't like it if values add up to exactly
-			// 100 (it doesn't draw the clip). I have submitted a bug.
-			if (crop.x + right === 100) {
-				right -= 0.00001;
+			if (forSvg) {
+				pTopLeft = this.arrayDividedBy100(pTopLeft);
+				pTopRight = this.arrayDividedBy100(pTopRight);
+				pBottomLeft = this.arrayDividedBy100(pBottomLeft);
+				pBottomRight = this.arrayDividedBy100(pBottomRight);
+			} else {
+				pTopLeft = this.arrayToPercent(pTopLeft);
+				pTopRight = this.arrayToPercent(pTopRight);
+				pBottomLeft = this.arrayToPercent(pBottomLeft);
+				pBottomRight = this.arrayToPercent(pBottomRight);
 			}
+			return {
+				top: {
+					left: pTopLeft,
+					right: pTopRight
+				},
+				bottom: {
+					left: pBottomLeft,
+					right: pBottomRight
+				}
+			};
+		},
+		getImageClipStyle: function getImageClipStyle() {
+			var polygon = this.getPolygonValues();
 
-			if (crop.y + bottom === 100) {
-				bottom -= 0.00001;
-			}
-
-			var insetVal = 'inset(' + this.arrayToPercent([crop.y, right, bottom, crop.x]) + ')';
+			var polygonVal = 'polygon(' + polygon.top.left + ', ' + polygon.top.right + ', ' + polygon.bottom.right + ', ' + polygon.bottom.left + ')';
 
 			return {
-				WebkitClipPath: insetVal,
-				clipPath: insetVal
+				WebkitClipPath: polygonVal,
+				clipPath: 'url("#ReactCropperClipPolygon")'
 			};
 		},
 		onImageLoad: function onImageLoad(e) {
@@ -20261,6 +20289,20 @@
 				crop.height = crop.width / crop.aspect * imageAspect;
 			}
 		},
+		getClipPathHtml: function getClipPathHtml() {
+			var polygon = this.getPolygonValues(true);
+			// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
+			return {
+				__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">' + ('<polygon points="' + polygon.top.left + ', ' + polygon.top.right + ', ' + polygon.bottom.right + ', ' + polygon.bottom.left + '" />') + '</clipPath>'
+			};
+		},
+		renderSvg: function renderSvg() {
+			return _react2.default.createElement(
+				'svg',
+				{ width: '0', height: '0', style: { position: 'absolute', top: '0', left: '0' } },
+				_react2.default.createElement('defs', { dangerouslySetInnerHTML: this.getClipPathHtml() })
+			);
+		},
 		render: function render() {
 			var cropSelection = undefined,
 			    imageClip = undefined;
@@ -20287,6 +20329,7 @@
 					onMouseDown: this.onComponentMouseTouchDown,
 					tabIndex: '1',
 					onKeyDown: this.onComponentKeyDown },
+				this.renderSvg(),
 				_react2.default.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
 				_react2.default.createElement(
 					'div',
