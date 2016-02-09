@@ -509,13 +509,11 @@ var ReactCrop = React.createClass({
 		);
 	},
 
-	arrayDividedBy100(arr, delimeter) {
-		delimeter = delimeter || ' ';
+	arrayDividedBy100(arr, delimeter = ' ') {
 		return arr.map(number => number / 100).join(delimeter);
 	},
 
-	arrayToPercent(arr, delimeter) {
-		delimeter = delimeter || ' ';
+	arrayToPercent(arr, delimeter = ' ') {
 		return arr.map(number => number + '%').join(delimeter);
 	},
 
@@ -549,15 +547,9 @@ var ReactCrop = React.createClass({
 		};
 	},
 
-	getImageClipStyle() {
-		let polygon = this.getPolygonValues();
-
-		let polygonVal = `polygon(${polygon.top.left}, ${polygon.top.right}, ${polygon.bottom.right}, ${polygon.bottom.left})`;
-
-		return {
-			WebkitClipPath: polygonVal,
-			clipPath: 'url("#ReactCropperClipPolygon")'
-		};
+	getPolygonClipPath() {
+		let { top, bottom } = this.getPolygonValues();
+		return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
 	},
 
 	onImageLoad(e) {
@@ -594,13 +586,13 @@ var ReactCrop = React.createClass({
 		}
 	},
 
+	// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
 	getClipPathHtml() {
-		let polygon = this.getPolygonValues(true);
-		// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
+		let { top, bottom } = this.getPolygonValues(true);
 		return {
-			__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">' +
-						`<polygon points="${polygon.top.left}, ${polygon.top.right}, ${polygon.bottom.right}, ${polygon.bottom.left}" />` +
-					'</clipPath>'
+			__html: `<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">
+								<polygon points="${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}" />
+							</clipPath>`
 		};
 	},
 
@@ -617,7 +609,10 @@ var ReactCrop = React.createClass({
 
 		if (!this.cropInvalid) {
 			cropSelection = this.createCropSelection();
-			imageClip = this.getImageClipStyle();
+			imageClip = {
+				WebkitClipPath: this.getPolygonClipPath(),
+				clipPath: 'url("#ReactCropperClipPolygon")'
+			};
 		}
 
 		let componentClasses = ['ReactCrop'];

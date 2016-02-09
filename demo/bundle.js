@@ -20206,14 +20206,16 @@
 				_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
 			);
 		},
-		arrayDividedBy100: function arrayDividedBy100(arr, delimeter) {
-			delimeter = delimeter || ' ';
+		arrayDividedBy100: function arrayDividedBy100(arr) {
+			var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+
 			return arr.map(function (number) {
 				return number / 100;
 			}).join(delimeter);
 		},
-		arrayToPercent: function arrayToPercent(arr, delimeter) {
-			delimeter = delimeter || ' ';
+		arrayToPercent: function arrayToPercent(arr) {
+			var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+
 			return arr.map(function (number) {
 				return number + '%';
 			}).join(delimeter);
@@ -20247,15 +20249,13 @@
 				}
 			};
 		},
-		getImageClipStyle: function getImageClipStyle() {
-			var polygon = this.getPolygonValues();
+		getPolygonClipPath: function getPolygonClipPath() {
+			var _getPolygonValues = this.getPolygonValues();
 
-			var polygonVal = 'polygon(' + polygon.top.left + ', ' + polygon.top.right + ', ' + polygon.bottom.right + ', ' + polygon.bottom.left + ')';
+			var top = _getPolygonValues.top;
+			var bottom = _getPolygonValues.bottom;
 
-			return {
-				WebkitClipPath: polygonVal,
-				clipPath: 'url("#ReactCropperClipPolygon")'
-			};
+			return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
 		},
 		onImageLoad: function onImageLoad(e) {
 			var crop = this.state.crop;
@@ -20289,11 +20289,17 @@
 				crop.height = crop.width / crop.aspect * imageAspect;
 			}
 		},
+
+
+		// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
 		getClipPathHtml: function getClipPathHtml() {
-			var polygon = this.getPolygonValues(true);
-			// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
+			var _getPolygonValues2 = this.getPolygonValues(true);
+
+			var top = _getPolygonValues2.top;
+			var bottom = _getPolygonValues2.bottom;
+
 			return {
-				__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">' + ('<polygon points="' + polygon.top.left + ', ' + polygon.top.right + ', ' + polygon.bottom.right + ', ' + polygon.bottom.left + '" />') + '</clipPath>'
+				__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">\n\t\t\t\t\t\t\t\t<polygon points="' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + '" />\n\t\t\t\t\t\t\t</clipPath>'
 			};
 		},
 		renderSvg: function renderSvg() {
@@ -20309,7 +20315,10 @@
 
 			if (!this.cropInvalid) {
 				cropSelection = this.createCropSelection();
-				imageClip = this.getImageClipStyle();
+				imageClip = {
+					WebkitClipPath: this.getPolygonClipPath(),
+					clipPath: 'url("#ReactCropperClipPolygon")'
+				};
 			}
 
 			var componentClasses = ['ReactCrop'];
