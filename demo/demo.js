@@ -41,7 +41,7 @@ function loadEditView(dataUrl) {
 }
 
 function onImageLoaded(crop) {
-	console.log("Image was loaded. Crop:", crop);
+	console.log('Image was loaded. Crop:', crop);
 }
 
 /**

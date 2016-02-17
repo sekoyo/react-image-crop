@@ -1,33 +1,8 @@
 import React from 'react';
+import assign from 'object-assign';
 
-function objectAssign(target, source) {
-	let from;
-	let to = target;
-	let symbols;
+const ReactCrop = React.createClass({
 
-	for (let s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (let key in from) {
-			if (Object.prototype.hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (Object.getOwnPropertySymbols) {
-			symbols = Object.getOwnPropertySymbols(from);
-			for (let i = 0; i < symbols.length; i++) {
-				if (Object.prototype.propertyIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-}
-
-var ReactCrop = React.createClass({
 	propTypes: {
 		src: React.PropTypes.string.isRequired,
 		crop: React.PropTypes.object,
@@ -59,9 +34,9 @@ var ReactCrop = React.createClass({
 	},
 
 	getInitialState(props = this.props) {
-		let crop = objectAssign({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
+		const crop = assign({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
 
-		this.cropInvalid = (crop.width === 0 || crop.height === 0);
+		this.cropInvalid = (!crop.width || !crop.height);
 
 		return {
 			crop: crop
@@ -100,11 +75,11 @@ var ReactCrop = React.createClass({
 	},
 
 	straightenYPath(clientX) {
-		let evData = this.evData;
-		let ord = evData.ord;
-		let cropOffset = evData.cropOffset;
-		let cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
-		let cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
+		const evData = this.evData;
+		const ord = evData.ord;
+		const cropOffset = evData.cropOffset;
+		const cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
+		const cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
 		let k, d;
 
 		if (ord === 'nw' || ord === 'se') {
@@ -123,18 +98,18 @@ var ReactCrop = React.createClass({
 			return;
 		}
 
-		let crop = this.state.crop;
-		let evData = this.evData;
-		let clientPos = this.getClientPos(e);
+		const crop = this.state.crop;
+		const evData = this.evData;
+		const clientPos = this.getClientPos(e);
 
 		if (evData.isResize && crop.aspect && evData.cropOffset) {
 			clientPos.y = this.straightenYPath(clientPos.x);
 		}
 
-		let xDiffPx = clientPos.x - evData.clientStartX;
+		const xDiffPx = clientPos.x - evData.clientStartX;
 		evData.xDiffPc = xDiffPx / evData.imageWidth * 100;
 
-		let yDiffPx = clientPos.y - evData.clientStartY;
+		const yDiffPx = clientPos.y - evData.clientStartY;
 		evData.yDiffPc = yDiffPx / evData.imageHeight * 100;
 
 		if (evData.isResize) {
@@ -153,9 +128,9 @@ var ReactCrop = React.createClass({
 	},
 
 	getNewSize() {
-		let crop = this.state.crop;
-		let evData = this.evData;
-		let imageAspect = evData.imageWidth / evData.imageHeight;
+		const crop = this.state.crop;
+		const evData = this.evData;
+		const imageAspect = evData.imageWidth / evData.imageHeight;
 
 		// New width.
 		let newWidth = evData.cropStartWidth + evData.xDiffPc;
@@ -211,9 +186,9 @@ var ReactCrop = React.createClass({
 	},
 
 	resizeCrop() {
-		let crop = this.state.crop;
-		let evData = this.evData;
-		let ord = evData.ord;
+		const crop = this.state.crop;
+		const evData = this.evData;
+		const ord = evData.ord;
 
 		// On the inverse change the diff so it's the same and
 		// the same algo applies.
@@ -225,7 +200,7 @@ var ReactCrop = React.createClass({
 		}
 
 		// New size.
-		let newSize = this.getNewSize();
+		const newSize = this.getNewSize();
 
 		// Adjust x/y to give illusion of 'staticness' as width/height is increased
 		// when polarity is inversed.
@@ -265,8 +240,8 @@ var ReactCrop = React.createClass({
 	},
 
 	dragCrop() {
-		let crop = this.state.crop;
-		let evData = this.evData;
+		const crop = this.state.crop;
+		const evData = this.evData;
 		crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
 		crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
 	},
@@ -287,7 +262,7 @@ var ReactCrop = React.createClass({
 	},
 
 	crossOverCheck() {
-		let evData = this.evData;
+		const evData = this.evData;
 
 		if ((!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc >= 0) ||
 			(evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc <= 0)) {
@@ -299,8 +274,8 @@ var ReactCrop = React.createClass({
 			evData.yCrossOver = !evData.yCrossOver;
 		}
 
-		let swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
-		let swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
+		const swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
+		const swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
 
 		evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
 		evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
@@ -309,15 +284,15 @@ var ReactCrop = React.createClass({
 	onCropMouseTouchDown(e) {
 		e.preventDefault(); // Stop drag selection.
 
-		let crop = this.state.crop;
-		let clientPos = this.getClientPos(e);
+		const crop = this.state.crop;
+		const clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
 		this.refs.component.focus();
 
-		let ord = e.target.dataset.ord;
-		let xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
-		let yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
+		const ord = e.target.dataset.ord;
+		const xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
+		const yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
 
 		let cropOffset;
 
@@ -373,14 +348,14 @@ var ReactCrop = React.createClass({
 		e.preventDefault(); // Stop drag selection.
 
 		let crop = this.props.keepSelection === true ? {} : this.state.crop;
-		let clientPos = this.getClientPos(e);
+		const clientPos = this.getClientPos(e);
 
 		// Focus for detecting keypress.
 		this.refs.component.focus();
 
-		let imageOffset = this.getElementOffset(this.refs.image);
-		let xPc = (clientPos.x - imageOffset.left) / this.refs.image.width * 100;
-		let yPc = (clientPos.y - imageOffset.top) / this.refs.image.height * 100;
+		const imageOffset = this.getElementOffset(this.refs.image);
+		const xPc = (clientPos.x - imageOffset.left) / this.refs.image.width * 100;
+		const yPc = (clientPos.y - imageOffset.top) / this.refs.image.height * 100;
 
 		crop.x = xPc;
 		crop.y = yPc;
@@ -411,8 +386,8 @@ var ReactCrop = React.createClass({
 	},
 
 	onComponentKeyDown(e) {
-		let keyCode = e.which;
-		let crop = this.state.crop;
+		const keyCode = e.which;
+		const crop = this.state.crop;
 		let nudged = false;
 
 		if (!crop.width || !crop.height) {
@@ -466,11 +441,11 @@ var ReactCrop = React.createClass({
 	},
 
 	getElementOffset(el) {
-		let rect = el.getBoundingClientRect();
-		let docEl = document.documentElement;
+		const rect = el.getBoundingClientRect();
+		const docEl = document.documentElement;
 
-		let rectTop = rect.top + window.pageYOffset - docEl.clientTop;
-		let rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
+		const rectTop = rect.top + window.pageYOffset - docEl.clientTop;
+		const rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
 
 		return {
 			top: rectTop,
@@ -483,7 +458,7 @@ var ReactCrop = React.createClass({
 	},
 
 	createCropSelection() {
-		let style = this.getCropStyle();
+		const style = this.getCropStyle();
 
 		return (
 			<div ref='cropSelect'
@@ -518,13 +493,13 @@ var ReactCrop = React.createClass({
 	},
 
 	getPolygonValues(forSvg) {
-		let crop = this.state.crop;
+		const crop = this.state.crop;
 		let pTopLeft = [ crop.x, crop.y ];
 		let pTopRight = [ crop.x + crop.width, crop.y ];
 		let pBottomLeft = [ crop.x, crop.y + crop.height ];
 		let pBottomRight = [ crop.x + crop.width, crop.y + crop.height ];
 
-		if(forSvg) {
+		if (forSvg) {
 			pTopLeft = this.arrayDividedBy100(pTopLeft);
 			pTopRight = this.arrayDividedBy100(pTopRight);
 			pBottomLeft = this.arrayDividedBy100(pBottomLeft);
@@ -548,15 +523,15 @@ var ReactCrop = React.createClass({
 	},
 
 	getPolygonClipPath() {
-		let { top, bottom } = this.getPolygonValues();
+		const { top, bottom } = this.getPolygonValues();
 		return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
 	},
 
 	onImageLoad(e) {
-		let crop = this.state.crop;
-		let imageWidth = e.target.naturalWidth;
-		let imageHeight = e.target.naturalHeight;
-		let imageAspect = imageWidth / imageHeight;
+		const crop = this.state.crop;
+		const imageWidth = e.target.naturalWidth;
+		const imageHeight = e.target.naturalHeight;
+		const imageAspect = imageWidth / imageHeight;
 
 		// If there is a width or height then infer the other to
 		// ensure the value is correct.
@@ -588,11 +563,11 @@ var ReactCrop = React.createClass({
 
 	// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
 	getClipPathHtml() {
-		let { top, bottom } = this.getPolygonValues(true);
+		const { top, bottom } = this.getPolygonValues(true);
 		return {
 			__html: `<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">
-								<polygon points="${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}" />
-							</clipPath>`
+						<polygon points="${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}" />
+					</clipPath>`
 		};
 	},
 
@@ -631,7 +606,7 @@ var ReactCrop = React.createClass({
 				onMouseDown={this.onComponentMouseTouchDown}
 				tabIndex="1"
 				onKeyDown={this.onComponentKeyDown}>
-				{ this.renderSvg() }
+				{this.renderSvg()}
 
 				<img ref='image' className='ReactCrop--image' src={this.props.src} onLoad={this.onImageLoad} />
 

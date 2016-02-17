@@ -99,7 +99,7 @@
 	}
 
 	function onImageLoaded(crop) {
-		console.log("Image was loaded. Crop:", crop);
+		console.log('Image was loaded. Crop:', crop);
 	}
 
 	/**
@@ -19724,34 +19724,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _objectAssign = __webpack_require__(160);
+
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function objectAssign(target, source) {
-		var from = undefined;
-		var to = target;
-		var symbols = undefined;
-
-		for (var s = 1; s < arguments.length; s++) {
-			from = Object(arguments[s]);
-
-			for (var key in from) {
-				if (Object.prototype.hasOwnProperty.call(from, key)) {
-					to[key] = from[key];
-				}
-			}
-
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
-				for (var i = 0; i < symbols.length; i++) {
-					if (Object.prototype.propertyIsEnumerable.call(from, symbols[i])) {
-						to[symbols[i]] = from[symbols[i]];
-					}
-				}
-			}
-		}
-
-		return to;
-	}
 
 	var ReactCrop = _react2.default.createClass({
 		displayName: 'ReactCrop',
@@ -19789,9 +19766,9 @@
 		getInitialState: function getInitialState() {
 			var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 
-			var crop = objectAssign({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
+			var crop = (0, _objectAssign2.default)({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
 
-			this.cropInvalid = crop.width === 0 || crop.height === 0;
+			this.cropInvalid = !crop.width || !crop.height;
 
 			return {
 				crop: crop
@@ -20290,7 +20267,6 @@
 			}
 		},
 
-
 		// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
 		getClipPathHtml: function getClipPathHtml() {
 			var _getPolygonValues2 = this.getPolygonValues(true);
@@ -20299,7 +20275,7 @@
 			var bottom = _getPolygonValues2.bottom;
 
 			return {
-				__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">\n\t\t\t\t\t\t\t\t<polygon points="' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + '" />\n\t\t\t\t\t\t\t</clipPath>'
+				__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">\n\t\t\t\t\t\t<polygon points="' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + '" />\n\t\t\t\t\t</clipPath>'
 			};
 		},
 		renderSvg: function renderSvg() {
@@ -20352,6 +20328,51 @@
 	});
 
 	exports.default = ReactCrop;
+
+/***/ },
+/* 160 */
+/***/ function(module, exports) {
+
+	/* eslint-disable no-unused-vars */
+	'use strict';
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+
+		return Object(val);
+	}
+
+	module.exports = Object.assign || function (target, source) {
+		var from;
+		var to = toObject(target);
+		var symbols;
+
+		for (var s = 1; s < arguments.length; s++) {
+			from = Object(arguments[s]);
+
+			for (var key in from) {
+				if (hasOwnProperty.call(from, key)) {
+					to[key] = from[key];
+				}
+			}
+
+			if (Object.getOwnPropertySymbols) {
+				symbols = Object.getOwnPropertySymbols(from);
+				for (var i = 0; i < symbols.length; i++) {
+					if (propIsEnumerable.call(from, symbols[i])) {
+						to[symbols[i]] = from[symbols[i]];
+					}
+				}
+			}
+		}
+
+		return to;
+	};
+
 
 /***/ }
 /******/ ]);

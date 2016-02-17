@@ -8,34 +8,11 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _objectAssign = require('object-assign');
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function objectAssign(target, source) {
-	var from = undefined;
-	var to = target;
-	var symbols = undefined;
-
-	for (var s = 1; s < arguments.length; s++) {
-		from = Object(arguments[s]);
-
-		for (var key in from) {
-			if (Object.prototype.hasOwnProperty.call(from, key)) {
-				to[key] = from[key];
-			}
-		}
-
-		if (Object.getOwnPropertySymbols) {
-			symbols = Object.getOwnPropertySymbols(from);
-			for (var i = 0; i < symbols.length; i++) {
-				if (Object.prototype.propertyIsEnumerable.call(from, symbols[i])) {
-					to[symbols[i]] = from[symbols[i]];
-				}
-			}
-		}
-	}
-
-	return to;
-}
 
 var ReactCrop = _react2.default.createClass({
 	displayName: 'ReactCrop',
@@ -73,9 +50,9 @@ var ReactCrop = _react2.default.createClass({
 	getInitialState: function getInitialState() {
 		var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 
-		var crop = objectAssign({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
+		var crop = (0, _objectAssign2.default)({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
 
-		this.cropInvalid = crop.width === 0 || crop.height === 0;
+		this.cropInvalid = !crop.width || !crop.height;
 
 		return {
 			crop: crop
@@ -574,7 +551,6 @@ var ReactCrop = _react2.default.createClass({
 		}
 	},
 
-
 	// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
 	getClipPathHtml: function getClipPathHtml() {
 		var _getPolygonValues2 = this.getPolygonValues(true);
@@ -583,7 +559,7 @@ var ReactCrop = _react2.default.createClass({
 		var bottom = _getPolygonValues2.bottom;
 
 		return {
-			__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">\n\t\t\t\t\t\t\t\t<polygon points="' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + '" />\n\t\t\t\t\t\t\t</clipPath>'
+			__html: '<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">\n\t\t\t\t\t\t<polygon points="' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + '" />\n\t\t\t\t\t</clipPath>'
 		};
 	},
 	renderSvg: function renderSvg() {
