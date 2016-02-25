@@ -529,8 +529,9 @@ const ReactCrop = React.createClass({
 
 	onImageLoad(e) {
 		const crop = this.state.crop;
-		const imageWidth = e.target.naturalWidth;
-		const imageHeight = e.target.naturalHeight;
+		const image = e.target;
+		const imageWidth = image.naturalWidth;
+		const imageHeight = image.naturalHeight;
 		const imageAspect = imageWidth / imageHeight;
 
 		// If there is a width or height then infer the other to
@@ -546,7 +547,7 @@ const ReactCrop = React.createClass({
 			this.setState({ crop: crop });
 		}
 		if (this.props.onImageLoaded) {
-			this.props.onImageLoaded(crop);
+			this.props.onImageLoaded(crop, image);
 		}
 	},
 
