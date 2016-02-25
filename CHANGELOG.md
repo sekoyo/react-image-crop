@@ -1,7 +1,6 @@
 0.1.2
 
-	- Make crop darkened background work on Firefox (FF doesn't support clip-path: inset)
-	- Use `object-assign` package and declare it as a peerDependency
+	As of this version release notes can be found at [Releases](/DominicTobias/react-image-crop/releases)
 
 0.1.1
 
