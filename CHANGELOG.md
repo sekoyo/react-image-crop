@@ -1,6 +1,5 @@
 0.1.2
-
-	As of this version release notes can be found at [Releases](/DominicTobias/react-image-crop/releases)
+As of this version release notes can be found at [Releases](/DominicTobias/react-image-crop/releases)
 
 0.1.1
 
