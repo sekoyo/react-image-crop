@@ -520,6 +520,7 @@ var ReactCrop = _react2.default.createClass({
 	},
 	onImageLoad: function onImageLoad(e) {
 		var crop = this.state.crop;
+		var image = e.target;
 		var imageWidth = e.target.naturalWidth;
 		var imageHeight = e.target.naturalHeight;
 		var imageAspect = imageWidth / imageHeight;
@@ -537,7 +538,7 @@ var ReactCrop = _react2.default.createClass({
 			this.setState({ crop: crop });
 		}
 		if (this.props.onImageLoaded) {
-			this.props.onImageLoaded(crop);
+			this.props.onImageLoaded(crop, image);
 		}
 	},
 	adjustOnImageLoadCrop: function adjustOnImageLoadCrop(crop, imageAspect) {
