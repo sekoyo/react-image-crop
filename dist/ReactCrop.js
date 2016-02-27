@@ -17,6 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var ReactCrop = _react2.default.createClass({
 	displayName: 'ReactCrop',
 
+
 	propTypes: {
 		src: _react2.default.PropTypes.string.isRequired,
 		crop: _react2.default.PropTypes.object,
@@ -520,8 +521,9 @@ var ReactCrop = _react2.default.createClass({
 	},
 	onImageLoad: function onImageLoad(e) {
 		var crop = this.state.crop;
-		var imageWidth = e.target.naturalWidth;
-		var imageHeight = e.target.naturalHeight;
+		var image = e.target;
+		var imageWidth = image.naturalWidth;
+		var imageHeight = image.naturalHeight;
 		var imageAspect = imageWidth / imageHeight;
 
 		// If there is a width or height then infer the other to
@@ -537,7 +539,7 @@ var ReactCrop = _react2.default.createClass({
 			this.setState({ crop: crop });
 		}
 		if (this.props.onImageLoaded) {
-			this.props.onImageLoaded(crop);
+			this.props.onImageLoaded(crop, image);
 		}
 	},
 	adjustOnImageLoadCrop: function adjustOnImageLoadCrop(crop, imageAspect) {
@@ -550,6 +552,7 @@ var ReactCrop = _react2.default.createClass({
 			crop.height = crop.width / crop.aspect * imageAspect;
 		}
 	},
+
 
 	// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
 	getClipPathHtml: function getClipPathHtml() {

@@ -8,12 +8,14 @@
   outline: none; }
 
 .ReactCrop--image {
-  display: block; }
+  display: block;
+  max-width: 100%; }
 
 .ReactCrop--image-copy {
   position: absolute;
   top: 0;
-  left: 0; }
+  left: 0;
+  max-width: 100%; }
 
 .ReactCrop--crop-wrapper {
   position: absolute;
