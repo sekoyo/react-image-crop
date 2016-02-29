@@ -51,7 +51,7 @@ var ReactCrop = _react2.default.createClass({
 	getInitialState: function getInitialState() {
 		var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 
-		var crop = (0, _objectAssign2.default)({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
+		var crop = (0, _objectAssign2.default)({}, this.defaultCrop, this.state ? this.state.crop : {}, props.crop);
 
 		this.cropInvalid = !crop.width || !crop.height;
 

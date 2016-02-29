@@ -34,7 +34,7 @@ const ReactCrop = React.createClass({
 	},
 
 	getInitialState(props = this.props) {
-		const crop = assign({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
+		const crop = assign({}, this.defaultCrop, this.state ? this.state.crop : {}, props.crop);
 
 		this.cropInvalid = (!crop.width || !crop.height);
 
