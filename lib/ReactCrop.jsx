@@ -30,11 +30,12 @@ const ReactCrop = React.createClass({
 		x: 0,
 		y: 0,
 		width: 0,
-		height: 0
+		height: 0,
+		aspect: false
 	},
 
 	getInitialState(props = this.props) {
-		const crop = assign({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
+		const crop = assign({}, this.defaultCrop, props.crop);
 
 		this.cropInvalid = (!crop.width || !crop.height);
 

@@ -30,14 +30,42 @@ fileInput.addEventListener('change', function(e) {
 var cropEditor = document.querySelector('#crop-editor');
 
 function loadEditView(dataUrl) {
-	// Pass in with crop={crop}.
-	var crop = {
-		x: 20,
-		y: 10,
-		width: 60,
-		aspect: 3/4
-	};
-	ReactDOM.render(<ReactCrop crop={crop} src={dataUrl} onImageLoaded={onImageLoaded} onComplete={onCropComplete} />, cropEditor);
+	
+	var Parent = React.createClass({
+		getInitialState: function() {
+			return {
+				crop: {
+					x: 0,
+					y: 0,		
+					aspect: 16/9,
+					width: 50
+				}
+			};
+		},
+
+		onButtonClick: function() {
+			this.setState({
+				crop: {
+					x: 20,
+					y: 5,		
+					aspect: false,
+					width: 30,
+					height: 50
+				}
+			});
+		},
+
+		render: function() {
+			return (
+				<div>
+					<ReactCrop crop={this.state.crop} src={dataUrl} onImageLoaded={onImageLoaded} onComplete={onCropComplete} />
+					<button onClick={this.onButtonClick}>Programatically set crop</button>
+				</div>
+			);
+		}
+	});
+
+	ReactDOM.render(<Parent />, cropEditor);
 }
 
 function onImageLoaded(crop) {

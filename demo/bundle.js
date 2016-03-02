@@ -88,14 +88,48 @@
 	var cropEditor = document.querySelector('#crop-editor');
 
 	function loadEditView(dataUrl) {
-		// Pass in with crop={crop}.
-		var crop = {
-			x: 20,
-			y: 10,
-			width: 60,
-			aspect: 3 / 4
-		};
-		_reactDom2.default.render(_react2.default.createElement(_ReactCrop2.default, { crop: crop, src: dataUrl, onImageLoaded: onImageLoaded, onComplete: onCropComplete }), cropEditor);
+
+		var Parent = _react2.default.createClass({
+			displayName: 'Parent',
+
+			getInitialState: function getInitialState() {
+				return {
+					crop: {
+						x: 0,
+						y: 0,
+						aspect: 16 / 9,
+						width: 50
+					}
+				};
+			},
+
+			onButtonClick: function onButtonClick() {
+				this.setState({
+					crop: {
+						x: 20,
+						y: 5,
+						aspect: false,
+						width: 30,
+						height: 50
+					}
+				});
+			},
+
+			render: function render() {
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(_ReactCrop2.default, { crop: this.state.crop, src: dataUrl, onImageLoaded: onImageLoaded, onComplete: onCropComplete }),
+					_react2.default.createElement(
+						'button',
+						{ onClick: this.onButtonClick },
+						'Programatically set crop'
+					)
+				);
+			}
+		});
+
+		_reactDom2.default.render(_react2.default.createElement(Parent, null), cropEditor);
 	}
 
 	function onImageLoaded(crop) {
@@ -19733,6 +19767,7 @@
 	var ReactCrop = _react2.default.createClass({
 		displayName: 'ReactCrop',
 
+
 		propTypes: {
 			src: _react2.default.PropTypes.string.isRequired,
 			crop: _react2.default.PropTypes.object,
@@ -19766,7 +19801,7 @@
 		getInitialState: function getInitialState() {
 			var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
 
-			var crop = (0, _objectAssign2.default)({}, this.defaultCrop, props.crop, this.state ? this.state.crop : {});
+			var crop = (0, _objectAssign2.default)({}, this.defaultCrop, props.crop);
 
 			this.cropInvalid = !crop.width || !crop.height;
 
@@ -20236,8 +20271,9 @@
 		},
 		onImageLoad: function onImageLoad(e) {
 			var crop = this.state.crop;
-			var imageWidth = e.target.naturalWidth;
-			var imageHeight = e.target.naturalHeight;
+			var image = e.target;
+			var imageWidth = image.naturalWidth;
+			var imageHeight = image.naturalHeight;
 			var imageAspect = imageWidth / imageHeight;
 
 			// If there is a width or height then infer the other to
@@ -20253,7 +20289,7 @@
 				this.setState({ crop: crop });
 			}
 			if (this.props.onImageLoaded) {
-				this.props.onImageLoaded(crop);
+				this.props.onImageLoaded(crop, image);
 			}
 		},
 		adjustOnImageLoadCrop: function adjustOnImageLoadCrop(crop, imageAspect) {
@@ -20266,6 +20302,7 @@
 				crop.height = crop.width / crop.aspect * imageAspect;
 			}
 		},
+
 
 		// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
 		getClipPathHtml: function getClipPathHtml() {
