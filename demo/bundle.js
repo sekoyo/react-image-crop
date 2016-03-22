@@ -19795,7 +19795,8 @@
 			x: 0,
 			y: 0,
 			width: 0,
-			height: 0
+			height: 0,
+			aspect: false
 		},
 
 		getInitialState: function getInitialState() {
@@ -19842,8 +19843,8 @@
 			var cropOffset = evData.cropOffset;
 			var cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
 			var cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
-			var k = undefined,
-			    d = undefined;
+			var k = void 0,
+			    d = void 0;
 
 			if (ord === 'nw' || ord === 'se') {
 				k = cropStartHeight / cropStartWidth;
@@ -19910,7 +19911,7 @@
 			newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
 
 			// New height.
-			var newHeight = undefined;
+			var newHeight = void 0;
 
 			if (crop.aspect) {
 				newHeight = newWidth / crop.aspect * imageAspect;
@@ -20001,7 +20002,7 @@
 			crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
 		},
 		inverseOrd: function inverseOrd(ord) {
-			var inverseOrd = undefined;
+			var inverseOrd = void 0;
 
 			if (ord === 'n') inverseOrd = 's';else if (ord === 'ne') inverseOrd = 'sw';else if (ord === 'e') inverseOrd = 'w';else if (ord === 'se') inverseOrd = 'nw';else if (ord === 's') inverseOrd = 'n';else if (ord === 'sw') inverseOrd = 'ne';else if (ord === 'w') inverseOrd = 'e';else if (ord === 'nw') inverseOrd = 'se';
 
@@ -20037,7 +20038,7 @@
 			var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
 			var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
 
-			var cropOffset = undefined;
+			var cropOffset = void 0;
 
 			if (crop.aspect) {
 				cropOffset = this.getElementOffset(this.refs.cropSelect);
@@ -20066,8 +20067,8 @@
 			this.mouseDownOnCrop = true;
 		},
 		getClientPos: function getClientPos(e) {
-			var pageX = undefined,
-			    pageY = undefined;
+			var pageX = void 0,
+			    pageY = void 0;
 
 			if (e.touches) {
 				pageX = e.touches[0].pageX;
@@ -20083,7 +20084,7 @@
 			};
 		},
 		onComponentMouseTouchDown: function onComponentMouseTouchDown(e) {
-			if (e.target !== this.refs.imageCopy) {
+			if (e.target !== this.refs.imageCopy && e.target !== this.refs.cropWrapper) {
 				return;
 			}
 
@@ -20323,8 +20324,8 @@
 			);
 		},
 		render: function render() {
-			var cropSelection = undefined,
-			    imageClip = undefined;
+			var cropSelection = void 0,
+			    imageClip = void 0;
 
 			if (!this.cropInvalid) {
 				cropSelection = this.createCropSelection();
@@ -20355,7 +20356,7 @@
 				_react2.default.createElement('img', { ref: 'image', className: 'ReactCrop--image', src: this.props.src, onLoad: this.onImageLoad }),
 				_react2.default.createElement(
 					'div',
-					{ className: 'ReactCrop--crop-wrapper' },
+					{ className: 'ReactCrop--crop-wrapper', ref: 'cropWrapper' },
 					_react2.default.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
 					cropSelection
 				),
