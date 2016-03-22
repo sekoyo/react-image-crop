@@ -342,7 +342,7 @@ const ReactCrop = React.createClass({
 	},
 
 	onComponentMouseTouchDown(e) {
-		if (e.target !== this.refs.imageCopy) {
+		if (e.target !== this.refs.imageCopy && e.target !== this.refs.cropWrapper) {
 			return;
 		}
 
@@ -612,7 +612,7 @@ const ReactCrop = React.createClass({
 
 				<img ref='image' className='ReactCrop--image' src={this.props.src} onLoad={this.onImageLoad} />
 
-				<div className='ReactCrop--crop-wrapper'>
+				<div className='ReactCrop--crop-wrapper' ref="cropWrapper">
 					<img ref='imageCopy' className='ReactCrop--image-copy' src={this.props.src} style={imageClip} />
 					{cropSelection}
 				</div>
