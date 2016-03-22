@@ -334,7 +334,7 @@ var ReactCrop = _react2.default.createClass({
 		};
 	},
 	onComponentMouseTouchDown: function onComponentMouseTouchDown(e) {
-		if (e.target !== this.refs.imageCopy || e.target !== this.refs.cropWrapper) {
+		if (e.target !== this.refs.imageCopy && e.target !== this.refs.cropWrapper) {
 			return;
 		}
 
