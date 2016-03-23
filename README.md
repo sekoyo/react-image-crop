@@ -20,6 +20,8 @@ Include the main js module, e.g.:
 
 ```js
 var ReactCrop = require('react-image-crop');
+//without Babel
+var ReactCrop = require('react-image-crop').default;
 // or es6:
 import ReactCrop from 'react-image-crop';
 ```
