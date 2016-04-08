@@ -1,48 +1,62 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import assign from 'object-assign';
 
-const ReactCrop = React.createClass({
+class ReactCrop extends Component {
 
-	propTypes: {
-		src: React.PropTypes.string.isRequired,
-		crop: React.PropTypes.object,
-		minWidth: React.PropTypes.number,
-		minHeight: React.PropTypes.number,
-		keepSelection: React.PropTypes.bool,
-		onChange: React.PropTypes.func,
-		onComplete: React.PropTypes.func,
-		onImageLoaded: React.PropTypes.func
-	},
+	static propTypes = {
+		src: PropTypes.string.isRequired,
+		crop: PropTypes.object,
+		minWidth: PropTypes.number,
+		minHeight: PropTypes.number,
+		keepSelection: PropTypes.bool,
+		onChange: PropTypes.func,
+		onComplete: PropTypes.func,
+		onImageLoaded: PropTypes.func
+	}
 
-	xOrds: ['e', 'w'],
-	yOrds: ['n', 's'],
-	xyOrds: ['nw', 'ne', 'se', 'sw'],
+	static xOrds = ['e', 'w']
+	static yOrds = ['n', 's']
+	static xyOrds = ['nw', 'ne', 'se', 'sw']
 
-	arrowKey: {
+	static arrowKey = {
 		left: 37,
 		up: 38,
 		right: 39,
 		down: 40
-	},
-	nudgeStep: 0.2,
+	}
 
-	defaultCrop: {
+	static nudgeStep = 0.2
+
+	static defaultCrop = {
 		x: 0,
 		y: 0,
 		width: 0,
 		height: 0,
 		aspect: false
-	},
+	}
 
-	getInitialState(props = this.props) {
-		const crop = assign({}, this.defaultCrop, props.crop);
+	constructor(props) {
+		super(props);
+
+		this.onDocMouseTouchMove = this.onDocMouseTouchMove.bind(this);
+		this.onDocMouseTouchEnd = this.onDocMouseTouchEnd.bind(this);
+		this.onImageLoad = this.onImageLoad.bind(this);
+		this.onComponentMouseTouchDown = this.onComponentMouseTouchDown.bind(this);
+		this.onComponentKeyDown = this.onComponentKeyDown.bind(this);
+		this.onCropMouseTouchDown = this.onCropMouseTouchDown.bind(this);
+
+		this.state = this.getState();
+	}
+
+	getState(props = this.props) {
+		const crop = assign({}, ReactCrop.defaultCrop, props.crop);
 
 		this.cropInvalid = (!crop.width || !crop.height);
 
 		return {
 			crop: crop
 		};
-	},
+	}
 
 	componentDidMount() {
 		document.addEventListener('mousemove', this.onDocMouseTouchMove);
@@ -51,7 +65,7 @@ const ReactCrop = React.createClass({
 		document.addEventListener('mouseup', this.onDocMouseTouchEnd);
 		document.addEventListener('touchend', this.onDocMouseTouchEnd);
 		document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
-	},
+	}
 
 	componentWillUnmount() {
 		document.removeEventListener('mousemove', this.onDocMouseTouchMove);
@@ -60,11 +74,11 @@ const ReactCrop = React.createClass({
 		document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
 		document.removeEventListener('touchend', this.onDocMouseTouchEnd);
 		document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
-	},
+	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState(this.getInitialState(nextProps));
-	},
+		this.setState(this.getState(nextProps));
+	}
 
 	getCropStyle() {
 		return {
@@ -73,7 +87,7 @@ const ReactCrop = React.createClass({
 			width: this.state.crop.width + '%',
 			height: this.state.crop.height + '%'
 		};
-	},
+	}
 
 	straightenYPath(clientX) {
 		const evData = this.evData;
@@ -92,7 +106,7 @@ const ReactCrop = React.createClass({
 		}
 
 		return k * clientX + d;
-	},
+	}
 
 	onDocMouseTouchMove(e) {
 		if (!this.mouseDownOnCrop) {
@@ -126,7 +140,7 @@ const ReactCrop = React.createClass({
 		}
 
 		this.setState({ crop: crop });
-	},
+	}
 
 	getNewSize() {
 		const crop = this.state.crop;
@@ -184,7 +198,7 @@ const ReactCrop = React.createClass({
 			width: newWidth,
 			height: newHeight
 		};
-	},
+	}
 
 	resizeCrop() {
 		const crop = this.state.crop;
@@ -227,25 +241,25 @@ const ReactCrop = React.createClass({
 		crop.y = this.clamp(newY, 0, 100 - newSize.height);
 
 		// Apply width/height changes depending on ordinate.
-		if (this.xyOrds.indexOf(ord) > -1) {
+		if (ReactCrop.xyOrds.indexOf(ord) > -1) {
 			crop.width = newSize.width;
 			crop.height = newSize.height;
-		} else if (this.xOrds.indexOf(ord) > -1) {
+		} else if (ReactCrop.xOrds.indexOf(ord) > -1) {
 			crop.width = newSize.width;
-		} else if (this.yOrds.indexOf(ord) > -1) {
+		} else if (ReactCrop.yOrds.indexOf(ord) > -1) {
 			crop.height = newSize.height;
 		}
 
 		evData.lastYCrossover = evData.yCrossOver;
 		this.crossOverCheck();
-	},
+	}
 
 	dragCrop() {
 		const crop = this.state.crop;
 		const evData = this.evData;
 		crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
 		crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
-	},
+	}
 
 	inverseOrd(ord) {
 		let inverseOrd;
@@ -260,7 +274,7 @@ const ReactCrop = React.createClass({
 		else if (ord === 'nw') inverseOrd = 'se';
 
 		return inverseOrd;
-	},
+	}
 
 	crossOverCheck() {
 		const evData = this.evData;
@@ -280,7 +294,7 @@ const ReactCrop = React.createClass({
 
 		evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
 		evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
-	},
+	}
 
 	onCropMouseTouchDown(e) {
 		e.preventDefault(); // Stop drag selection.
@@ -322,7 +336,7 @@ const ReactCrop = React.createClass({
 		};
 
 		this.mouseDownOnCrop = true;
-	},
+	}
 
 	getClientPos(e) {
 		let pageX, pageY;
@@ -339,7 +353,7 @@ const ReactCrop = React.createClass({
 			x: pageX,
 			y: pageY
 		};
-	},
+	}
 
 	onComponentMouseTouchDown(e) {
 		if (e.target !== this.refs.imageCopy && e.target !== this.refs.cropWrapper) {
@@ -384,7 +398,7 @@ const ReactCrop = React.createClass({
 
 		this.mouseDownOnCrop = true;
 		this.setState({ newCropIsBeingDrawn: true });
-	},
+	}
 
 	onComponentKeyDown(e) {
 		const keyCode = e.which;
@@ -395,17 +409,17 @@ const ReactCrop = React.createClass({
 			return;
 		}
 
-		if (keyCode === this.arrowKey.left) {
-			crop.x -= this.nudgeStep;
+		if (keyCode === ReactCrop.arrowKey.left) {
+			crop.x -= ReactCrop.nudgeStep;
 			nudged = true;
-		} else if (keyCode === this.arrowKey.right) {
-			crop.x += this.nudgeStep;
+		} else if (keyCode === ReactCrop.arrowKey.right) {
+			crop.x += ReactCrop.nudgeStep;
 			nudged = true;
-		} else if (keyCode === this.arrowKey.up) {
-			crop.y -= this.nudgeStep;
+		} else if (keyCode === ReactCrop.arrowKey.up) {
+			crop.y -= ReactCrop.nudgeStep;
 			nudged = true;
-		} else if (keyCode === this.arrowKey.down) {
-			crop.y += this.nudgeStep;
+		} else if (keyCode === ReactCrop.arrowKey.down) {
+			crop.y += ReactCrop.nudgeStep;
 			nudged = true;
 		}
 
@@ -425,7 +439,7 @@ const ReactCrop = React.createClass({
 				this.props.onComplete(crop);
 			}
 		}
-	},
+	}
 
 	onDocMouseTouchEnd(e) {
 		if (this.mouseDownOnCrop) {
@@ -439,7 +453,7 @@ const ReactCrop = React.createClass({
 
 			this.setState({ newCropIsBeingDrawn: false });
 		}
-	},
+	}
 
 	getElementOffset(el) {
 		const rect = el.getBoundingClientRect();
@@ -452,11 +466,11 @@ const ReactCrop = React.createClass({
 			top: rectTop,
 			left: rectLeft
 		};
-	},
+	}
 
 	clamp(num, min, max) {
 		return Math.min(Math.max(num, min), max);
-	},
+	}
 
 	createCropSelection() {
 		const style = this.getCropStyle();
@@ -483,15 +497,15 @@ const ReactCrop = React.createClass({
 				<div className='ReactCrop--drag-handle ord-w' data-ord='w'></div>
 			</div>
 		);
-	},
+	}
 
 	arrayDividedBy100(arr, delimeter = ' ') {
 		return arr.map(number => number / 100).join(delimeter);
-	},
+	}
 
 	arrayToPercent(arr, delimeter = ' ') {
 		return arr.map(number => number + '%').join(delimeter);
-	},
+	}
 
 	getPolygonValues(forSvg) {
 		const crop = this.state.crop;
@@ -521,12 +535,12 @@ const ReactCrop = React.createClass({
 				right: pBottomRight
 			}
 		};
-	},
+	}
 
 	getPolygonClipPath() {
 		const { top, bottom } = this.getPolygonValues();
 		return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
-	},
+	}
 
 	onImageLoad(e) {
 		const crop = this.state.crop;
@@ -550,7 +564,7 @@ const ReactCrop = React.createClass({
 		if (this.props.onImageLoaded) {
 			this.props.onImageLoaded(crop, image);
 		}
-	},
+	}
 
 	adjustOnImageLoadCrop(crop, imageAspect) {
 		if (crop.y + crop.height > 100) {
@@ -561,25 +575,23 @@ const ReactCrop = React.createClass({
 			crop.width = 100 - crop.x;
 			crop.height = (crop.width / crop.aspect) * imageAspect;
 		}
-	},
+	}
 
-	// We used dangerouslySetInnerHTML because react refuses to add the attribute 'clipPathUnits' to the rendered DOM
-	getClipPathHtml() {
-		const { top, bottom } = this.getPolygonValues(true);
-		return {
-			__html: `<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">
-						<polygon points="${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}" />
-					</clipPath>`
-		};
-	},
-
+	// Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
 	renderSvg() {
+		const { top, bottom } = this.getPolygonValues(true);
+		const points = `${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}`;
+
 		return (
-			<svg width="0" height="0" style={{ position: 'absolute', top: '0', left: '0' }}>
-				<defs dangerouslySetInnerHTML={ this.getClipPathHtml() } />
+			<svg width="0" height="0" style={{ position: 'absolute' }}>
+				<defs>
+					<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">
+						<polygon points={`${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}`} />
+					</clipPath>
+				</defs>
 			</svg>
 		);
-	},
+	}
 
 	render() {
 		let cropSelection, imageClip;
@@ -621,6 +633,6 @@ const ReactCrop = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 export default ReactCrop;

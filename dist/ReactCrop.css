@@ -2,7 +2,8 @@
   position: relative;
   display: inline-block;
   cursor: crosshair;
-  overflow: hidden; }
+  overflow: hidden;
+  max-width: 100%; }
 
 .ReactCrop:focus {
   outline: none; }

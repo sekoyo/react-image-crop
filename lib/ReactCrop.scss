@@ -20,6 +20,7 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 	display: inline-block;
 	cursor: crosshair;
 	overflow: hidden;
+	max-width: 100%;
 }
 
 .ReactCrop:focus {
