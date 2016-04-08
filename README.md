@@ -111,3 +111,5 @@ I wanted to keep this component focused so I didn't provide this. Normally a cro
 To develop run `npm run dev`, this will recompile your JS on changes. If you wish to change css then run `npm run sass-watch` in another tab.
 
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
+
+A commit hook will ensure that `npm run release` is ran for you, or you can do it yourself so you have a single commit.
