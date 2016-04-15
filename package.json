@@ -4,6 +4,7 @@
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "index.js",
+  "jsnext:main": "lib/ReactCrop.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack --progress --colors --watch --config demo/webpack.config.js",
