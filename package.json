@@ -5,6 +5,7 @@
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "index.js",
   "jsnext:main": "lib/ReactCrop.jsx",
+  "style": "dist/ReactCrop.css",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --progress --colors --watch --config demo/webpack.config.js & npm run sass-watch",
