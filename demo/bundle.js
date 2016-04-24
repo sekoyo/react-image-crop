@@ -108,7 +108,7 @@
 					crop: {
 						x: 20,
 						y: 5,
-						aspect: false,
+						aspect: 1,
 						width: 30,
 						height: 50
 					}
@@ -20148,7 +20148,11 @@
 		}, {
 			key: 'componentWillReceiveProps',
 			value: function componentWillReceiveProps(nextProps) {
-				this.setState(this.getState(nextProps));
+				var nextState = this.getState(nextProps);
+				if (nextState.crop.aspect) {
+					this.ensureAspectDimensions(nextState.crop, this.refs.image);
+				}
+				this.setState(nextState);
 			}
 		}, {
 			key: 'getCropStyle',
@@ -20632,33 +20636,18 @@
 				return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
 			}
 		}, {
-			key: 'onImageLoad',
-			value: function onImageLoad(e) {
-				var crop = this.state.crop;
-				var image = e.target;
-				var imageWidth = image.naturalWidth;
-				var imageHeight = image.naturalHeight;
+			key: 'ensureAspectDimensions',
+			value: function ensureAspectDimensions(crop, imageEl) {
+				var imageWidth = imageEl.naturalWidth;
+				var imageHeight = imageEl.naturalHeight;
 				var imageAspect = imageWidth / imageHeight;
 
-				// If there is a width or height then infer the other to
-				// ensure the value is correct.
-				if (crop.aspect) {
-					if (crop.width) {
-						crop.height = crop.width / crop.aspect * imageAspect;
-					} else if (crop.height) {
-						crop.width = crop.height * crop.aspect / imageAspect;
-					}
-					this.adjustOnImageLoadCrop(crop, imageAspect);
-					this.cropInvalid = !crop.width || !crop.height;
-					this.setState({ crop: crop });
+				if (crop.width) {
+					crop.height = crop.width / crop.aspect * imageAspect;
+				} else if (crop.height) {
+					crop.width = crop.height * crop.aspect / imageAspect;
 				}
-				if (this.props.onImageLoaded) {
-					this.props.onImageLoaded(crop, image);
-				}
-			}
-		}, {
-			key: 'adjustOnImageLoadCrop',
-			value: function adjustOnImageLoadCrop(crop, imageAspect) {
+
 				if (crop.y + crop.height > 100) {
 					crop.height = 100 - crop.y;
 					crop.width = crop.height * crop.aspect / imageAspect;
@@ -20666,6 +20655,23 @@
 				if (crop.x + crop.width > 100) {
 					crop.width = 100 - crop.x;
 					crop.height = crop.width / crop.aspect * imageAspect;
+				}
+			}
+		}, {
+			key: 'onImageLoad',
+			value: function onImageLoad(e) {
+				var crop = this.state.crop;
+				var imageEl = e.target;
+
+				// If there is a width or height then infer the other to
+				// ensure the value is correct.
+				if (crop.aspect) {
+					this.ensureAspectDimensions(crop, imageEl);
+					this.cropInvalid = !crop.width || !crop.height;
+					this.setState({ crop: crop });
+				}
+				if (this.props.onImageLoaded) {
+					this.props.onImageLoaded(crop, imageEl);
 				}
 			}
 

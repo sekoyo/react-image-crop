@@ -108,7 +108,7 @@ I wanted to keep this component focused so I didn't provide this. Normally a cro
 
 ## Contributing / Developing
 
-To develop run `npm run dev`, this will recompile your JS on changes. If you wish to change css then run `npm run sass-watch` in another tab.
+To develop run `npm start`, this will recompile your JS and SCSS on changes.
 
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
 
