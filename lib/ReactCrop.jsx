@@ -77,7 +77,11 @@ class ReactCrop extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.setState(this.getState(nextProps));
+		const nextState = this.getState(nextProps);
+		if (nextState.crop.aspect) {
+			this.ensureAspectDimensions(nextState.crop, this.refs.image);
+		}
+		this.setState(nextState);
 	}
 
 	getCropStyle() {
@@ -542,31 +546,17 @@ class ReactCrop extends Component {
 		return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
 	}
 
-	onImageLoad(e) {
-		const crop = this.state.crop;
-		const image = e.target;
-		const imageWidth = image.naturalWidth;
-		const imageHeight = image.naturalHeight;
+	ensureAspectDimensions(crop, imageEl) {
+		const imageWidth = imageEl.naturalWidth;
+		const imageHeight = imageEl.naturalHeight;
 		const imageAspect = imageWidth / imageHeight;
 
-		// If there is a width or height then infer the other to
-		// ensure the value is correct.
-		if (crop.aspect) {
-			if (crop.width) {
-				crop.height = (crop.width / crop.aspect) * imageAspect;
-			} else if (crop.height) {
-				crop.width = (crop.height * crop.aspect) / imageAspect;
-			}
-			this.adjustOnImageLoadCrop(crop, imageAspect);
-			this.cropInvalid = !crop.width || !crop.height;
-			this.setState({ crop: crop });
+		if (crop.width) {
+			crop.height = (crop.width / crop.aspect) * imageAspect;
+		} else if (crop.height) {
+			crop.width = (crop.height * crop.aspect) / imageAspect;
 		}
-		if (this.props.onImageLoaded) {
-			this.props.onImageLoaded(crop, image);
-		}
-	}
 
-	adjustOnImageLoadCrop(crop, imageAspect) {
 		if (crop.y + crop.height > 100) {
 			crop.height = 100 - crop.y;
 			crop.width = (crop.height * crop.aspect) / imageAspect;
@@ -574,6 +564,22 @@ class ReactCrop extends Component {
 		if (crop.x + crop.width > 100) {
 			crop.width = 100 - crop.x;
 			crop.height = (crop.width / crop.aspect) * imageAspect;
+		}
+	}
+
+	onImageLoad(e) {
+		const crop = this.state.crop;
+		const imageEl = e.target;
+
+		// If there is a width or height then infer the other to
+		// ensure the value is correct.
+		if (crop.aspect) {
+			this.ensureAspectDimensions(crop, imageEl);
+			this.cropInvalid = !crop.width || !crop.height;
+			this.setState({ crop: crop });
+		}
+		if (this.props.onImageLoaded) {
+			this.props.onImageLoaded(crop, imageEl);
 		}
 	}
 

@@ -48,7 +48,7 @@ function loadEditView(dataUrl) {
 				crop: {
 					x: 20,
 					y: 5,		
-					aspect: false,
+					aspect: 1,
 					width: 30,
 					height: 50
 				}
