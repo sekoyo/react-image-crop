@@ -36,8 +36,8 @@ function loadEditView(dataUrl) {
 			return {
 				crop: {
 					x: 0,
-					y: 0,		
-					aspect: 16/9,
+					y: 0,
+					height: 16/9,
 					width: 50
 				}
 			};
@@ -47,7 +47,7 @@ function loadEditView(dataUrl) {
 			this.setState({
 				crop: {
 					x: 20,
-					y: 5,		
+					y: 5,
 					aspect: 1,
 					width: 30,
 					height: 50
@@ -55,10 +55,24 @@ function loadEditView(dataUrl) {
 			});
 		},
 
+		onImageLoaded: function(crop) {
+			console.log('Image was loaded. Crop:', crop);
+			// this.setState({
+			// 	crop: {
+			// 		aspect: 16/9,
+			// 		width: 30,
+			// 	}
+			// });
+		},
+
+		onCropComplete: function(crop) {
+			// console.log('Crop move complete:', crop);
+		},
+
 		render: function() {
 			return (
 				<div>
-					<ReactCrop crop={this.state.crop} src={dataUrl} onImageLoaded={onImageLoaded} onComplete={onCropComplete} />
+					<ReactCrop crop={this.state.crop} src={dataUrl} onImageLoaded={this.onImageLoaded} onComplete={this.onCropComplete} />
 					<button onClick={this.onButtonClick}>Programatically set crop</button>
 				</div>
 			);
@@ -66,15 +80,4 @@ function loadEditView(dataUrl) {
 	});
 
 	ReactDOM.render(<Parent />, cropEditor);
-}
-
-function onImageLoaded(crop) {
-	console.log('Image was loaded. Crop:', crop);
-}
-
-/**
- * On crop complete update the preview.
- */
-function onCropComplete (crop) {
-	// console.log('Crop move complete:', crop);
 }

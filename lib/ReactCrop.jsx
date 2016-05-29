@@ -81,6 +81,7 @@ class ReactCrop extends Component {
 		if (nextState.crop.aspect) {
 			this.ensureAspectDimensions(nextState.crop, this.refs.image);
 		}
+		this.cropInvalid = !nextState.crop.width || !nextState.crop.height;
 		this.setState(nextState);
 	}
 

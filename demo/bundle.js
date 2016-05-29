@@ -97,7 +97,7 @@
 					crop: {
 						x: 0,
 						y: 0,
-						aspect: 16 / 9,
+						height: 16 / 9,
 						width: 50
 					}
 				};
@@ -115,11 +115,25 @@
 				});
 			},
 
+			onImageLoaded: function onImageLoaded(crop) {
+				console.log('Image was loaded. Crop:', crop);
+				// this.setState({
+				// 	crop: {
+				// 		aspect: 16/9,
+				// 		width: 30,
+				// 	}
+				// });
+			},
+
+			onCropComplete: function onCropComplete(crop) {
+				// console.log('Crop move complete:', crop);
+			},
+
 			render: function render() {
 				return _react2.default.createElement(
 					'div',
 					null,
-					_react2.default.createElement(_ReactCrop2.default, { crop: this.state.crop, src: dataUrl, onImageLoaded: onImageLoaded, onComplete: onCropComplete }),
+					_react2.default.createElement(_ReactCrop2.default, { crop: this.state.crop, src: dataUrl, onImageLoaded: this.onImageLoaded, onComplete: this.onCropComplete }),
 					_react2.default.createElement(
 						'button',
 						{ onClick: this.onButtonClick },
@@ -130,17 +144,6 @@
 		});
 
 		_reactDom2.default.render(_react2.default.createElement(Parent, null), cropEditor);
-	}
-
-	function onImageLoaded(crop) {
-		console.log('Image was loaded. Crop:', crop);
-	}
-
-	/**
-	 * On crop complete update the preview.
-	 */
-	function onCropComplete(crop) {
-		// console.log('Crop move complete:', crop);
 	}
 
 /***/ },
@@ -20152,6 +20155,7 @@
 				if (nextState.crop.aspect) {
 					this.ensureAspectDimensions(nextState.crop, this.refs.image);
 				}
+				this.cropInvalid = !nextState.crop.width || !nextState.crop.height;
 				this.setState(nextState);
 			}
 		}, {
