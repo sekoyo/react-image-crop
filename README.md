@@ -116,4 +116,4 @@ A commit hook will ensure that `npm run release` is ran for you, or you can do i
 
 ## Browser compatibility
 
-Should work on any modern browser, however the darkened non-selected part of the image will not work in IE11 or IE Edge due to a lack of [clipPath(http://caniuse.com/#search=clippath) support.
+Should work on any modern browser, however the darkened non-selected part of the image will not work in IE11 or IE Edge due to a lack of [clipPath](http://caniuse.com/#search=clippath) support.
