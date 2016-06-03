@@ -504,47 +504,8 @@ class ReactCrop extends Component {
 		);
 	}
 
-	arrayDividedBy100(arr, delimeter = ' ') {
-		return arr.map(number => number / 100).join(delimeter);
-	}
-
 	arrayToPercent(arr, delimeter = ' ') {
 		return arr.map(number => number + '%').join(delimeter);
-	}
-
-	getPolygonValues(forSvg) {
-		const crop = this.state.crop;
-		let pTopLeft = [ crop.x, crop.y ];
-		let pTopRight = [ crop.x + crop.width, crop.y ];
-		let pBottomLeft = [ crop.x, crop.y + crop.height ];
-		let pBottomRight = [ crop.x + crop.width, crop.y + crop.height ];
-
-		if (forSvg) {
-			pTopLeft = this.arrayDividedBy100(pTopLeft);
-			pTopRight = this.arrayDividedBy100(pTopRight);
-			pBottomLeft = this.arrayDividedBy100(pBottomLeft);
-			pBottomRight = this.arrayDividedBy100(pBottomRight);
-		} else {
-			pTopLeft = this.arrayToPercent(pTopLeft);
-			pTopRight = this.arrayToPercent(pTopRight);
-			pBottomLeft = this.arrayToPercent(pBottomLeft);
-			pBottomRight = this.arrayToPercent(pBottomRight);
-		}
-		return {
-			top: {
-				left: pTopLeft,
-				right: pTopRight
-			},
-			bottom: {
-				left: pBottomLeft,
-				right: pBottomRight
-			}
-		};
-	}
-
-	getPolygonClipPath() {
-		const { top, bottom } = this.getPolygonValues();
-		return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
 	}
 
 	ensureAspectDimensions(crop, imageEl) {
@@ -584,31 +545,51 @@ class ReactCrop extends Component {
 		}
 	}
 
-	// Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
-	renderSvg() {
-		const { top, bottom } = this.getPolygonValues(true);
-		const points = `${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}`;
+	createCropOverlay(crop) {
+		const b0 = {
+			top: 0,
+			bottom: 0,
+			left: 0,
+			width: crop.x + '%',
+		};
+
+		const b1 = {
+			top: '0%',
+			left: crop.x + '%',
+			height: crop.y + '%',
+			width: crop.width + '%',
+		};
+
+		const b2 = {
+			top: (crop.y + crop.height) + '%',
+			left: crop.x + '%',
+			height: (100 - (crop.y + crop.height)) + '%',
+			width: crop.width + '%',
+		};
+
+		const b3 = {
+			top: 0,
+			left: (crop.x + crop.width) + '%',
+			bottom: 0,
+			width: (100 - (crop.x + crop.width)) + '%',
+		};
 
 		return (
-			<svg width="0" height="0" style={{ position: 'absolute' }}>
-				<defs>
-					<clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">
-						<polygon points={`${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}`} />
-					</clipPath>
-				</defs>
-			</svg>
+			<div className='ReactCrop--overlay'>
+				<div className='ReactCrop--overlay-box' style={b0} />
+				<div className='ReactCrop--overlay-box' style={b1} />
+				<div className='ReactCrop--overlay-box' style={b2} />
+				<div className='ReactCrop--overlay-box' style={b3} />
+			</div>
 		);
 	}
 
 	render() {
-		let cropSelection, imageClip;
+		let cropSelection, cropOverlay;
 
 		if (!this.cropInvalid) {
 			cropSelection = this.createCropSelection();
-			imageClip = {
-				WebkitClipPath: this.getPolygonClipPath(),
-				clipPath: 'url("#ReactCropperClipPolygon")'
-			};
+			cropOverlay = this.createCropOverlay(this.state.crop);
 		}
 
 		let componentClasses = ['ReactCrop'];
@@ -621,18 +602,18 @@ class ReactCrop extends Component {
 		}
 
 		return (
-			<div ref="component"
+			<div ref='component'
 				className={componentClasses.join(' ')}
 				onTouchStart={this.onComponentMouseTouchDown}
 				onMouseDown={this.onComponentMouseTouchDown}
-				tabIndex="1"
+				tabIndex='1'
 				onKeyDown={this.onComponentKeyDown}>
-				{this.renderSvg()}
 
 				<img ref='image' className='ReactCrop--image' src={this.props.src} onLoad={this.onImageLoad} />
 
-				<div className='ReactCrop--crop-wrapper' ref="cropWrapper">
-					<img ref='imageCopy' className='ReactCrop--image-copy' src={this.props.src} style={imageClip} />
+				<div className='ReactCrop--crop-wrapper' ref='cropWrapper'>
+					<img ref='imageCopy' className='ReactCrop--image-copy' src={this.props.src} />
+					{cropOverlay}
 					{cropSelection}
 				</div>
 
