@@ -11,7 +11,12 @@ class ReactCrop extends Component {
 		keepSelection: PropTypes.bool,
 		onChange: PropTypes.func,
 		onComplete: PropTypes.func,
-		onImageLoaded: PropTypes.func
+		onImageLoaded: PropTypes.func,
+		disabled: PropTypes.bool
+	}
+
+	static defaultProps = {
+		disabled: false
 	}
 
 	static xOrds = ['e', 'w']
@@ -114,6 +119,10 @@ class ReactCrop extends Component {
 	}
 
 	onDocMouseTouchMove(e) {
+		if (this.props.disabled) {
+			return;
+		}
+
 		if (!this.mouseDownOnCrop) {
 			return;
 		}
@@ -304,6 +313,10 @@ class ReactCrop extends Component {
 	onCropMouseTouchDown(e) {
 		e.preventDefault(); // Stop drag selection.
 
+		if (this.props.disabled) {
+			return;
+		}
+
 		const crop = this.state.crop;
 		const clientPos = this.getClientPos(e);
 
@@ -367,6 +380,10 @@ class ReactCrop extends Component {
 
 		e.preventDefault(); // Stop drag selection.
 
+		if (this.props.disabled) {
+			return;
+		}
+
 		let crop = this.props.keepSelection === true ? {} : this.state.crop;
 		const clientPos = this.getClientPos(e);
 
@@ -406,6 +423,10 @@ class ReactCrop extends Component {
 	}
 
 	onComponentKeyDown(e) {
+		if (this.props.disabled) {
+			return;
+		}
+
 		const keyCode = e.which;
 		const crop = this.state.crop;
 		let nudged = false;
@@ -447,6 +468,10 @@ class ReactCrop extends Component {
 	}
 
 	onDocMouseTouchEnd(e) {
+		if (this.props.disabled) {
+			return;
+		}
+
 		if (this.mouseDownOnCrop) {
 
 			this.cropInvalid = !this.state.crop.width && !this.state.crop.height;
