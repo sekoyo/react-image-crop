@@ -1,4 +1,5 @@
 module.exports = {
+	eval: 'eval-source-map',
 	entry: __dirname + '/demo',
 	output: {
 		path: __dirname,
@@ -6,16 +7,9 @@ module.exports = {
 	},
 	module: {
 		loaders: [{
-			test: /\.jsx?$/,
-			exclude: /(node_modules|bower_components)/,
-			loader: 'babel',
-			query: {
-				presets: ['react', 'es2015'],
-				plugins: [
-    				'add-module-exports',
-					'transform-class-properties'
-				]
-			}
+			test: /\.js$/,
+			exclude: /node_modules/,
+			loader: 'babel'
 		}]
 	}
 };
