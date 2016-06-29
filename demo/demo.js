@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ReactCrop from '../lib/ReactCrop.jsx';
+import ReactCrop from '../lib/ReactCrop';
 
 /**
  * Select an image file.
@@ -66,14 +66,25 @@ function loadEditView(dataUrl) {
 		},
 
 		onCropComplete: function(crop) {
-			// console.log('Crop move complete:', crop);
+			console.log('Crop move complete:', crop);
 		},
+
+		// onCropChange: function(crop) {
+		// 	console.log('Crop change');
+		// },
 
 		render: function() {
 			return (
 				<div>
-					<ReactCrop crop={this.state.crop} src={dataUrl} onImageLoaded={this.onImageLoaded} onComplete={this.onCropComplete} />
+					<ReactCrop
+						crop={this.state.crop}
+						src={dataUrl}
+						onImageLoaded={this.onImageLoaded}
+						onComplete={this.onCropComplete}
+						// onChange={this.onCropChange}
+					/>
 					<button onClick={this.onButtonClick}>Programatically set crop</button>
+					<button onClick={() => {this.setState({foo: Date.now()})}}>Change foo state</button>
 				</div>
 			);
 		}
