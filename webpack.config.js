@@ -1,7 +1,6 @@
 const path = require('path');
 
 module.exports = {
-	eval: 'eval-source-map',
 	entry: './lib/ReactCrop.js',
 	output: {
 		path: path.join(__dirname, 'dist'),
