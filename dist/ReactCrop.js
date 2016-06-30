@@ -726,7 +726,7 @@ module.exports =
 					componentClasses.push('ReactCrop-fixed-aspect');
 				}
 				if (this.props.disabled) {
-					componentClasses.push('ReactCrop-disabled');
+					componentClasses.push('ReactCrop--disabled');
 				}
 
 				return _react2.default.createElement(

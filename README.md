@@ -76,6 +76,10 @@ A minimum crop height.
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.
 
+#### disabled (optional)
+
+If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
+
 #### onChange(crop) (optional)
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
