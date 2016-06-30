@@ -4,6 +4,8 @@
   cursor: crosshair;
   overflow: hidden;
   max-width: 100%; }
+  .ReactCrop.ReactCrop--disabled {
+    cursor: inherit; }
 
 .ReactCrop:focus {
   outline: none; }
@@ -42,6 +44,8 @@
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   animation-play-state: running; }
+  .ReactCrop--disabled .ReactCrop--crop-selection {
+    cursor: inherit; }
 
 @keyframes marching-ants {
   0% {
@@ -113,6 +117,9 @@
   margin-top: -4px;
   margin-left: -4px;
   cursor: w-resize; }
+
+.ReactCrop--disabled .ReactCrop--drag-handle {
+  cursor: inherit; }
 
 .ReactCrop--drag-bar {
   position: absolute; }

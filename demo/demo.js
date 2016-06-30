@@ -81,6 +81,7 @@ function loadEditView(dataUrl) {
 						src={dataUrl}
 						onImageLoaded={this.onImageLoaded}
 						onComplete={this.onCropComplete}
+						disabled={true}
 						// onChange={this.onCropChange}
 					/>
 					<button onClick={this.onButtonClick}>Programatically set crop</button>

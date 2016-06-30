@@ -21,6 +21,10 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 	cursor: crosshair;
 	overflow: hidden;
 	max-width: 100%;
+
+	&.ReactCrop--disabled {
+		cursor: inherit;
+	}
 }
 
 .ReactCrop:focus {
@@ -54,6 +58,10 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 	transform: translate3d(0,0,0);
 	box-sizing: border-box;
 	cursor: move;
+
+	.ReactCrop--disabled & {
+		cursor: inherit;
+	}
 
 	// Marching ants.
 	background-image:
@@ -149,6 +157,12 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 	margin-top: -(floor($drag-handle-height / 2));
 	margin-left: -(floor($drag-handle-width / 2));
 	cursor: w-resize;
+}
+
+// Use the same specificity as the ords above but just
+// come after.
+.ReactCrop--disabled .ReactCrop--drag-handle {
+	cursor: inherit;
 }
 
 .ReactCrop--drag-bar {

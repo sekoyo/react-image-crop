@@ -143,7 +143,8 @@
 						crop: this.state.crop,
 						src: dataUrl,
 						onImageLoaded: this.onImageLoaded,
-						onComplete: this.onCropComplete
+						onComplete: this.onCropComplete,
+						disabled: true
 						// onChange={this.onCropChange}
 					}),
 					_react2.default.createElement(
@@ -20580,6 +20581,10 @@
 		}, {
 			key: 'onDocMouseTouchMove',
 			value: function onDocMouseTouchMove(e) {
+				if (this.props.disabled) {
+					return;
+				}
+
 				if (!this.mouseDownOnCrop) {
 					return;
 				}
@@ -20763,6 +20768,10 @@
 			value: function onCropMouseTouchDown(e) {
 				e.preventDefault(); // Stop drag selection.
 
+				if (this.props.disabled) {
+					return;
+				}
+
 				var crop = this.state.crop;
 				var clientPos = this.getClientPos(e);
 
@@ -20829,6 +20838,10 @@
 
 				e.preventDefault(); // Stop drag selection.
 
+				if (this.props.disabled) {
+					return;
+				}
+
 				var crop = this.props.keepSelection === true ? {} : this.state.crop;
 				var clientPos = this.getClientPos(e);
 
@@ -20869,6 +20882,10 @@
 		}, {
 			key: 'onComponentKeyDown',
 			value: function onComponentKeyDown(e) {
+				if (this.props.disabled) {
+					return;
+				}
+
 				var keyCode = e.which;
 				var crop = this.state.crop;
 				var nudged = false;
@@ -20911,6 +20928,10 @@
 		}, {
 			key: 'onDocMouseTouchEnd',
 			value: function onDocMouseTouchEnd(e) {
+				if (this.props.disabled) {
+					return;
+				}
+
 				if (this.mouseDownOnCrop) {
 
 					this.cropInvalid = this.isCropInvalid(this.state.crop);
@@ -21122,6 +21143,9 @@
 				if (this.state.crop.aspect) {
 					componentClasses.push('ReactCrop-fixed-aspect');
 				}
+				if (this.props.disabled) {
+					componentClasses.push('ReactCrop--disabled');
+				}
 
 				return _react2.default.createElement(
 					'div',
@@ -21155,7 +21179,11 @@
 		keepSelection: _react.PropTypes.bool,
 		onChange: _react.PropTypes.func,
 		onComplete: _react.PropTypes.func,
-		onImageLoaded: _react.PropTypes.func
+		onImageLoaded: _react.PropTypes.func,
+		disabled: _react.PropTypes.bool
+	};
+	ReactCrop.defaultProps = {
+		disabled: false
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];
