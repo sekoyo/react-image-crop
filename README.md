@@ -92,6 +92,10 @@ A callback which happens after a resize, drag, or nudge. Passes the current crop
 
 A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element.
 
+#### ellipse (optional)
+
+If true, the selection will have an ellipse shape rather than a rectangular one. If a fixed aspect ratio is also specified, the shape will be strictly circular.
+
 ## What about showing the crop on the client?
 
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend. However here are some tips for client-side crop previews:
