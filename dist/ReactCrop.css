@@ -47,6 +47,11 @@
   .ReactCrop--disabled .ReactCrop--crop-selection {
     cursor: inherit; }
 
+.ReactCrop-ellipse .ReactCrop--crop-selection {
+  background-image: none;
+  border: 1px dashed rgba(255, 255, 255, 0.7);
+  border-radius: 100%; }
+
 @keyframes marching-ants {
   0% {
     background-position: 0 0,  0 100%,  0 0,  100% 0; }
@@ -152,16 +157,9 @@
   height: 100%;
   margin-left: -4px; }
 
+.ReactCrop-ellipse .ReactCrop--drag-bar,
 .ReactCrop-new-crop .ReactCrop--drag-bar,
-.ReactCrop-new-crop .ReactCrop--drag-handle {
-  display: none; }
-
-.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-n,
-.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-e,
-.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-s,
-.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-w {
-  display: none; }
-
+.ReactCrop-new-crop .ReactCrop--drag-handle,
 .ReactCrop-fixed-aspect .ReactCrop--drag-bar {
   display: none; }
 

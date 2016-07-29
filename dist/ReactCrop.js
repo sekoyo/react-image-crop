@@ -292,8 +292,8 @@ module.exports =
 				crop.x = this.clamp(newX, 0, 100 - newSize.width);
 				crop.y = this.clamp(newY, 0, 100 - newSize.height);
 
-				// Apply width/height changes depending on ordinate.
-				if (ReactCrop.xyOrds.indexOf(ord) > -1) {
+				// Apply width/height changes depending on ordinate (fixed aspect always applies both).
+				if (crop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
 					crop.width = newSize.width;
 					crop.height = newSize.height;
 				} else if (ReactCrop.xOrds.indexOf(ord) > -1) {
@@ -550,6 +550,9 @@ module.exports =
 			key: 'createCropSelection',
 			value: function createCropSelection() {
 				var style = this.getCropStyle();
+				var aspect = this.state.crop.aspect;
+				var ellipse = this.props.ellipse;
+
 
 				return _react2.default.createElement(
 					'div',
@@ -562,14 +565,14 @@ module.exports =
 					_react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
 					_react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
 					_react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-					_react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+					ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
+					aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
+					ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
+					aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
+					ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
+					aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
+					ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
+					aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
 				);
 			}
 		}, {
@@ -622,6 +625,29 @@ module.exports =
 				};
 			}
 		}, {
+			key: 'getEllipseValues',
+			value: function getEllipseValues(forSvg) {
+				var crop = this.state.crop;
+
+				var rx = crop.width / 2;
+				var ry = crop.height / 2;
+				var cx = crop.x + rx;
+				var cy = crop.y + ry;
+
+				if (forSvg) {
+					rx /= 100;
+					ry /= 100;
+					cx /= 100;
+					cy /= 100;
+				} else {
+					rx += '%';
+					ry += '%';
+					cx += '%';
+					cy += '%';
+				}
+				return { cx: cx, cy: cy, rx: rx, ry: ry };
+			}
+		}, {
 			key: 'getPolygonClipPath',
 			value: function getPolygonClipPath() {
 				var _getPolygonValues = this.getPolygonValues();
@@ -630,6 +656,18 @@ module.exports =
 				var bottom = _getPolygonValues.bottom;
 
 				return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
+			}
+		}, {
+			key: 'getEllipseClipPath',
+			value: function getEllipseClipPath() {
+				var _getEllipseValues = this.getEllipseValues();
+
+				var rx = _getEllipseValues.rx;
+				var ry = _getEllipseValues.ry;
+				var cx = _getEllipseValues.cx;
+				var cy = _getEllipseValues.cy;
+
+				return 'ellipse(' + rx + ' ' + ry + ' at ' + cx + ' ' + cy + ')';
 			}
 		}, {
 			key: 'ensureAspectDimensions',
@@ -678,12 +716,17 @@ module.exports =
 		}, {
 			key: 'renderSvg',
 			value: function renderSvg() {
-				var _getPolygonValues2 = this.getPolygonValues(true);
+				var shape = void 0;
+				if (this.props.ellipse) {
+					shape = _react2.default.createElement('ellipse', this.getEllipseValues(true));
+				} else {
+					var _getPolygonValues2 = this.getPolygonValues(true);
 
-				var top = _getPolygonValues2.top;
-				var bottom = _getPolygonValues2.bottom;
+					var top = _getPolygonValues2.top;
+					var bottom = _getPolygonValues2.bottom;
 
-				var points = top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left;
+					shape = _react2.default.createElement('polygon', { points: top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left });
+				}
 
 				return _react2.default.createElement(
 					'svg',
@@ -694,7 +737,7 @@ module.exports =
 						_react2.default.createElement(
 							'clipPath',
 							{ id: 'ReactCropperClipPolygon', clipPathUnits: 'objectBoundingBox' },
-							_react2.default.createElement('polygon', { points: top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left })
+							shape
 						)
 					)
 				);
@@ -708,7 +751,7 @@ module.exports =
 				if (!this.cropInvalid) {
 					cropSelection = this.createCropSelection();
 					imageClip = {
-						WebkitClipPath: this.getPolygonClipPath(),
+						WebkitClipPath: this.props.ellipse ? this.getEllipseClipPath() : this.getPolygonClipPath(),
 						clipPath: 'url("#ReactCropperClipPolygon")'
 					};
 				}
@@ -720,6 +763,9 @@ module.exports =
 				}
 				if (this.state.crop.aspect) {
 					componentClasses.push('ReactCrop-fixed-aspect');
+				}
+				if (this.props.ellipse) {
+					componentClasses.push('ReactCrop-ellipse');
 				}
 				if (this.props.disabled) {
 					componentClasses.push('ReactCrop--disabled');
@@ -758,7 +804,8 @@ module.exports =
 		onChange: _react.PropTypes.func,
 		onComplete: _react.PropTypes.func,
 		onImageLoaded: _react.PropTypes.func,
-		disabled: _react.PropTypes.bool
+		disabled: _react.PropTypes.bool,
+		ellipse: _react.PropTypes.bool
 	};
 	ReactCrop.defaultProps = {
 		disabled: false
