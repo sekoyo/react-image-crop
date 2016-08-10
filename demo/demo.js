@@ -81,11 +81,10 @@ function loadEditView(dataUrl) {
 						src={dataUrl}
 						onImageLoaded={this.onImageLoaded}
 						onComplete={this.onCropComplete}
-						disabled={true}
 						// onChange={this.onCropChange}
 					/>
 					<button onClick={this.onButtonClick}>Programatically set crop</button>
-					<button onClick={() => {this.setState({foo: Date.now()})}}>Change foo state</button>
+					<button onClick={() => {this.setState({ foo: Date.now() })}}>Change foo state</button>
 				</div>
 			);
 		}
