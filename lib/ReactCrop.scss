@@ -16,255 +16,255 @@ $drag-handle-mobile-height: $drag-handle-height + 8;
 $drag-bar-mobile-size: $drag-bar-size + 8;
 
 .ReactCrop {
-	position: relative;
-	display: inline-block;
-	cursor: crosshair;
-	overflow: hidden;
-	max-width: 100%;
+  position: relative;
+  display: inline-block;
+  cursor: crosshair;
+  overflow: hidden;
+  max-width: 100%;
 
-	&.ReactCrop--disabled {
-		cursor: inherit;
-	}
+  &.ReactCrop--disabled {
+    cursor: inherit;
+  }
 }
 
 .ReactCrop:focus {
-	outline: none;
+  outline: none;
 }
 
 .ReactCrop--image {
-	display: block;
-	max-width: 100%;
+  display: block;
+  max-width: 100%;
 }
 .ReactCrop--image-copy {
-	position: absolute;
-	top: 0;
-	left: 0;
-	max-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: 100%;
 }
 
 .ReactCrop--crop-wrapper {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background-color: $cropped-area-overlay-color;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: $cropped-area-overlay-color;
 }
 
 .ReactCrop--crop-selection {
-	position: absolute;
-	top: 0;
-	left: 0;
-	transform: translate3d(0,0,0);
-	box-sizing: border-box;
-	cursor: move;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(0,0,0);
+  box-sizing: border-box;
+  cursor: move;
 
-	.ReactCrop--disabled & {
-		cursor: inherit;
-	}
+  .ReactCrop--disabled & {
+    cursor: inherit;
+  }
 
-	// Marching ants.
-	background-image:
-		linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
-		linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
-		linear-gradient(to bottom, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
-		linear-gradient(to bottom, $marching-ants-colour 50%, $marching-ants-alt-colour 50%);
-	padding: 1px;
-	background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
-	background-position: 0 0, 0 100%, 0 0, 100% 0;
-	background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-	animation: marching-ants 2s;
-	animation-timing-function: linear;
-	animation-iteration-count: infinite;
-	animation-play-state: running;
+  // Marching ants.
+  background-image:
+    linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
+    linear-gradient(to right, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
+    linear-gradient(to bottom, $marching-ants-colour 50%, $marching-ants-alt-colour 50%),
+    linear-gradient(to bottom, $marching-ants-colour 50%, $marching-ants-alt-colour 50%);
+  padding: 1px;
+  background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  animation: marching-ants 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
 }
 
 .ReactCrop-ellipse .ReactCrop--crop-selection {
-	// Unfortunately, I wasn't able to animate the circular border around ellipse selections,
-	// so this is open for improvement...
-	background-image: none;
-	border: 1px dashed rgba(255, 255, 255, 0.7);
-	border-radius: 100%;
+  // Unfortunately, I wasn't able to animate the circular border around ellipse selections,
+  // so this is open for improvement...
+  background-image: none;
+  border: 1px dashed rgba(255, 255, 255, 0.7);
+  border-radius: 100%;
 }
 
 @keyframes marching-ants {
-	0% {
-		background-position: 0 0,  0 100%,  0 0,  100% 0;
-	}
+  0% {
+    background-position: 0 0,  0 100%,  0 0,  100% 0;
+  }
 
-	100% {
-		background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
-	}
+  100% {
+    background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
+  }
 }
 
 .ReactCrop--drag-handle {
-	position: absolute;
-	width: $drag-handle-width;
-	height: $drag-handle-height;
-	background-color: $drag-handle-background-colour;
-	border: $drag-handle-border;
-	box-sizing: border-box;
+  position: absolute;
+  width: $drag-handle-width;
+  height: $drag-handle-height;
+  background-color: $drag-handle-background-colour;
+  border: $drag-handle-border;
+  box-sizing: border-box;
 
-	// This stops the borders disappearing when keyboard
-	// nudging.
-	outline: 1px solid transparent;
+  // This stops the borders disappearing when keyboard
+  // nudging.
+  outline: 1px solid transparent;
 }
 
 .ReactCrop .ord-nw {
-	top: 0;
-	left: 0;
-	margin-top: -(floor($drag-handle-height / 2));
-	margin-left: -(floor($drag-handle-width / 2));
-	cursor: nw-resize;
+  top: 0;
+  left: 0;
+  margin-top: -(floor($drag-handle-height / 2));
+  margin-left: -(floor($drag-handle-width / 2));
+  cursor: nw-resize;
 }
 .ReactCrop .ord-n {
-	top: 0;
-	left: 50%;
-	margin-top: -(floor($drag-handle-height / 2));
-	margin-left: -(floor($drag-handle-width / 2));
-	cursor: n-resize;
+  top: 0;
+  left: 50%;
+  margin-top: -(floor($drag-handle-height / 2));
+  margin-left: -(floor($drag-handle-width / 2));
+  cursor: n-resize;
 }
 .ReactCrop .ord-ne {
-	top: 0;
-	right: 0;
-	margin-top: -(floor($drag-handle-height / 2));
-	margin-right: -(floor($drag-handle-width / 2));
-	cursor: ne-resize;
+  top: 0;
+  right: 0;
+  margin-top: -(floor($drag-handle-height / 2));
+  margin-right: -(floor($drag-handle-width / 2));
+  cursor: ne-resize;
 }
 .ReactCrop .ord-e {
-	top: 50%;
-	right: 0;
-	margin-top: -(floor($drag-handle-height / 2));
-	margin-right: -(floor($drag-handle-width / 2));
-	cursor: e-resize;
+  top: 50%;
+  right: 0;
+  margin-top: -(floor($drag-handle-height / 2));
+  margin-right: -(floor($drag-handle-width / 2));
+  cursor: e-resize;
 }
 .ReactCrop .ord-se {
-	bottom: 0;
-	right: 0;
-	margin-bottom: -(floor($drag-handle-height / 2));
-	margin-right: -(floor($drag-handle-width / 2));
-	cursor: se-resize;
+  bottom: 0;
+  right: 0;
+  margin-bottom: -(floor($drag-handle-height / 2));
+  margin-right: -(floor($drag-handle-width / 2));
+  cursor: se-resize;
 }
 .ReactCrop .ord-s {
-	bottom: 0;
-	left: 50%;
-	margin-bottom: -(floor($drag-handle-height / 2));
-	margin-left: -(floor($drag-handle-width / 2));
-	cursor: s-resize;
+  bottom: 0;
+  left: 50%;
+  margin-bottom: -(floor($drag-handle-height / 2));
+  margin-left: -(floor($drag-handle-width / 2));
+  cursor: s-resize;
 }
 .ReactCrop .ord-sw {
-	bottom: 0;
-	left: 0;
-	margin-bottom: -(floor($drag-handle-height / 2));
-	margin-left: -(floor($drag-handle-width / 2));
-	cursor: sw-resize;
+  bottom: 0;
+  left: 0;
+  margin-bottom: -(floor($drag-handle-height / 2));
+  margin-left: -(floor($drag-handle-width / 2));
+  cursor: sw-resize;
 }
 .ReactCrop .ord-w {
-	top: 50%;
-	left: 0;
-	margin-top: -(floor($drag-handle-height / 2));
-	margin-left: -(floor($drag-handle-width / 2));
-	cursor: w-resize;
+  top: 50%;
+  left: 0;
+  margin-top: -(floor($drag-handle-height / 2));
+  margin-left: -(floor($drag-handle-width / 2));
+  cursor: w-resize;
 }
 
 // Use the same specificity as the ords above but just
 // come after.
 .ReactCrop--disabled .ReactCrop--drag-handle {
-	cursor: inherit;
+  cursor: inherit;
 }
 
 .ReactCrop--drag-bar {
-	position: absolute;
+  position: absolute;
 }
 .ReactCrop--drag-bar.ord-n {
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: $drag-bar-size;
-	margin-top: -($drag-bar-size - 2);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: $drag-bar-size;
+  margin-top: -($drag-bar-size - 2);
 }
 .ReactCrop--drag-bar.ord-e {
-	right: 0;
-	top: 0;
-	width: $drag-bar-size;
-	height: 100%;
-	margin-right: -($drag-bar-size - 2);
+  right: 0;
+  top: 0;
+  width: $drag-bar-size;
+  height: 100%;
+  margin-right: -($drag-bar-size - 2);
 }
 .ReactCrop--drag-bar.ord-s {
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: $drag-bar-size;
-	margin-bottom: -($drag-bar-size - 2);
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: $drag-bar-size;
+  margin-bottom: -($drag-bar-size - 2);
 }
 .ReactCrop--drag-bar.ord-w {
-	top: 0;
-	left: 0;
-	width: $drag-bar-size;
-	height: 100%;
-	margin-left: -($drag-bar-size - 2);
+  top: 0;
+  left: 0;
+  width: $drag-bar-size;
+  height: 100%;
+  margin-left: -($drag-bar-size - 2);
 }
 
 .ReactCrop-ellipse .ReactCrop--drag-bar,
 .ReactCrop-new-crop .ReactCrop--drag-bar,
 .ReactCrop-new-crop .ReactCrop--drag-handle,
 .ReactCrop-fixed-aspect .ReactCrop--drag-bar {
-	display: none;
+  display: none;
 }
 
 @media (max-width: $mobile-max-width) {
-	.ReactCrop--drag-handle {
-		width: $drag-handle-mobile-width;
-		height: $drag-handle-mobile-height;
-	}
+  .ReactCrop--drag-handle {
+    width: $drag-handle-mobile-width;
+    height: $drag-handle-mobile-height;
+  }
 
-	.ReactCrop .ord-nw {
-		margin-top: -(floor($drag-handle-mobile-height / 2));
-		margin-left: -(floor($drag-handle-mobile-width / 2));
-	}
-	.ReactCrop .ord-n {
-		margin-top: -(floor($drag-handle-mobile-height / 2));
-		margin-left: -(floor($drag-handle-mobile-width / 2));
-	}
-	.ReactCrop .ord-ne {
-		margin-top: -(floor($drag-handle-mobile-height / 2));
-		margin-right: -(floor($drag-handle-mobile-width / 2));
-	}
-	.ReactCrop .ord-e {
-		margin-top: -(floor($drag-handle-mobile-height / 2));
-		margin-right: -(floor($drag-handle-mobile-width / 2));
-	}
-	.ReactCrop .ord-se {
-		margin-bottom: -(floor($drag-handle-mobile-height / 2));
-		margin-right: -(floor($drag-handle-mobile-width / 2));
-	}
-	.ReactCrop .ord-s {
-		margin-bottom: -(floor($drag-handle-mobile-height / 2));
-		margin-left: -(floor($drag-handle-mobile-width / 2));
-	}
-	.ReactCrop .ord-sw {
-		margin-bottom: -(floor($drag-handle-mobile-height / 2));
-		margin-left: -(floor($drag-handle-mobile-width / 2));
-	}
-	.ReactCrop .ord-w {
-		margin-top: -(floor($drag-handle-mobile-height / 2));
-		margin-left: -(floor($drag-handle-mobile-width / 2));
-	}
+  .ReactCrop .ord-nw {
+    margin-top: -(floor($drag-handle-mobile-height / 2));
+    margin-left: -(floor($drag-handle-mobile-width / 2));
+  }
+  .ReactCrop .ord-n {
+    margin-top: -(floor($drag-handle-mobile-height / 2));
+    margin-left: -(floor($drag-handle-mobile-width / 2));
+  }
+  .ReactCrop .ord-ne {
+    margin-top: -(floor($drag-handle-mobile-height / 2));
+    margin-right: -(floor($drag-handle-mobile-width / 2));
+  }
+  .ReactCrop .ord-e {
+    margin-top: -(floor($drag-handle-mobile-height / 2));
+    margin-right: -(floor($drag-handle-mobile-width / 2));
+  }
+  .ReactCrop .ord-se {
+    margin-bottom: -(floor($drag-handle-mobile-height / 2));
+    margin-right: -(floor($drag-handle-mobile-width / 2));
+  }
+  .ReactCrop .ord-s {
+    margin-bottom: -(floor($drag-handle-mobile-height / 2));
+    margin-left: -(floor($drag-handle-mobile-width / 2));
+  }
+  .ReactCrop .ord-sw {
+    margin-bottom: -(floor($drag-handle-mobile-height / 2));
+    margin-left: -(floor($drag-handle-mobile-width / 2));
+  }
+  .ReactCrop .ord-w {
+    margin-top: -(floor($drag-handle-mobile-height / 2));
+    margin-left: -(floor($drag-handle-mobile-width / 2));
+  }
 
-	.ReactCrop--drag-bar.ord-n {
-		height: $drag-bar-mobile-size;
-		margin-top: -($drag-bar-mobile-size - 2);
-	}
-	.ReactCrop--drag-bar.ord-e {
-		width: $drag-bar-mobile-size;
-		margin-right: -($drag-bar-mobile-size - 2);
-	}
-	.ReactCrop--drag-bar.ord-s {
-		height: $drag-bar-mobile-size;
-		margin-bottom: -($drag-bar-mobile-size - 2);
-	}
-	.ReactCrop--drag-bar.ord-w {
-		width: $drag-bar-mobile-size;
-		margin-left: -($drag-bar-mobile-size - 2);
-	}
+  .ReactCrop--drag-bar.ord-n {
+    height: $drag-bar-mobile-size;
+    margin-top: -($drag-bar-mobile-size - 2);
+  }
+  .ReactCrop--drag-bar.ord-e {
+    width: $drag-bar-mobile-size;
+    margin-right: -($drag-bar-mobile-size - 2);
+  }
+  .ReactCrop--drag-bar.ord-s {
+    height: $drag-bar-mobile-size;
+    margin-bottom: -($drag-bar-mobile-size - 2);
+  }
+  .ReactCrop--drag-bar.ord-w {
+    width: $drag-bar-mobile-size;
+    margin-left: -($drag-bar-mobile-size - 2);
+  }
 }
