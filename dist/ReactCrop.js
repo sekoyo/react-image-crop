@@ -148,6 +148,7 @@ module.exports =
 	      e.preventDefault(); // Stop drag selection.
 
 	      var crop = this.state.crop;
+
 	      var evData = this.evData;
 	      var clientPos = this.getClientPos(e);
 
@@ -170,7 +171,7 @@ module.exports =
 	      this.cropInvalid = false;
 
 	      if (this.props.onChange) {
-	        this.props.onChange(crop);
+	        this.props.onChange(this.getCropValue());
 	      }
 
 	      this.setState({ crop: crop });
@@ -185,6 +186,7 @@ module.exports =
 	      e.preventDefault(); // Stop drag selection.
 
 	      var crop = this.state.crop;
+
 	      var clientPos = this.getClientPos(e);
 
 	      // Focus for detecting keypress.
@@ -275,12 +277,15 @@ module.exports =
 	  }, {
 	    key: 'onComponentKeyDown',
 	    value: function onComponentKeyDown(e) {
+	      var _this2 = this;
+
 	      if (this.props.disabled) {
 	        return;
 	      }
 
 	      var keyCode = e.which;
 	      var crop = this.state.crop;
+
 	      var nudged = false;
 
 	      if (!crop.width || !crop.height) {
@@ -306,14 +311,14 @@ module.exports =
 	        crop.x = this.clamp(crop.x, 0, 100 - crop.width);
 	        crop.y = this.clamp(crop.y, 0, 100 - crop.height);
 
-	        this.setState({ crop: crop });
-
-	        if (this.props.onChange) {
-	          this.props.onChange(crop);
-	        }
-	        if (this.props.onComplete) {
-	          this.props.onComplete(crop);
-	        }
+	        this.setState({ crop: crop }, function () {
+	          if (_this2.props.onChange) {
+	            _this2.props.onChange(_this2.getCropValue());
+	          }
+	          if (_this2.props.onComplete) {
+	            _this2.props.onComplete(_this2.getCropValue());
+	          }
+	        });
 	      }
 	    }
 	  }, {
@@ -328,11 +333,28 @@ module.exports =
 	        this.mouseDownOnCrop = false;
 
 	        if (this.props.onComplete) {
-	          this.props.onComplete(this.state.crop);
+	          this.props.onComplete(this.getCropValue());
 	        }
 
 	        this.setState({ newCropIsBeingDrawn: false });
 	      }
+	    }
+	  }, {
+	    key: 'getCropValue',
+	    value: function getCropValue() {
+	      var crop = this.state.crop;
+	      var outputPixelUnits = this.props.outputPixelUnits;
+
+
+	      if (!outputPixelUnits) {
+	        return crop;
+	      }
+	      return {
+	        x: Math.round(this.image.naturalWidth * (crop.x / 100)),
+	        y: Math.round(this.image.naturalHeight * (crop.y / 100)),
+	        width: Math.round(this.image.naturalWidth * (crop.width / 100)),
+	        height: Math.round(this.image.naturalHeight * (crop.height / 100))
+	      };
 	    }
 	  }, {
 	    key: 'getPolygonValues',
@@ -605,7 +627,7 @@ module.exports =
 	        this.setState({ crop: crop });
 	      }
 	      if (this.props.onImageLoaded) {
-	        this.props.onImageLoaded(crop, imageEl);
+	        this.props.onImageLoaded(this.getCropValue(), imageEl);
 	      }
 	    }
 	  }, {
@@ -629,7 +651,7 @@ module.exports =
 	  }, {
 	    key: 'createCropSelection',
 	    value: function createCropSelection() {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      var style = this.getCropStyle();
 	      var aspect = this.state.crop.aspect;
@@ -640,7 +662,7 @@ module.exports =
 	        'div',
 	        {
 	          ref: function ref(c) {
-	            _this2.cropSelect = c;
+	            _this3.cropSelect = c;
 	          },
 	          style: style,
 	          className: 'ReactCrop--crop-selection',
@@ -766,7 +788,7 @@ module.exports =
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      var cropSelection = void 0;
 	      var imageClip = void 0;
@@ -798,7 +820,7 @@ module.exports =
 	        'div',
 	        {
 	          ref: function ref(c) {
-	            _this3.component = c;
+	            _this4.component = c;
 	          },
 	          className: componentClasses.join(' '),
 	          onTouchStart: this.onComponentMouseTouchDown,
@@ -809,13 +831,13 @@ module.exports =
 	        this.renderSvg(),
 	        _react2.default.createElement('img', {
 	          ref: function ref(c) {
-	            _this3.image = c;
+	            _this4.image = c;
 	          },
 	          crossOrigin: 'anonymous',
 	          className: 'ReactCrop--image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
-	            _this3.onImageLoad(e.target);
+	            _this4.onImageLoad(e.target);
 	          },
 	          alt: ''
 	        }),
@@ -824,12 +846,12 @@ module.exports =
 	          {
 	            className: 'ReactCrop--crop-wrapper',
 	            ref: function ref(c) {
-	              _this3.cropWrapper = c;
+	              _this4.cropWrapper = c;
 	            }
 	          },
 	          _react2.default.createElement('img', {
 	            ref: function ref(c) {
-	              _this3.imageCopy = c;
+	              _this4.imageCopy = c;
 	            },
 	            className: 'ReactCrop--image-copy',
 	            src: this.props.src,
@@ -857,6 +879,7 @@ module.exports =
 	  onImageLoaded: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
 	  ellipse: _react.PropTypes.bool,
+	  outputPixelUnits: _react.PropTypes.bool,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
