@@ -65,6 +65,9 @@ module.exports =
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	// Waiting for bug fix: https://github.com/yannickcr/eslint-plugin-react/issues/507
+	/* eslint-disable react/sort-comp */
+
 	var ReactCrop = function (_Component) {
 	  _inherits(ReactCrop, _Component);
 
@@ -85,13 +88,6 @@ module.exports =
 	  }
 
 	  _createClass(ReactCrop, [{
-	    key: 'nextCropState',
-	    value: function nextCropState(crop) {
-	      var nextCrop = (0, _objectAssign2.default)({}, ReactCrop.defaultCrop, crop);
-	      this.cropInvalid = this.isCropInvalid(nextCrop);
-	      return nextCrop;
-	    }
-	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      document.addEventListener('mousemove', this.onDocMouseTouchMove);
@@ -101,17 +97,31 @@ module.exports =
 	      document.addEventListener('touchend', this.onDocMouseTouchEnd);
 	      document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 
-	      if (this.refs.image.complete || this.refs.image.readyState) {
-	        if (this.refs.image.naturalWidth === 0) {
+	      if (this.image.complete || this.image.readyState) {
+	        if (this.image.naturalWidth === 0) {
 	          // Broken load on iOS, PR #51
 	          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
 	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
-	          var src = this.refs.image.src;
-	          this.refs.image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-	          this.refs.image.src = src;
+	          var src = this.image.src;
+	          this.image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+	          this.image.src = src;
 	        } else {
-	          this.onImageLoad(this.refs.image);
+	          this.onImageLoad(this.image);
 	        }
+	      }
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      if (nextProps.crop) {
+	        var nextCrop = this.nextCropState(nextProps.crop);
+
+	        if (nextCrop.aspect) {
+	          this.ensureAspectDimensions(nextCrop, this.image);
+	        }
+
+	        this.cropInvalid = this.isCropInvalid(nextCrop);
+	        this.setState({ crop: nextCrop });
 	      }
 	    }
 	  }, {
@@ -123,51 +133,6 @@ module.exports =
 	      document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
 	      document.removeEventListener('touchend', this.onDocMouseTouchEnd);
 	      document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
-	    }
-	  }, {
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(nextProps) {
-	      if (nextProps.crop) {
-	        var nextCrop = this.nextCropState(nextProps.crop);
-
-	        if (nextCrop.aspect) {
-	          this.ensureAspectDimensions(nextCrop, this.refs.image);
-	        }
-
-	        this.cropInvalid = this.isCropInvalid(nextCrop);
-	        this.setState({ crop: nextCrop });
-	      }
-	    }
-	  }, {
-	    key: 'getCropStyle',
-	    value: function getCropStyle() {
-	      return {
-	        top: this.state.crop.y + '%',
-	        left: this.state.crop.x + '%',
-	        width: this.state.crop.width + '%',
-	        height: this.state.crop.height + '%'
-	      };
-	    }
-	  }, {
-	    key: 'straightenYPath',
-	    value: function straightenYPath(clientX) {
-	      var evData = this.evData;
-	      var ord = evData.ord;
-	      var cropOffset = evData.cropOffset;
-	      var cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
-	      var cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
-	      var k = void 0,
-	          d = void 0;
-
-	      if (ord === 'nw' || ord === 'se') {
-	        k = cropStartHeight / cropStartWidth;
-	        d = cropOffset.top - cropOffset.left * k;
-	      } else {
-	        k = -cropStartHeight / cropStartWidth;
-	        d = cropOffset.top + cropStartHeight - cropOffset.left * k;
-	      }
-
-	      return k * clientX + d;
 	    }
 	  }, {
 	    key: 'onDocMouseTouchMove',
@@ -211,152 +176,6 @@ module.exports =
 	      this.setState({ crop: crop });
 	    }
 	  }, {
-	    key: 'getNewSize',
-	    value: function getNewSize() {
-	      var crop = this.state.crop;
-	      var evData = this.evData;
-	      var imageAspect = evData.imageWidth / evData.imageHeight;
-
-	      // New width.
-	      var newWidth = evData.cropStartWidth + evData.xDiffPc;
-
-	      if (evData.xCrossOver) {
-	        newWidth = Math.abs(newWidth);
-	      }
-
-	      var maxWidth = 100;
-
-	      // Stop the box expanding on the opposite side when some edges are hit.
-	      if (!this.state.newCropIsBeingDrawn) {
-	        maxWidth = ['nw', 'w', 'sw'].indexOf(evData.inversedXOrd || evData.ord) > -1 ? evData.cropStartX : 100 - evData.cropStartX;
-	      }
-
-	      newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
-
-	      // New height.
-	      var newHeight = void 0;
-
-	      if (crop.aspect) {
-	        newHeight = newWidth / crop.aspect * imageAspect;
-	      } else {
-	        newHeight = evData.cropStartHeight + evData.yDiffPc;
-	      }
-
-	      if (evData.yCrossOver) {
-	        // Cap if polarity is inversed and the shape fills the y space.
-	        newHeight = Math.min(Math.abs(newHeight), evData.cropStartY);
-	      }
-
-	      var maxHeight = 100;
-
-	      // Stop the box expanding on the opposite side when some edges are hit.
-	      if (!this.state.newCropIsBeingDrawn) {
-	        maxHeight = ['nw', 'n', 'ne'].indexOf(evData.inversedYOrd || evData.ord) > -1 ? evData.cropStartY : 100 - evData.cropStartY;
-	      }
-
-	      newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
-
-	      if (crop.aspect) {
-	        newWidth = newHeight * crop.aspect / imageAspect;
-	      }
-
-	      return {
-	        width: newWidth,
-	        height: newHeight
-	      };
-	    }
-	  }, {
-	    key: 'resizeCrop',
-	    value: function resizeCrop() {
-	      var crop = this.state.crop;
-	      var evData = this.evData;
-	      var ord = evData.ord;
-
-	      // On the inverse change the diff so it's the same and
-	      // the same algo applies.
-	      if (evData.xInversed) {
-	        evData.xDiffPc -= evData.cropStartWidth * 2;
-	      }
-	      if (evData.yInversed) {
-	        evData.yDiffPc -= evData.cropStartHeight * 2;
-	      }
-
-	      // New size.
-	      var newSize = this.getNewSize();
-
-	      // Adjust x/y to give illusion of 'staticness' as width/height is increased
-	      // when polarity is inversed.
-	      var newX = evData.cropStartX;
-	      var newY = evData.cropStartY;
-
-	      if (evData.xCrossOver) {
-	        newX = crop.x + (crop.width - newSize.width);
-	      }
-
-	      if (evData.yCrossOver) {
-	        // This not only removes the little "shake" when inverting at a diagonal, but for some
-	        // reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
-	        // figure out why.
-	        if (evData.lastYCrossover === false) {
-	          newY = crop.y - newSize.height;
-	        } else {
-	          newY = crop.y + (crop.height - newSize.height);
-	        }
-	      }
-
-	      crop.x = this.clamp(newX, 0, 100 - newSize.width);
-	      crop.y = this.clamp(newY, 0, 100 - newSize.height);
-
-	      // Apply width/height changes depending on ordinate (fixed aspect always applies both).
-	      if (crop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
-	        crop.width = newSize.width;
-	        crop.height = newSize.height;
-	      } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
-	        crop.width = newSize.width;
-	      } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
-	        crop.height = newSize.height;
-	      }
-
-	      evData.lastYCrossover = evData.yCrossOver;
-	      this.crossOverCheck();
-	    }
-	  }, {
-	    key: 'dragCrop',
-	    value: function dragCrop() {
-	      var crop = this.state.crop;
-	      var evData = this.evData;
-	      crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
-	      crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
-	    }
-	  }, {
-	    key: 'inverseOrd',
-	    value: function inverseOrd(ord) {
-	      var inverseOrd = void 0;
-
-	      if (ord === 'n') inverseOrd = 's';else if (ord === 'ne') inverseOrd = 'sw';else if (ord === 'e') inverseOrd = 'w';else if (ord === 'se') inverseOrd = 'nw';else if (ord === 's') inverseOrd = 'n';else if (ord === 'sw') inverseOrd = 'ne';else if (ord === 'w') inverseOrd = 'e';else if (ord === 'nw') inverseOrd = 'se';
-
-	      return inverseOrd;
-	    }
-	  }, {
-	    key: 'crossOverCheck',
-	    value: function crossOverCheck() {
-	      var evData = this.evData;
-
-	      if (!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc >= 0 || evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc <= 0) {
-	        evData.xCrossOver = !evData.xCrossOver;
-	      }
-
-	      if (!evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc >= 0 || evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc <= 0) {
-	        evData.yCrossOver = !evData.yCrossOver;
-	      }
-
-	      var swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
-	      var swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
-
-	      evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
-	      evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
-	    }
-	  }, {
 	    key: 'onCropMouseTouchDown',
 	    value: function onCropMouseTouchDown(e) {
 	      if (this.props.disabled) {
@@ -369,7 +188,7 @@ module.exports =
 	      var clientPos = this.getClientPos(e);
 
 	      // Focus for detecting keypress.
-	      this.refs.component.focus();
+	      this.component.focus();
 
 	      var ord = e.target.dataset.ord;
 	      var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
@@ -378,12 +197,12 @@ module.exports =
 	      var cropOffset = void 0;
 
 	      if (crop.aspect) {
-	        cropOffset = this.getElementOffset(this.refs.cropSelect);
+	        cropOffset = this.getElementOffset(this.cropSelect);
 	      }
 
 	      this.evData = {
-	        imageWidth: this.refs.image.width,
-	        imageHeight: this.refs.image.height,
+	        imageWidth: this.image.width,
+	        imageHeight: this.image.height,
 	        clientStartX: clientPos.x,
 	        clientStartY: clientPos.y,
 	        cropStartWidth: crop.width,
@@ -396,7 +215,7 @@ module.exports =
 	        yCrossOver: yInversed,
 	        startXCrossOver: xInversed,
 	        startYCrossOver: yInversed,
-	        isResize: e.target !== this.refs.cropSelect,
+	        isResize: e.target !== this.cropSelect,
 	        ord: ord,
 	        cropOffset: cropOffset
 	      };
@@ -404,28 +223,9 @@ module.exports =
 	      this.mouseDownOnCrop = true;
 	    }
 	  }, {
-	    key: 'getClientPos',
-	    value: function getClientPos(e) {
-	      var pageX = void 0,
-	          pageY = void 0;
-
-	      if (e.touches) {
-	        pageX = e.touches[0].pageX;
-	        pageY = e.touches[0].pageY;
-	      } else {
-	        pageX = e.pageX;
-	        pageY = e.pageY;
-	      }
-
-	      return {
-	        x: pageX,
-	        y: pageY
-	      };
-	    }
-	  }, {
 	    key: 'onComponentMouseTouchDown',
 	    value: function onComponentMouseTouchDown(e) {
-	      if (e.target !== this.refs.imageCopy && e.target !== this.refs.cropWrapper) {
+	      if (e.target !== this.imageCopy && e.target !== this.cropWrapper) {
 	        return;
 	      }
 
@@ -439,11 +239,11 @@ module.exports =
 	      var clientPos = this.getClientPos(e);
 
 	      // Focus for detecting keypress.
-	      this.refs.component.focus();
+	      this.component.focus();
 
-	      var imageOffset = this.getElementOffset(this.refs.image);
-	      var xPc = (clientPos.x - imageOffset.left) / this.refs.image.width * 100;
-	      var yPc = (clientPos.y - imageOffset.top) / this.refs.image.height * 100;
+	      var imageOffset = this.getElementOffset(this.image);
+	      var xPc = (clientPos.x - imageOffset.left) / this.image.width * 100;
+	      var yPc = (clientPos.y - imageOffset.top) / this.image.height * 100;
 
 	      crop.x = xPc;
 	      crop.y = yPc;
@@ -451,8 +251,8 @@ module.exports =
 	      crop.height = 0;
 
 	      this.evData = {
-	        imageWidth: this.refs.image.width,
-	        imageHeight: this.refs.image.height,
+	        imageWidth: this.image.width,
+	        imageHeight: this.image.height,
 	        clientStartX: clientPos.x,
 	        clientStartY: clientPos.y,
 	        cropStartWidth: crop.width,
@@ -518,13 +318,12 @@ module.exports =
 	    }
 	  }, {
 	    key: 'onDocMouseTouchEnd',
-	    value: function onDocMouseTouchEnd(e) {
+	    value: function onDocMouseTouchEnd() {
 	      if (this.props.disabled) {
 	        return;
 	      }
 
 	      if (this.mouseDownOnCrop) {
-
 	        this.cropInvalid = this.isCropInvalid(this.state.crop);
 	        this.mouseDownOnCrop = false;
 
@@ -534,77 +333,6 @@ module.exports =
 
 	        this.setState({ newCropIsBeingDrawn: false });
 	      }
-	    }
-	  }, {
-	    key: 'getElementOffset',
-	    value: function getElementOffset(el) {
-	      var rect = el.getBoundingClientRect();
-	      var docEl = document.documentElement;
-
-	      var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
-	      var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
-
-	      return {
-	        top: rectTop,
-	        left: rectLeft
-	      };
-	    }
-	  }, {
-	    key: 'clamp',
-	    value: function clamp(num, min, max) {
-	      return Math.min(Math.max(num, min), max);
-	    }
-	  }, {
-	    key: 'isCropInvalid',
-	    value: function isCropInvalid(crop) {
-	      return !crop.width || !crop.height;
-	    }
-	  }, {
-	    key: 'createCropSelection',
-	    value: function createCropSelection() {
-	      var style = this.getCropStyle();
-	      var aspect = this.state.crop.aspect;
-	      var ellipse = this.props.ellipse;
-
-
-	      return _react2.default.createElement(
-	        'div',
-	        { ref: 'cropSelect',
-	          style: style,
-	          className: 'ReactCrop--crop-selection',
-	          onMouseDown: this.onCropMouseTouchDown,
-	          onTouchStart: this.onCropMouseTouchDown },
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
-	      );
-	    }
-	  }, {
-	    key: 'arrayDividedBy100',
-	    value: function arrayDividedBy100(arr) {
-	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
-
-	      return arr.map(function (number) {
-	        return number / 100;
-	      }).join(delimeter);
-	    }
-	  }, {
-	    key: 'arrayToPercent',
-	    value: function arrayToPercent(arr) {
-	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
-
-	      return arr.map(function (number) {
-	        return number + '%';
-	      }).join(delimeter);
 	    }
 	  }, {
 	    key: 'getPolygonValues',
@@ -635,6 +363,16 @@ module.exports =
 	          left: pBottomLeft,
 	          right: pBottomRight
 	        }
+	      };
+	    }
+	  }, {
+	    key: 'getCropStyle',
+	    value: function getCropStyle() {
+	      return {
+	        top: this.state.crop.y + '%',
+	        left: this.state.crop.x + '%',
+	        width: this.state.crop.width + '%',
+	        height: this.state.crop.height + '%'
 	      };
 	    }
 	  }, {
@@ -683,11 +421,298 @@ module.exports =
 	      return 'ellipse(' + rx + ' ' + ry + ' at ' + cx + ' ' + cy + ')';
 	    }
 	  }, {
+	    key: 'getElementOffset',
+	    value: function getElementOffset(el) {
+	      var rect = el.getBoundingClientRect();
+	      var docEl = document.documentElement;
+
+	      var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
+	      var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
+
+	      return {
+	        top: rectTop,
+	        left: rectLeft
+	      };
+	    }
+	  }, {
+	    key: 'getClientPos',
+	    value: function getClientPos(e) {
+	      var pageX = void 0;
+	      var pageY = void 0;
+
+	      if (e.touches) {
+	        pageX = e.touches[0].pageX;
+	        pageY = e.touches[0].pageY;
+	      } else {
+	        pageX = e.pageX;
+	        pageY = e.pageY;
+	      }
+
+	      return {
+	        x: pageX,
+	        y: pageY
+	      };
+	    }
+	  }, {
+	    key: 'getNewSize',
+	    value: function getNewSize() {
+	      var crop = this.state.crop;
+	      var evData = this.evData;
+	      var imageAspect = evData.imageWidth / evData.imageHeight;
+
+	      // New width.
+	      var newWidth = evData.cropStartWidth + evData.xDiffPc;
+
+	      if (evData.xCrossOver) {
+	        newWidth = Math.abs(newWidth);
+	      }
+
+	      var maxWidth = 100;
+
+	      // Stop the box expanding on the opposite side when some edges are hit.
+	      if (!this.state.newCropIsBeingDrawn) {
+	        maxWidth = ['nw', 'w', 'sw'].indexOf(evData.inversedXOrd || evData.ord) > -1 ? evData.cropStartX : 100 - evData.cropStartX;
+	      }
+
+	      newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
+
+	      // New height.
+	      var newHeight = void 0;
+
+	      if (crop.aspect) {
+	        newHeight = newWidth / crop.aspect * imageAspect;
+	      } else {
+	        newHeight = evData.cropStartHeight + evData.yDiffPc;
+	      }
+
+	      if (evData.yCrossOver) {
+	        // Cap if polarity is inversed and the shape fills the y space.
+	        newHeight = Math.min(Math.abs(newHeight), evData.cropStartY);
+	      }
+
+	      var maxHeight = 100;
+
+	      // Stop the box expanding on the opposite side when some edges are hit.
+	      if (!this.state.newCropIsBeingDrawn) {
+	        maxHeight = ['nw', 'n', 'ne'].indexOf(evData.inversedYOrd || evData.ord) > -1 ? evData.cropStartY : 100 - evData.cropStartY;
+	      }
+
+	      newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
+
+	      if (crop.aspect) {
+	        newWidth = newHeight * crop.aspect / imageAspect;
+	      }
+
+	      return {
+	        width: newWidth,
+	        height: newHeight
+	      };
+	    }
+	  }, {
+	    key: 'dragCrop',
+	    value: function dragCrop() {
+	      var crop = this.state.crop;
+	      var evData = this.evData;
+	      crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
+	      crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
+	    }
+	  }, {
+	    key: 'resizeCrop',
+	    value: function resizeCrop() {
+	      var crop = this.state.crop;
+	      var evData = this.evData;
+	      var ord = evData.ord;
+
+	      // On the inverse change the diff so it's the same and
+	      // the same algo applies.
+	      if (evData.xInversed) {
+	        evData.xDiffPc -= evData.cropStartWidth * 2;
+	      }
+	      if (evData.yInversed) {
+	        evData.yDiffPc -= evData.cropStartHeight * 2;
+	      }
+
+	      // New size.
+	      var newSize = this.getNewSize();
+
+	      // Adjust x/y to give illusion of 'staticness' as width/height is increased
+	      // when polarity is inversed.
+	      var newX = evData.cropStartX;
+	      var newY = evData.cropStartY;
+
+	      if (evData.xCrossOver) {
+	        newX = crop.x + (crop.width - newSize.width);
+	      }
+
+	      if (evData.yCrossOver) {
+	        // This not only removes the little "shake" when inverting at a diagonal, but for some
+	        // reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
+	        // figure out why.
+	        if (evData.lastYCrossover === false) {
+	          newY = crop.y - newSize.height;
+	        } else {
+	          newY = crop.y + (crop.height - newSize.height);
+	        }
+	      }
+
+	      crop.x = this.clamp(newX, 0, 100 - newSize.width);
+	      crop.y = this.clamp(newY, 0, 100 - newSize.height);
+
+	      // Apply width/height changes depending on ordinate (fixed aspect always applies both).
+	      if (crop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
+	        crop.width = newSize.width;
+	        crop.height = newSize.height;
+	      } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
+	        crop.width = newSize.width;
+	      } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
+	        crop.height = newSize.height;
+	      }
+
+	      evData.lastYCrossover = evData.yCrossOver;
+	      this.crossOverCheck();
+	    }
+	  }, {
+	    key: 'straightenYPath',
+	    value: function straightenYPath(clientX) {
+	      var evData = this.evData;
+	      var ord = evData.ord;
+	      var cropOffset = evData.cropOffset;
+	      var cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
+	      var cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
+	      var k = void 0;
+	      var d = void 0;
+
+	      if (ord === 'nw' || ord === 'se') {
+	        k = cropStartHeight / cropStartWidth;
+	        d = cropOffset.top - cropOffset.left * k;
+	      } else {
+	        k = -cropStartHeight / cropStartWidth;
+	        d = cropOffset.top + (cropStartHeight - cropOffset.left * k);
+	      }
+
+	      return k * clientX + d;
+	    }
+	  }, {
+	    key: 'onImageLoad',
+	    value: function onImageLoad(imageEl) {
+	      var crop = this.state.crop;
+
+	      // If there is a width or height then infer the other to
+	      // ensure the value is correct.
+	      if (crop.aspect) {
+	        this.ensureAspectDimensions(crop, imageEl);
+	        this.cropInvalid = this.isCropInvalid(crop);
+	        this.setState({ crop: crop });
+	      }
+	      if (this.props.onImageLoaded) {
+	        this.props.onImageLoaded(crop, imageEl);
+	      }
+	    }
+	  }, {
+	    key: 'arrayDividedBy100',
+	    value: function arrayDividedBy100(arr) {
+	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+
+	      return arr.map(function (number) {
+	        return number / 100;
+	      }).join(delimeter);
+	    }
+	  }, {
+	    key: 'arrayToPercent',
+	    value: function arrayToPercent(arr) {
+	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+
+	      return arr.map(function (number) {
+	        return number + '%';
+	      }).join(delimeter);
+	    }
+	  }, {
+	    key: 'createCropSelection',
+	    value: function createCropSelection() {
+	      var _this2 = this;
+
+	      var style = this.getCropStyle();
+	      var aspect = this.state.crop.aspect;
+	      var ellipse = this.props.ellipse;
+
+
+	      return _react2.default.createElement(
+	        'div',
+	        {
+	          ref: function ref(c) {
+	            _this2.cropSelect = c;
+	          },
+	          style: style,
+	          className: 'ReactCrop--crop-selection',
+	          onMouseDown: this.onCropMouseTouchDown,
+	          onTouchStart: this.onCropMouseTouchDown
+	        },
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+	      );
+	    }
+	  }, {
+	    key: 'isCropInvalid',
+	    value: function isCropInvalid(crop) {
+	      return !crop.width || !crop.height;
+	    }
+	  }, {
+	    key: 'nextCropState',
+	    value: function nextCropState(crop) {
+	      var nextCrop = (0, _objectAssign2.default)({}, ReactCrop.defaultCrop, crop);
+	      this.cropInvalid = this.isCropInvalid(nextCrop);
+	      return nextCrop;
+	    }
+	  }, {
+	    key: 'clamp',
+	    value: function clamp(num, min, max) {
+	      return Math.min(Math.max(num, min), max);
+	    }
+	  }, {
+	    key: 'crossOverCheck',
+	    value: function crossOverCheck() {
+	      var evData = this.evData;
+
+	      if (!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc >= 0 || evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc <= 0) {
+	        evData.xCrossOver = !evData.xCrossOver;
+	      }
+
+	      if (!evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc >= 0 || evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc <= 0) {
+	        evData.yCrossOver = !evData.yCrossOver;
+	      }
+
+	      var swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
+	      var swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
+
+	      evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
+	      evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
+	    }
+	  }, {
+	    key: 'inverseOrd',
+	    value: function inverseOrd(ord) {
+	      var inverseOrd = void 0;
+
+	      if (ord === 'n') inverseOrd = 's';else if (ord === 'ne') inverseOrd = 'sw';else if (ord === 'e') inverseOrd = 'w';else if (ord === 'se') inverseOrd = 'nw';else if (ord === 's') inverseOrd = 'n';else if (ord === 'sw') inverseOrd = 'ne';else if (ord === 'w') inverseOrd = 'e';else if (ord === 'nw') inverseOrd = 'se';
+
+	      return inverseOrd;
+	    }
+	  }, {
 	    key: 'ensureAspectDimensions',
-	    value: function ensureAspectDimensions(crop, imageEl) {
+	    value: function ensureAspectDimensions(cropObj, imageEl) {
 	      var imageWidth = imageEl.naturalWidth;
 	      var imageHeight = imageEl.naturalHeight;
 	      var imageAspect = imageWidth / imageHeight;
+	      var crop = cropObj;
 
 	      if (crop.width) {
 	        crop.height = crop.width / crop.aspect * imageAspect;
@@ -705,22 +730,6 @@ module.exports =
 	      }
 
 	      return crop;
-	    }
-	  }, {
-	    key: 'onImageLoad',
-	    value: function onImageLoad(imageEl) {
-	      var crop = this.state.crop;
-
-	      // If there is a width or height then infer the other to
-	      // ensure the value is correct.
-	      if (crop.aspect) {
-	        this.ensureAspectDimensions(crop, imageEl);
-	        this.cropInvalid = this.isCropInvalid(crop);
-	        this.setState({ crop: crop });
-	      }
-	      if (this.props.onImageLoaded) {
-	        this.props.onImageLoaded(crop, imageEl);
-	      }
 	    }
 
 	    // Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
@@ -757,10 +766,10 @@ module.exports =
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this2 = this;
+	      var _this3 = this;
 
-	      var cropSelection = void 0,
-	          imageClip = void 0;
+	      var cropSelection = void 0;
+	      var imageClip = void 0;
 
 	      if (!this.cropInvalid) {
 	        cropSelection = this.createCropSelection();
@@ -787,20 +796,46 @@ module.exports =
 
 	      return _react2.default.createElement(
 	        'div',
-	        { ref: 'component',
+	        {
+	          ref: function ref(c) {
+	            _this3.component = c;
+	          },
 	          className: componentClasses.join(' '),
 	          onTouchStart: this.onComponentMouseTouchDown,
 	          onMouseDown: this.onComponentMouseTouchDown,
 	          tabIndex: '1',
-	          onKeyDown: this.onComponentKeyDown },
+	          onKeyDown: this.onComponentKeyDown
+	        },
 	        this.renderSvg(),
-	        _react2.default.createElement('img', { ref: 'image', crossOrigin: 'anonymous', className: 'ReactCrop--image', src: this.props.src, onLoad: function onLoad(e) {
-	            _this2.onImageLoad(e.target);
-	          } }),
+	        _react2.default.createElement('img', {
+	          ref: function ref(c) {
+	            _this3.image = c;
+	          },
+	          crossOrigin: 'anonymous',
+	          className: 'ReactCrop--image',
+	          src: this.props.src,
+	          onLoad: function onLoad(e) {
+	            _this3.onImageLoad(e.target);
+	          },
+	          alt: ''
+	        }),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'ReactCrop--crop-wrapper', ref: 'cropWrapper' },
-	          _react2.default.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
+	          {
+	            className: 'ReactCrop--crop-wrapper',
+	            ref: function ref(c) {
+	              _this3.cropWrapper = c;
+	            }
+	          },
+	          _react2.default.createElement('img', {
+	            ref: function ref(c) {
+	              _this3.imageCopy = c;
+	            },
+	            className: 'ReactCrop--image-copy',
+	            src: this.props.src,
+	            style: imageClip,
+	            alt: ''
+	          }),
 	          cropSelection
 	        ),
 	        this.props.children
@@ -821,7 +856,8 @@ module.exports =
 	  onComplete: _react.PropTypes.func,
 	  onImageLoaded: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
-	  ellipse: _react.PropTypes.bool
+	  ellipse: _react.PropTypes.bool,
+	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
 	  disabled: false
