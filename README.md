@@ -72,6 +72,14 @@ A minimum crop width.
 
 A minimum crop height.
 
+#### maxWidth (optional)
+
+A maximum crop width.
+
+#### maxHeight (optional)
+
+A maximum crop height.
+
 #### keepSelection (optional)
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.

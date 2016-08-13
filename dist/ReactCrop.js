@@ -105,7 +105,7 @@ module.exports =
 	        if (this.refs.image.naturalWidth === 0) {
 	          // Broken load on iOS, PR #51
 	          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
-	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
+	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded 
 	          var src = this.refs.image.src;
 	          this.refs.image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 	          this.refs.image.src = src;
@@ -224,11 +224,12 @@ module.exports =
 	        newWidth = Math.abs(newWidth);
 	      }
 
-	      var maxWidth = 100;
+	      var maxWidth = this.props.maxWidth;
 
 	      // Stop the box expanding on the opposite side when some edges are hit.
 	      if (!this.state.newCropIsBeingDrawn) {
 	        maxWidth = ['nw', 'w', 'sw'].indexOf(evData.inversedXOrd || evData.ord) > -1 ? evData.cropStartX : 100 - evData.cropStartX;
+	        maxWidth = this.clamp(maxWidth, 100, this.props.maxWidth);
 	      }
 
 	      newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
@@ -247,11 +248,12 @@ module.exports =
 	        newHeight = Math.min(Math.abs(newHeight), evData.cropStartY);
 	      }
 
-	      var maxHeight = 100;
+	      var maxHeight = this.props.maxHeight;
 
 	      // Stop the box expanding on the opposite side when some edges are hit.
 	      if (!this.state.newCropIsBeingDrawn) {
 	        maxHeight = ['nw', 'n', 'ne'].indexOf(evData.inversedYOrd || evData.ord) > -1 ? evData.cropStartY : 100 - evData.cropStartY;
+	        maxHeight = this.clamp(maxHeight, 100, this.props.maxHeight);
 	      }
 
 	      newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
@@ -816,6 +818,8 @@ module.exports =
 	  crop: _react.PropTypes.object,
 	  minWidth: _react.PropTypes.number,
 	  minHeight: _react.PropTypes.number,
+	  maxWidth: _react.PropTypes.number,
+	  maxHeight: _react.PropTypes.number,
 	  keepSelection: _react.PropTypes.bool,
 	  onChange: _react.PropTypes.func,
 	  onComplete: _react.PropTypes.func,
@@ -824,7 +828,9 @@ module.exports =
 	  ellipse: _react.PropTypes.bool
 	};
 	ReactCrop.defaultProps = {
-	  disabled: false
+	  disabled: false,
+	  maxWidth: 100,
+	  maxHeight: 100
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];

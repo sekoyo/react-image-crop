@@ -37,9 +37,8 @@ function loadEditView(dataUrl) {
         crop: {
           x: 0,
           y: 0,
-          aspect: 16/9,
-          width: 50
-        }
+        },
+        maxHeight: 80,
       };
     },
 
@@ -77,7 +76,7 @@ function loadEditView(dataUrl) {
       return (
         <div>
           <ReactCrop
-            crop={this.state.crop}
+            {...this.state}
             src={dataUrl}
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
