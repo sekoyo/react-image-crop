@@ -97,16 +97,17 @@ module.exports =
 	      document.addEventListener('touchend', this.onDocMouseTouchEnd);
 	      document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 
-	      if (this.image.complete || this.image.readyState) {
-	        if (this.image.naturalWidth === 0) {
+	      if (this.imageRef.complete || this.imageRef.readyState) {
+	        if (this.imageRef.naturalWidth === 0) {
 	          // Broken load on iOS, PR #51
 	          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
 	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
-	          var src = this.image.src;
-	          this.image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-	          this.image.src = src;
+	          var src = this.imageRef.src;
+	          var emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+	          this.imageRef.src = emptyGif;
+	          this.imageRef.src = src;
 	        } else {
-	          this.onImageLoad(this.image);
+	          this.onImageLoad(this.imageRef);
 	        }
 	      }
 	    }
@@ -117,7 +118,7 @@ module.exports =
 	        var nextCrop = this.nextCropState(nextProps.crop);
 
 	        if (nextCrop.aspect) {
-	          this.ensureAspectDimensions(nextCrop, this.image);
+	          this.ensureAspectDimensions(nextCrop, this.imageRef);
 	        }
 
 	        this.cropInvalid = this.isCropInvalid(nextCrop);
@@ -190,7 +191,7 @@ module.exports =
 	      var clientPos = this.getClientPos(e);
 
 	      // Focus for detecting keypress.
-	      this.component.focus();
+	      this.componentRef.focus();
 
 	      var ord = e.target.dataset.ord;
 	      var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
@@ -199,12 +200,12 @@ module.exports =
 	      var cropOffset = void 0;
 
 	      if (crop.aspect) {
-	        cropOffset = this.getElementOffset(this.cropSelect);
+	        cropOffset = this.getElementOffset(this.cropSelectRef);
 	      }
 
 	      this.evData = {
-	        imageWidth: this.image.width,
-	        imageHeight: this.image.height,
+	        imageWidth: this.imageRef.width,
+	        imageHeight: this.imageRef.height,
 	        clientStartX: clientPos.x,
 	        clientStartY: clientPos.y,
 	        cropStartWidth: crop.width,
@@ -217,7 +218,7 @@ module.exports =
 	        yCrossOver: yInversed,
 	        startXCrossOver: xInversed,
 	        startYCrossOver: yInversed,
-	        isResize: e.target !== this.cropSelect,
+	        isResize: e.target !== this.cropSelectRef,
 	        ord: ord,
 	        cropOffset: cropOffset
 	      };
@@ -227,7 +228,7 @@ module.exports =
 	  }, {
 	    key: 'onComponentMouseTouchDown',
 	    value: function onComponentMouseTouchDown(e) {
-	      if (e.target !== this.imageCopy && e.target !== this.cropWrapper) {
+	      if (e.target !== this.imageCopyRef && e.target !== this.cropWrapperRef) {
 	        return;
 	      }
 
@@ -241,11 +242,11 @@ module.exports =
 	      var clientPos = this.getClientPos(e);
 
 	      // Focus for detecting keypress.
-	      this.component.focus();
+	      this.componentRef.focus();
 
-	      var imageOffset = this.getElementOffset(this.image);
-	      var xPc = (clientPos.x - imageOffset.left) / this.image.width * 100;
-	      var yPc = (clientPos.y - imageOffset.top) / this.image.height * 100;
+	      var imageOffset = this.getElementOffset(this.imageRef);
+	      var xPc = (clientPos.x - imageOffset.left) / this.imageRef.width * 100;
+	      var yPc = (clientPos.y - imageOffset.top) / this.imageRef.height * 100;
 
 	      crop.x = xPc;
 	      crop.y = yPc;
@@ -253,8 +254,8 @@ module.exports =
 	      crop.height = 0;
 
 	      this.evData = {
-	        imageWidth: this.image.width,
-	        imageHeight: this.image.height,
+	        imageWidth: this.imageRef.width,
+	        imageHeight: this.imageRef.height,
 	        clientStartX: clientPos.x,
 	        clientStartY: clientPos.y,
 	        cropStartWidth: crop.width,
@@ -350,10 +351,10 @@ module.exports =
 	        return crop;
 	      }
 	      return {
-	        x: Math.round(this.image.naturalWidth * (crop.x / 100)),
-	        y: Math.round(this.image.naturalHeight * (crop.y / 100)),
-	        width: Math.round(this.image.naturalWidth * (crop.width / 100)),
-	        height: Math.round(this.image.naturalHeight * (crop.height / 100))
+	        x: Math.round(this.imageRef.naturalWidth * (crop.x / 100)),
+	        y: Math.round(this.imageRef.naturalHeight * (crop.y / 100)),
+	        width: Math.round(this.imageRef.naturalWidth * (crop.width / 100)),
+	        height: Math.round(this.imageRef.naturalHeight * (crop.height / 100))
 	      };
 	    }
 	  }, {
@@ -662,7 +663,7 @@ module.exports =
 	        'div',
 	        {
 	          ref: function ref(c) {
-	            _this3.cropSelect = c;
+	            _this3.cropSelectRef = c;
 	          },
 	          style: style,
 	          className: 'ReactCrop--crop-selection',
@@ -820,7 +821,7 @@ module.exports =
 	        'div',
 	        {
 	          ref: function ref(c) {
-	            _this4.component = c;
+	            _this4.componentRef = c;
 	          },
 	          className: componentClasses.join(' '),
 	          onTouchStart: this.onComponentMouseTouchDown,
@@ -831,7 +832,7 @@ module.exports =
 	        this.renderSvg(),
 	        _react2.default.createElement('img', {
 	          ref: function ref(c) {
-	            _this4.image = c;
+	            _this4.imageRef = c;
 	          },
 	          crossOrigin: 'anonymous',
 	          className: 'ReactCrop--image',
@@ -846,12 +847,12 @@ module.exports =
 	          {
 	            className: 'ReactCrop--crop-wrapper',
 	            ref: function ref(c) {
-	              _this4.cropWrapper = c;
+	              _this4.cropWrapperRef = c;
 	            }
 	          },
 	          _react2.default.createElement('img', {
 	            ref: function ref(c) {
-	              _this4.imageCopy = c;
+	              _this4.imageCopyRef = c;
 	            },
 	            className: 'ReactCrop--image-copy',
 	            src: this.props.src,
