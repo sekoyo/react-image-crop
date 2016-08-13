@@ -17,6 +17,7 @@ class ReactCrop extends Component {
     onImageLoaded: PropTypes.func,
     disabled: PropTypes.bool,
     ellipse: PropTypes.bool,
+    outputPixelUnits: PropTypes.bool,
     children: React.PropTypes.oneOfType([
       React.PropTypes.arrayOf(React.PropTypes.node),
       React.PropTypes.node,
@@ -116,7 +117,7 @@ class ReactCrop extends Component {
 
     e.preventDefault(); // Stop drag selection.
 
-    const crop = this.state.crop;
+    const { crop } = this.state;
     const evData = this.evData;
     const clientPos = this.getClientPos(e);
 
@@ -139,7 +140,7 @@ class ReactCrop extends Component {
     this.cropInvalid = false;
 
     if (this.props.onChange) {
-      this.props.onChange(crop);
+      this.props.onChange(this.getCropValue());
     }
 
     this.setState({ crop });
@@ -152,7 +153,7 @@ class ReactCrop extends Component {
 
     e.preventDefault(); // Stop drag selection.
 
-    const crop = this.state.crop;
+    const { crop } = this.state;
     const clientPos = this.getClientPos(e);
 
     // Focus for detecting keypress.
@@ -246,7 +247,7 @@ class ReactCrop extends Component {
     }
 
     const keyCode = e.which;
-    const crop = this.state.crop;
+    const { crop } = this.state;
     let nudged = false;
 
     if (!crop.width || !crop.height) {
@@ -272,14 +273,14 @@ class ReactCrop extends Component {
       crop.x = this.clamp(crop.x, 0, 100 - crop.width);
       crop.y = this.clamp(crop.y, 0, 100 - crop.height);
 
-      this.setState({ crop });
-
-      if (this.props.onChange) {
-        this.props.onChange(crop);
-      }
-      if (this.props.onComplete) {
-        this.props.onComplete(crop);
-      }
+      this.setState({ crop }, () => {
+        if (this.props.onChange) {
+          this.props.onChange(this.getCropValue());
+        }
+        if (this.props.onComplete) {
+          this.props.onComplete(this.getCropValue());
+        }
+      });
     }
   }
 
@@ -293,11 +294,24 @@ class ReactCrop extends Component {
       this.mouseDownOnCrop = false;
 
       if (this.props.onComplete) {
-        this.props.onComplete(this.state.crop);
+        this.props.onComplete(this.getCropValue());
       }
 
       this.setState({ newCropIsBeingDrawn: false });
     }
+  }
+
+  getCropValue() {
+    const { crop } = this.state;
+    const { outputPixelUnits } = this.props;
+
+    if (!outputPixelUnits) { return crop; }
+    return {
+      x: Math.round(this.image.naturalWidth * (crop.x / 100)),
+      y: Math.round(this.image.naturalHeight * (crop.y / 100)),
+      width: Math.round(this.image.naturalWidth * (crop.width / 100)),
+      height: Math.round(this.image.naturalHeight * (crop.height / 100)),
+    };
   }
 
   getPolygonValues(forSvg) {
@@ -551,7 +565,7 @@ class ReactCrop extends Component {
       this.setState({ crop });
     }
     if (this.props.onImageLoaded) {
-      this.props.onImageLoaded(crop, imageEl);
+      this.props.onImageLoaded(this.getCropValue(), imageEl);
     }
   }
 
