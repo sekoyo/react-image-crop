@@ -70,16 +70,17 @@ class ReactCrop extends Component {
     document.addEventListener('touchend', this.onDocMouseTouchEnd);
     document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 
-    if (this.image.complete || this.image.readyState) {
-      if (this.image.naturalWidth === 0) {
+    if (this.imageRef.complete || this.imageRef.readyState) {
+      if (this.imageRef.naturalWidth === 0) {
         // Broken load on iOS, PR #51
         // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
         // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
-        const src = this.image.src;
-        this.image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-        this.image.src = src;
+        const src = this.imageRef.src;
+        const emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+        this.imageRef.src = emptyGif;
+        this.imageRef.src = src;
       } else {
-        this.onImageLoad(this.image);
+        this.onImageLoad(this.imageRef);
       }
     }
   }
@@ -89,7 +90,7 @@ class ReactCrop extends Component {
       const nextCrop = this.nextCropState(nextProps.crop);
 
       if (nextCrop.aspect) {
-        this.ensureAspectDimensions(nextCrop, this.image);
+        this.ensureAspectDimensions(nextCrop, this.imageRef);
       }
 
       this.cropInvalid = this.isCropInvalid(nextCrop);
@@ -157,7 +158,7 @@ class ReactCrop extends Component {
     const clientPos = this.getClientPos(e);
 
     // Focus for detecting keypress.
-    this.component.focus();
+    this.componentRef.focus();
 
     const ord = e.target.dataset.ord;
     const xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
@@ -166,12 +167,12 @@ class ReactCrop extends Component {
     let cropOffset;
 
     if (crop.aspect) {
-      cropOffset = this.getElementOffset(this.cropSelect);
+      cropOffset = this.getElementOffset(this.cropSelectRef);
     }
 
     this.evData = {
-      imageWidth: this.image.width,
-      imageHeight: this.image.height,
+      imageWidth: this.imageRef.width,
+      imageHeight: this.imageRef.height,
       clientStartX: clientPos.x,
       clientStartY: clientPos.y,
       cropStartWidth: crop.width,
@@ -184,7 +185,7 @@ class ReactCrop extends Component {
       yCrossOver: yInversed,
       startXCrossOver: xInversed,
       startYCrossOver: yInversed,
-      isResize: e.target !== this.cropSelect,
+      isResize: e.target !== this.cropSelectRef,
       ord,
       cropOffset,
     };
@@ -193,7 +194,7 @@ class ReactCrop extends Component {
   }
 
   onComponentMouseTouchDown(e) {
-    if (e.target !== this.imageCopy && e.target !== this.cropWrapper) {
+    if (e.target !== this.imageCopyRef && e.target !== this.cropWrapperRef) {
       return;
     }
 
@@ -207,11 +208,11 @@ class ReactCrop extends Component {
     const clientPos = this.getClientPos(e);
 
     // Focus for detecting keypress.
-    this.component.focus();
+    this.componentRef.focus();
 
-    const imageOffset = this.getElementOffset(this.image);
-    const xPc = ((clientPos.x - imageOffset.left) / this.image.width) * 100;
-    const yPc = ((clientPos.y - imageOffset.top) / this.image.height) * 100;
+    const imageOffset = this.getElementOffset(this.imageRef);
+    const xPc = ((clientPos.x - imageOffset.left) / this.imageRef.width) * 100;
+    const yPc = ((clientPos.y - imageOffset.top) / this.imageRef.height) * 100;
 
     crop.x = xPc;
     crop.y = yPc;
@@ -219,8 +220,8 @@ class ReactCrop extends Component {
     crop.height = 0;
 
     this.evData = {
-      imageWidth: this.image.width,
-      imageHeight: this.image.height,
+      imageWidth: this.imageRef.width,
+      imageHeight: this.imageRef.height,
       clientStartX: clientPos.x,
       clientStartY: clientPos.y,
       cropStartWidth: crop.width,
@@ -307,10 +308,10 @@ class ReactCrop extends Component {
 
     if (!outputPixelUnits) { return crop; }
     return {
-      x: Math.round(this.image.naturalWidth * (crop.x / 100)),
-      y: Math.round(this.image.naturalHeight * (crop.y / 100)),
-      width: Math.round(this.image.naturalWidth * (crop.width / 100)),
-      height: Math.round(this.image.naturalHeight * (crop.height / 100)),
+      x: Math.round(this.imageRef.naturalWidth * (crop.x / 100)),
+      y: Math.round(this.imageRef.naturalHeight * (crop.y / 100)),
+      width: Math.round(this.imageRef.naturalWidth * (crop.width / 100)),
+      height: Math.round(this.imageRef.naturalHeight * (crop.height / 100)),
     };
   }
 
@@ -585,7 +586,7 @@ class ReactCrop extends Component {
     return (
       <div
         ref={(c) => {
-          this.cropSelect = c;
+          this.cropSelectRef = c;
         }}
         style={style}
         className="ReactCrop--crop-selection"
@@ -737,7 +738,7 @@ class ReactCrop extends Component {
     return (
       <div
         ref={(c) => {
-          this.component = c;
+          this.componentRef = c;
         }}
         className={componentClasses.join(' ')}
         onTouchStart={this.onComponentMouseTouchDown}
@@ -749,7 +750,7 @@ class ReactCrop extends Component {
 
         <img
           ref={(c) => {
-            this.image = c;
+            this.imageRef = c;
           }}
           crossOrigin="anonymous"
           className="ReactCrop--image"
@@ -761,12 +762,12 @@ class ReactCrop extends Component {
         <div
           className="ReactCrop--crop-wrapper"
           ref={(c) => {
-            this.cropWrapper = c;
+            this.cropWrapperRef = c;
           }}
         >
           <img
             ref={(c) => {
-              this.imageCopy = c;
+              this.imageCopyRef = c;
             }}
             className="ReactCrop--image-copy"
             src={this.props.src}
