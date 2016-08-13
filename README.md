@@ -128,7 +128,7 @@ To develop run `npm start`, this will recompile your JS and SCSS on changes.
 
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
 
-A commit hook will ensure that `npm run release` is ran for you, or you can do it yourself so you have a single commit.
+When you are happy with your changes you can build to dist with `npm run release`.
 
 ## Browser compatibility
 
