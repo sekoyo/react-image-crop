@@ -14,9 +14,6 @@
     "release-css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
     "release": "npm run release-js && npm run release-css"
   },
-  "pre-commit": [
-    "release"
-  ],
   "author": "Dominic Tobias <dominic.tobias@gmail.com>",
   "keywords": [
     "react",
@@ -40,7 +37,6 @@
     "eslint-config-airbnb": "^10.0.1",
     "eslint-plugin-react": "^6.0.0",
     "node-sass": "^3.8.0",
-    "pre-commit": "^1.1.3",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
     "webpack": "^1.13.1"
