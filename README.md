@@ -96,6 +96,10 @@ A callback which happens when the image is loaded. Passes the current crop state
 
 If true, the selection will have an ellipse shape rather than a rectangular one. If a fixed aspect ratio is also specified, the shape will be strictly circular.
 
+#### outputPixelUnits (optional)
+
+If true, the crop value in callbacks will have pixel units instead of percentages.
+
 ## What about showing the crop on the client?
 
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend. However here are some tips for client-side crop previews:
