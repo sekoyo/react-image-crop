@@ -26,6 +26,7 @@
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-core": "^6.13.2",
+    "babel-eslint": "^6.1.2",
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-class-properties": "^6.11.5",
@@ -35,6 +36,8 @@
     "cross-env": "^2.0.0",
     "eslint": "^3.3.0",
     "eslint-config-airbnb": "^10.0.1",
+    "eslint-plugin-import": "^1.13.0",
+    "eslint-plugin-jsx-a11y": "^2.1.0",
     "eslint-plugin-react": "^6.0.0",
     "node-sass": "^3.8.0",
     "react": "^15.3.0",
