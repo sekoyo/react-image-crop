@@ -65,6 +65,9 @@ module.exports =
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	// Waiting for bug fix: https://github.com/yannickcr/eslint-plugin-react/issues/507
+	/* eslint-disable react/sort-comp */
+
 	var ReactCrop = function (_Component) {
 	  _inherits(ReactCrop, _Component);
 
@@ -85,13 +88,6 @@ module.exports =
 	  }
 
 	  _createClass(ReactCrop, [{
-	    key: 'nextCropState',
-	    value: function nextCropState(crop) {
-	      var nextCrop = (0, _objectAssign2.default)({}, ReactCrop.defaultCrop, crop);
-	      this.cropInvalid = this.isCropInvalid(nextCrop);
-	      return nextCrop;
-	    }
-	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      document.addEventListener('mousemove', this.onDocMouseTouchMove);
@@ -101,17 +97,32 @@ module.exports =
 	      document.addEventListener('touchend', this.onDocMouseTouchEnd);
 	      document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 
-	      if (this.refs.image.complete || this.refs.image.readyState) {
-	        if (this.refs.image.naturalWidth === 0) {
+	      if (this.imageRef.complete || this.imageRef.readyState) {
+	        if (this.imageRef.naturalWidth === 0) {
 	          // Broken load on iOS, PR #51
 	          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
-	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded 
-	          var src = this.refs.image.src;
-	          this.refs.image.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-	          this.refs.image.src = src;
+	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
+	          var src = this.imageRef.src;
+	          var emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+	          this.imageRef.src = emptyGif;
+	          this.imageRef.src = src;
 	        } else {
-	          this.onImageLoad(this.refs.image);
+	          this.onImageLoad(this.imageRef);
 	        }
+	      }
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps) {
+	      if (nextProps.crop) {
+	        var nextCrop = this.nextCropState(nextProps.crop);
+
+	        if (nextCrop.aspect) {
+	          this.ensureAspectDimensions(nextCrop, this.imageRef);
+	        }
+
+	        this.cropInvalid = this.isCropInvalid(nextCrop);
+	        this.setState({ crop: nextCrop });
 	      }
 	    }
 	  }, {
@@ -123,51 +134,6 @@ module.exports =
 	      document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
 	      document.removeEventListener('touchend', this.onDocMouseTouchEnd);
 	      document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
-	    }
-	  }, {
-	    key: 'componentWillReceiveProps',
-	    value: function componentWillReceiveProps(nextProps) {
-	      if (nextProps.crop) {
-	        var nextCrop = this.nextCropState(nextProps.crop);
-
-	        if (nextCrop.aspect) {
-	          this.ensureAspectDimensions(nextCrop, this.refs.image);
-	        }
-
-	        this.cropInvalid = this.isCropInvalid(nextCrop);
-	        this.setState({ crop: nextCrop });
-	      }
-	    }
-	  }, {
-	    key: 'getCropStyle',
-	    value: function getCropStyle() {
-	      return {
-	        top: this.state.crop.y + '%',
-	        left: this.state.crop.x + '%',
-	        width: this.state.crop.width + '%',
-	        height: this.state.crop.height + '%'
-	      };
-	    }
-	  }, {
-	    key: 'straightenYPath',
-	    value: function straightenYPath(clientX) {
-	      var evData = this.evData;
-	      var ord = evData.ord;
-	      var cropOffset = evData.cropOffset;
-	      var cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
-	      var cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
-	      var k = void 0,
-	          d = void 0;
-
-	      if (ord === 'nw' || ord === 'se') {
-	        k = cropStartHeight / cropStartWidth;
-	        d = cropOffset.top - cropOffset.left * k;
-	      } else {
-	        k = -cropStartHeight / cropStartWidth;
-	        d = cropOffset.top + cropStartHeight - cropOffset.left * k;
-	      }
-
-	      return k * clientX + d;
 	    }
 	  }, {
 	    key: 'onDocMouseTouchMove',
@@ -183,6 +149,7 @@ module.exports =
 	      e.preventDefault(); // Stop drag selection.
 
 	      var crop = this.state.crop;
+
 	      var evData = this.evData;
 	      var clientPos = this.getClientPos(e);
 
@@ -205,10 +172,309 @@ module.exports =
 	      this.cropInvalid = false;
 
 	      if (this.props.onChange) {
-	        this.props.onChange(crop);
+	        this.props.onChange(this.getCropValue());
 	      }
 
 	      this.setState({ crop: crop });
+	    }
+	  }, {
+	    key: 'onCropMouseTouchDown',
+	    value: function onCropMouseTouchDown(e) {
+	      if (this.props.disabled) {
+	        return;
+	      }
+
+	      e.preventDefault(); // Stop drag selection.
+
+	      var crop = this.state.crop;
+
+	      var clientPos = this.getClientPos(e);
+
+	      // Focus for detecting keypress.
+	      this.componentRef.focus();
+
+	      var ord = e.target.dataset.ord;
+	      var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
+	      var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
+
+	      var cropOffset = void 0;
+
+	      if (crop.aspect) {
+	        cropOffset = this.getElementOffset(this.cropSelectRef);
+	      }
+
+	      this.evData = {
+	        imageWidth: this.imageRef.width,
+	        imageHeight: this.imageRef.height,
+	        clientStartX: clientPos.x,
+	        clientStartY: clientPos.y,
+	        cropStartWidth: crop.width,
+	        cropStartHeight: crop.height,
+	        cropStartX: xInversed ? crop.x + crop.width : crop.x,
+	        cropStartY: yInversed ? crop.y + crop.height : crop.y,
+	        xInversed: xInversed,
+	        yInversed: yInversed,
+	        xCrossOver: xInversed,
+	        yCrossOver: yInversed,
+	        startXCrossOver: xInversed,
+	        startYCrossOver: yInversed,
+	        isResize: e.target !== this.cropSelectRef,
+	        ord: ord,
+	        cropOffset: cropOffset
+	      };
+
+	      this.mouseDownOnCrop = true;
+	    }
+	  }, {
+	    key: 'onComponentMouseTouchDown',
+	    value: function onComponentMouseTouchDown(e) {
+	      if (e.target !== this.imageCopyRef && e.target !== this.cropWrapperRef) {
+	        return;
+	      }
+
+	      if (this.props.disabled) {
+	        return;
+	      }
+
+	      e.preventDefault(); // Stop drag selection.
+
+	      var crop = this.props.keepSelection === true ? {} : this.state.crop;
+	      var clientPos = this.getClientPos(e);
+
+	      // Focus for detecting keypress.
+	      this.componentRef.focus();
+
+	      var imageOffset = this.getElementOffset(this.imageRef);
+	      var xPc = (clientPos.x - imageOffset.left) / this.imageRef.width * 100;
+	      var yPc = (clientPos.y - imageOffset.top) / this.imageRef.height * 100;
+
+	      crop.x = xPc;
+	      crop.y = yPc;
+	      crop.width = 0;
+	      crop.height = 0;
+
+	      this.evData = {
+	        imageWidth: this.imageRef.width,
+	        imageHeight: this.imageRef.height,
+	        clientStartX: clientPos.x,
+	        clientStartY: clientPos.y,
+	        cropStartWidth: crop.width,
+	        cropStartHeight: crop.height,
+	        cropStartX: crop.x,
+	        cropStartY: crop.y,
+	        xInversed: false,
+	        yInversed: false,
+	        xCrossOver: false,
+	        yCrossOver: false,
+	        startXCrossOver: false,
+	        startYCrossOver: false,
+	        isResize: true,
+	        ord: 'nw'
+	      };
+
+	      this.mouseDownOnCrop = true;
+	      this.setState({ newCropIsBeingDrawn: true });
+	    }
+	  }, {
+	    key: 'onComponentKeyDown',
+	    value: function onComponentKeyDown(e) {
+	      var _this2 = this;
+
+	      if (this.props.disabled) {
+	        return;
+	      }
+
+	      var keyCode = e.which;
+	      var crop = this.state.crop;
+
+	      var nudged = false;
+
+	      if (!crop.width || !crop.height) {
+	        return;
+	      }
+
+	      if (keyCode === ReactCrop.arrowKey.left) {
+	        crop.x -= ReactCrop.nudgeStep;
+	        nudged = true;
+	      } else if (keyCode === ReactCrop.arrowKey.right) {
+	        crop.x += ReactCrop.nudgeStep;
+	        nudged = true;
+	      } else if (keyCode === ReactCrop.arrowKey.up) {
+	        crop.y -= ReactCrop.nudgeStep;
+	        nudged = true;
+	      } else if (keyCode === ReactCrop.arrowKey.down) {
+	        crop.y += ReactCrop.nudgeStep;
+	        nudged = true;
+	      }
+
+	      if (nudged) {
+	        e.preventDefault(); // Stop drag selection.
+	        crop.x = this.clamp(crop.x, 0, 100 - crop.width);
+	        crop.y = this.clamp(crop.y, 0, 100 - crop.height);
+
+	        this.setState({ crop: crop }, function () {
+	          if (_this2.props.onChange) {
+	            _this2.props.onChange(_this2.getCropValue());
+	          }
+	          if (_this2.props.onComplete) {
+	            _this2.props.onComplete(_this2.getCropValue());
+	          }
+	        });
+	      }
+	    }
+	  }, {
+	    key: 'onDocMouseTouchEnd',
+	    value: function onDocMouseTouchEnd() {
+	      if (this.props.disabled) {
+	        return;
+	      }
+
+	      if (this.mouseDownOnCrop) {
+	        this.cropInvalid = this.isCropInvalid(this.state.crop);
+	        this.mouseDownOnCrop = false;
+
+	        if (this.props.onComplete) {
+	          this.props.onComplete(this.getCropValue());
+	        }
+
+	        this.setState({ newCropIsBeingDrawn: false });
+	      }
+	    }
+	  }, {
+	    key: 'getCropValue',
+	    value: function getCropValue() {
+	      var crop = this.state.crop;
+	      var outputPixelUnits = this.props.outputPixelUnits;
+
+
+	      if (!outputPixelUnits) {
+	        return crop;
+	      }
+	      return {
+	        x: Math.round(this.imageRef.naturalWidth * (crop.x / 100)),
+	        y: Math.round(this.imageRef.naturalHeight * (crop.y / 100)),
+	        width: Math.round(this.imageRef.naturalWidth * (crop.width / 100)),
+	        height: Math.round(this.imageRef.naturalHeight * (crop.height / 100))
+	      };
+	    }
+	  }, {
+	    key: 'getPolygonValues',
+	    value: function getPolygonValues(forSvg) {
+	      var crop = this.state.crop;
+	      var pTopLeft = [crop.x, crop.y];
+	      var pTopRight = [crop.x + crop.width, crop.y];
+	      var pBottomLeft = [crop.x, crop.y + crop.height];
+	      var pBottomRight = [crop.x + crop.width, crop.y + crop.height];
+
+	      if (forSvg) {
+	        pTopLeft = this.arrayDividedBy100(pTopLeft);
+	        pTopRight = this.arrayDividedBy100(pTopRight);
+	        pBottomLeft = this.arrayDividedBy100(pBottomLeft);
+	        pBottomRight = this.arrayDividedBy100(pBottomRight);
+	      } else {
+	        pTopLeft = this.arrayToPercent(pTopLeft);
+	        pTopRight = this.arrayToPercent(pTopRight);
+	        pBottomLeft = this.arrayToPercent(pBottomLeft);
+	        pBottomRight = this.arrayToPercent(pBottomRight);
+	      }
+	      return {
+	        top: {
+	          left: pTopLeft,
+	          right: pTopRight
+	        },
+	        bottom: {
+	          left: pBottomLeft,
+	          right: pBottomRight
+	        }
+	      };
+	    }
+	  }, {
+	    key: 'getCropStyle',
+	    value: function getCropStyle() {
+	      return {
+	        top: this.state.crop.y + '%',
+	        left: this.state.crop.x + '%',
+	        width: this.state.crop.width + '%',
+	        height: this.state.crop.height + '%'
+	      };
+	    }
+	  }, {
+	    key: 'getEllipseValues',
+	    value: function getEllipseValues(forSvg) {
+	      var crop = this.state.crop;
+
+	      var rx = crop.width / 2;
+	      var ry = crop.height / 2;
+	      var cx = crop.x + rx;
+	      var cy = crop.y + ry;
+
+	      if (forSvg) {
+	        rx /= 100;
+	        ry /= 100;
+	        cx /= 100;
+	        cy /= 100;
+	      } else {
+	        rx += '%';
+	        ry += '%';
+	        cx += '%';
+	        cy += '%';
+	      }
+	      return { cx: cx, cy: cy, rx: rx, ry: ry };
+	    }
+	  }, {
+	    key: 'getPolygonClipPath',
+	    value: function getPolygonClipPath() {
+	      var _getPolygonValues = this.getPolygonValues();
+
+	      var top = _getPolygonValues.top;
+	      var bottom = _getPolygonValues.bottom;
+
+	      return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
+	    }
+	  }, {
+	    key: 'getEllipseClipPath',
+	    value: function getEllipseClipPath() {
+	      var _getEllipseValues = this.getEllipseValues();
+
+	      var rx = _getEllipseValues.rx;
+	      var ry = _getEllipseValues.ry;
+	      var cx = _getEllipseValues.cx;
+	      var cy = _getEllipseValues.cy;
+
+	      return 'ellipse(' + rx + ' ' + ry + ' at ' + cx + ' ' + cy + ')';
+	    }
+	  }, {
+	    key: 'getElementOffset',
+	    value: function getElementOffset(el) {
+	      var rect = el.getBoundingClientRect();
+	      var docEl = document.documentElement;
+
+	      var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
+	      var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
+
+	      return {
+	        top: rectTop,
+	        left: rectLeft
+	      };
+	    }
+	  }, {
+	    key: 'getClientPos',
+	    value: function getClientPos(e) {
+	      var pageX = void 0;
+	      var pageY = void 0;
+
+	      if (e.touches) {
+	        pageX = e.touches[0].pageX;
+	        pageY = e.touches[0].pageY;
+	      } else {
+	        pageX = e.pageX;
+	        pageY = e.pageY;
+	      }
+
+	      return {
+	        x: pageX,
+	        y: pageY
+	      };
 	    }
 	  }, {
 	    key: 'getNewSize',
@@ -268,6 +534,14 @@ module.exports =
 	      };
 	    }
 	  }, {
+	    key: 'dragCrop',
+	    value: function dragCrop() {
+	      var crop = this.state.crop;
+	      var evData = this.evData;
+	      crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
+	      crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
+	    }
+	  }, {
 	    key: 'resizeCrop',
 	    value: function resizeCrop() {
 	      var crop = this.state.crop;
@@ -323,21 +597,111 @@ module.exports =
 	      this.crossOverCheck();
 	    }
 	  }, {
-	    key: 'dragCrop',
-	    value: function dragCrop() {
-	      var crop = this.state.crop;
+	    key: 'straightenYPath',
+	    value: function straightenYPath(clientX) {
 	      var evData = this.evData;
-	      crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
-	      crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
+	      var ord = evData.ord;
+	      var cropOffset = evData.cropOffset;
+	      var cropStartWidth = evData.cropStartWidth / 100 * evData.imageWidth;
+	      var cropStartHeight = evData.cropStartHeight / 100 * evData.imageHeight;
+	      var k = void 0;
+	      var d = void 0;
+
+	      if (ord === 'nw' || ord === 'se') {
+	        k = cropStartHeight / cropStartWidth;
+	        d = cropOffset.top - cropOffset.left * k;
+	      } else {
+	        k = -cropStartHeight / cropStartWidth;
+	        d = cropOffset.top + (cropStartHeight - cropOffset.left * k);
+	      }
+
+	      return k * clientX + d;
 	    }
 	  }, {
-	    key: 'inverseOrd',
-	    value: function inverseOrd(ord) {
-	      var inverseOrd = void 0;
+	    key: 'onImageLoad',
+	    value: function onImageLoad(imageEl) {
+	      var crop = this.state.crop;
 
-	      if (ord === 'n') inverseOrd = 's';else if (ord === 'ne') inverseOrd = 'sw';else if (ord === 'e') inverseOrd = 'w';else if (ord === 'se') inverseOrd = 'nw';else if (ord === 's') inverseOrd = 'n';else if (ord === 'sw') inverseOrd = 'ne';else if (ord === 'w') inverseOrd = 'e';else if (ord === 'nw') inverseOrd = 'se';
+	      // If there is a width or height then infer the other to
+	      // ensure the value is correct.
+	      if (crop.aspect) {
+	        this.ensureAspectDimensions(crop, imageEl);
+	        this.cropInvalid = this.isCropInvalid(crop);
+	        this.setState({ crop: crop });
+	      }
+	      if (this.props.onImageLoaded) {
+	        this.props.onImageLoaded(this.getCropValue(), imageEl);
+	      }
+	    }
+	  }, {
+	    key: 'arrayDividedBy100',
+	    value: function arrayDividedBy100(arr) {
+	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
 
-	      return inverseOrd;
+	      return arr.map(function (number) {
+	        return number / 100;
+	      }).join(delimeter);
+	    }
+	  }, {
+	    key: 'arrayToPercent',
+	    value: function arrayToPercent(arr) {
+	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+
+	      return arr.map(function (number) {
+	        return number + '%';
+	      }).join(delimeter);
+	    }
+	  }, {
+	    key: 'createCropSelection',
+	    value: function createCropSelection() {
+	      var _this3 = this;
+
+	      var style = this.getCropStyle();
+	      var aspect = this.state.crop.aspect;
+	      var ellipse = this.props.ellipse;
+
+
+	      return _react2.default.createElement(
+	        'div',
+	        {
+	          ref: function ref(c) {
+	            _this3.cropSelectRef = c;
+	          },
+	          style: style,
+	          className: 'ReactCrop--crop-selection',
+	          onMouseDown: this.onCropMouseTouchDown,
+	          onTouchStart: this.onCropMouseTouchDown
+	        },
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
+	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
+	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+	      );
+	    }
+	  }, {
+	    key: 'isCropInvalid',
+	    value: function isCropInvalid(crop) {
+	      return !crop.width || !crop.height;
+	    }
+	  }, {
+	    key: 'nextCropState',
+	    value: function nextCropState(crop) {
+	      var nextCrop = (0, _objectAssign2.default)({}, ReactCrop.defaultCrop, crop);
+	      this.cropInvalid = this.isCropInvalid(nextCrop);
+	      return nextCrop;
+	    }
+	  }, {
+	    key: 'clamp',
+	    value: function clamp(num, min, max) {
+	      return Math.min(Math.max(num, min), max);
 	    }
 	  }, {
 	    key: 'crossOverCheck',
@@ -359,337 +723,21 @@ module.exports =
 	      evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
 	    }
 	  }, {
-	    key: 'onCropMouseTouchDown',
-	    value: function onCropMouseTouchDown(e) {
-	      if (this.props.disabled) {
-	        return;
-	      }
+	    key: 'inverseOrd',
+	    value: function inverseOrd(ord) {
+	      var inverseOrd = void 0;
 
-	      e.preventDefault(); // Stop drag selection.
+	      if (ord === 'n') inverseOrd = 's';else if (ord === 'ne') inverseOrd = 'sw';else if (ord === 'e') inverseOrd = 'w';else if (ord === 'se') inverseOrd = 'nw';else if (ord === 's') inverseOrd = 'n';else if (ord === 'sw') inverseOrd = 'ne';else if (ord === 'w') inverseOrd = 'e';else if (ord === 'nw') inverseOrd = 'se';
 
-	      var crop = this.state.crop;
-	      var clientPos = this.getClientPos(e);
-
-	      // Focus for detecting keypress.
-	      this.refs.component.focus();
-
-	      var ord = e.target.dataset.ord;
-	      var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
-	      var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
-
-	      var cropOffset = void 0;
-
-	      if (crop.aspect) {
-	        cropOffset = this.getElementOffset(this.refs.cropSelect);
-	      }
-
-	      this.evData = {
-	        imageWidth: this.refs.image.width,
-	        imageHeight: this.refs.image.height,
-	        clientStartX: clientPos.x,
-	        clientStartY: clientPos.y,
-	        cropStartWidth: crop.width,
-	        cropStartHeight: crop.height,
-	        cropStartX: xInversed ? crop.x + crop.width : crop.x,
-	        cropStartY: yInversed ? crop.y + crop.height : crop.y,
-	        xInversed: xInversed,
-	        yInversed: yInversed,
-	        xCrossOver: xInversed,
-	        yCrossOver: yInversed,
-	        startXCrossOver: xInversed,
-	        startYCrossOver: yInversed,
-	        isResize: e.target !== this.refs.cropSelect,
-	        ord: ord,
-	        cropOffset: cropOffset
-	      };
-
-	      this.mouseDownOnCrop = true;
-	    }
-	  }, {
-	    key: 'getClientPos',
-	    value: function getClientPos(e) {
-	      var pageX = void 0,
-	          pageY = void 0;
-
-	      if (e.touches) {
-	        pageX = e.touches[0].pageX;
-	        pageY = e.touches[0].pageY;
-	      } else {
-	        pageX = e.pageX;
-	        pageY = e.pageY;
-	      }
-
-	      return {
-	        x: pageX,
-	        y: pageY
-	      };
-	    }
-	  }, {
-	    key: 'onComponentMouseTouchDown',
-	    value: function onComponentMouseTouchDown(e) {
-	      if (e.target !== this.refs.imageCopy && e.target !== this.refs.cropWrapper) {
-	        return;
-	      }
-
-	      if (this.props.disabled) {
-	        return;
-	      }
-
-	      e.preventDefault(); // Stop drag selection.
-
-	      var crop = this.props.keepSelection === true ? {} : this.state.crop;
-	      var clientPos = this.getClientPos(e);
-
-	      // Focus for detecting keypress.
-	      this.refs.component.focus();
-
-	      var imageOffset = this.getElementOffset(this.refs.image);
-	      var xPc = (clientPos.x - imageOffset.left) / this.refs.image.width * 100;
-	      var yPc = (clientPos.y - imageOffset.top) / this.refs.image.height * 100;
-
-	      crop.x = xPc;
-	      crop.y = yPc;
-	      crop.width = 0;
-	      crop.height = 0;
-
-	      this.evData = {
-	        imageWidth: this.refs.image.width,
-	        imageHeight: this.refs.image.height,
-	        clientStartX: clientPos.x,
-	        clientStartY: clientPos.y,
-	        cropStartWidth: crop.width,
-	        cropStartHeight: crop.height,
-	        cropStartX: crop.x,
-	        cropStartY: crop.y,
-	        xInversed: false,
-	        yInversed: false,
-	        xCrossOver: false,
-	        yCrossOver: false,
-	        startXCrossOver: false,
-	        startYCrossOver: false,
-	        isResize: true,
-	        ord: 'nw'
-	      };
-
-	      this.mouseDownOnCrop = true;
-	      this.setState({ newCropIsBeingDrawn: true });
-	    }
-	  }, {
-	    key: 'onComponentKeyDown',
-	    value: function onComponentKeyDown(e) {
-	      if (this.props.disabled) {
-	        return;
-	      }
-
-	      var keyCode = e.which;
-	      var crop = this.state.crop;
-	      var nudged = false;
-
-	      if (!crop.width || !crop.height) {
-	        return;
-	      }
-
-	      if (keyCode === ReactCrop.arrowKey.left) {
-	        crop.x -= ReactCrop.nudgeStep;
-	        nudged = true;
-	      } else if (keyCode === ReactCrop.arrowKey.right) {
-	        crop.x += ReactCrop.nudgeStep;
-	        nudged = true;
-	      } else if (keyCode === ReactCrop.arrowKey.up) {
-	        crop.y -= ReactCrop.nudgeStep;
-	        nudged = true;
-	      } else if (keyCode === ReactCrop.arrowKey.down) {
-	        crop.y += ReactCrop.nudgeStep;
-	        nudged = true;
-	      }
-
-	      if (nudged) {
-	        e.preventDefault(); // Stop drag selection.
-	        crop.x = this.clamp(crop.x, 0, 100 - crop.width);
-	        crop.y = this.clamp(crop.y, 0, 100 - crop.height);
-
-	        this.setState({ crop: crop });
-
-	        if (this.props.onChange) {
-	          this.props.onChange(crop);
-	        }
-	        if (this.props.onComplete) {
-	          this.props.onComplete(crop);
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'onDocMouseTouchEnd',
-	    value: function onDocMouseTouchEnd(e) {
-	      if (this.props.disabled) {
-	        return;
-	      }
-
-	      if (this.mouseDownOnCrop) {
-
-	        this.cropInvalid = this.isCropInvalid(this.state.crop);
-	        this.mouseDownOnCrop = false;
-
-	        if (this.props.onComplete) {
-	          this.props.onComplete(this.state.crop);
-	        }
-
-	        this.setState({ newCropIsBeingDrawn: false });
-	      }
-	    }
-	  }, {
-	    key: 'getElementOffset',
-	    value: function getElementOffset(el) {
-	      var rect = el.getBoundingClientRect();
-	      var docEl = document.documentElement;
-
-	      var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
-	      var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
-
-	      return {
-	        top: rectTop,
-	        left: rectLeft
-	      };
-	    }
-	  }, {
-	    key: 'clamp',
-	    value: function clamp(num, min, max) {
-	      return Math.min(Math.max(num, min), max);
-	    }
-	  }, {
-	    key: 'isCropInvalid',
-	    value: function isCropInvalid(crop) {
-	      return !crop.width || !crop.height;
-	    }
-	  }, {
-	    key: 'createCropSelection',
-	    value: function createCropSelection() {
-	      var style = this.getCropStyle();
-	      var aspect = this.state.crop.aspect;
-	      var ellipse = this.props.ellipse;
-
-
-	      return _react2.default.createElement(
-	        'div',
-	        { ref: 'cropSelect',
-	          style: style,
-	          className: 'ReactCrop--crop-selection',
-	          onMouseDown: this.onCropMouseTouchDown,
-	          onTouchStart: this.onCropMouseTouchDown },
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
-	      );
-	    }
-	  }, {
-	    key: 'arrayDividedBy100',
-	    value: function arrayDividedBy100(arr) {
-	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
-
-	      return arr.map(function (number) {
-	        return number / 100;
-	      }).join(delimeter);
-	    }
-	  }, {
-	    key: 'arrayToPercent',
-	    value: function arrayToPercent(arr) {
-	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
-
-	      return arr.map(function (number) {
-	        return number + '%';
-	      }).join(delimeter);
-	    }
-	  }, {
-	    key: 'getPolygonValues',
-	    value: function getPolygonValues(forSvg) {
-	      var crop = this.state.crop;
-	      var pTopLeft = [crop.x, crop.y];
-	      var pTopRight = [crop.x + crop.width, crop.y];
-	      var pBottomLeft = [crop.x, crop.y + crop.height];
-	      var pBottomRight = [crop.x + crop.width, crop.y + crop.height];
-
-	      if (forSvg) {
-	        pTopLeft = this.arrayDividedBy100(pTopLeft);
-	        pTopRight = this.arrayDividedBy100(pTopRight);
-	        pBottomLeft = this.arrayDividedBy100(pBottomLeft);
-	        pBottomRight = this.arrayDividedBy100(pBottomRight);
-	      } else {
-	        pTopLeft = this.arrayToPercent(pTopLeft);
-	        pTopRight = this.arrayToPercent(pTopRight);
-	        pBottomLeft = this.arrayToPercent(pBottomLeft);
-	        pBottomRight = this.arrayToPercent(pBottomRight);
-	      }
-	      return {
-	        top: {
-	          left: pTopLeft,
-	          right: pTopRight
-	        },
-	        bottom: {
-	          left: pBottomLeft,
-	          right: pBottomRight
-	        }
-	      };
-	    }
-	  }, {
-	    key: 'getEllipseValues',
-	    value: function getEllipseValues(forSvg) {
-	      var crop = this.state.crop;
-
-	      var rx = crop.width / 2;
-	      var ry = crop.height / 2;
-	      var cx = crop.x + rx;
-	      var cy = crop.y + ry;
-
-	      if (forSvg) {
-	        rx /= 100;
-	        ry /= 100;
-	        cx /= 100;
-	        cy /= 100;
-	      } else {
-	        rx += '%';
-	        ry += '%';
-	        cx += '%';
-	        cy += '%';
-	      }
-	      return { cx: cx, cy: cy, rx: rx, ry: ry };
-	    }
-	  }, {
-	    key: 'getPolygonClipPath',
-	    value: function getPolygonClipPath() {
-	      var _getPolygonValues = this.getPolygonValues();
-
-	      var top = _getPolygonValues.top;
-	      var bottom = _getPolygonValues.bottom;
-
-	      return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
-	    }
-	  }, {
-	    key: 'getEllipseClipPath',
-	    value: function getEllipseClipPath() {
-	      var _getEllipseValues = this.getEllipseValues();
-
-	      var rx = _getEllipseValues.rx;
-	      var ry = _getEllipseValues.ry;
-	      var cx = _getEllipseValues.cx;
-	      var cy = _getEllipseValues.cy;
-
-	      return 'ellipse(' + rx + ' ' + ry + ' at ' + cx + ' ' + cy + ')';
+	      return inverseOrd;
 	    }
 	  }, {
 	    key: 'ensureAspectDimensions',
-	    value: function ensureAspectDimensions(crop, imageEl) {
+	    value: function ensureAspectDimensions(cropObj, imageEl) {
 	      var imageWidth = imageEl.naturalWidth;
 	      var imageHeight = imageEl.naturalHeight;
 	      var imageAspect = imageWidth / imageHeight;
+	      var crop = cropObj;
 
 	      if (crop.width) {
 	        crop.height = crop.width / crop.aspect * imageAspect;
@@ -707,22 +755,6 @@ module.exports =
 	      }
 
 	      return crop;
-	    }
-	  }, {
-	    key: 'onImageLoad',
-	    value: function onImageLoad(imageEl) {
-	      var crop = this.state.crop;
-
-	      // If there is a width or height then infer the other to
-	      // ensure the value is correct.
-	      if (crop.aspect) {
-	        this.ensureAspectDimensions(crop, imageEl);
-	        this.cropInvalid = this.isCropInvalid(crop);
-	        this.setState({ crop: crop });
-	      }
-	      if (this.props.onImageLoaded) {
-	        this.props.onImageLoaded(crop, imageEl);
-	      }
 	    }
 
 	    // Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
@@ -759,10 +791,10 @@ module.exports =
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this2 = this;
+	      var _this4 = this;
 
-	      var cropSelection = void 0,
-	          imageClip = void 0;
+	      var cropSelection = void 0;
+	      var imageClip = void 0;
 
 	      if (!this.cropInvalid) {
 	        cropSelection = this.createCropSelection();
@@ -789,20 +821,46 @@ module.exports =
 
 	      return _react2.default.createElement(
 	        'div',
-	        { ref: 'component',
+	        {
+	          ref: function ref(c) {
+	            _this4.componentRef = c;
+	          },
 	          className: componentClasses.join(' '),
 	          onTouchStart: this.onComponentMouseTouchDown,
 	          onMouseDown: this.onComponentMouseTouchDown,
 	          tabIndex: '1',
-	          onKeyDown: this.onComponentKeyDown },
+	          onKeyDown: this.onComponentKeyDown
+	        },
 	        this.renderSvg(),
-	        _react2.default.createElement('img', { ref: 'image', crossOrigin: 'anonymous', className: 'ReactCrop--image', src: this.props.src, onLoad: function onLoad(e) {
-	            _this2.onImageLoad(e.target);
-	          } }),
+	        _react2.default.createElement('img', {
+	          ref: function ref(c) {
+	            _this4.imageRef = c;
+	          },
+	          crossOrigin: 'anonymous',
+	          className: 'ReactCrop--image',
+	          src: this.props.src,
+	          onLoad: function onLoad(e) {
+	            _this4.onImageLoad(e.target);
+	          },
+	          alt: ''
+	        }),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'ReactCrop--crop-wrapper', ref: 'cropWrapper' },
-	          _react2.default.createElement('img', { ref: 'imageCopy', className: 'ReactCrop--image-copy', src: this.props.src, style: imageClip }),
+	          {
+	            className: 'ReactCrop--crop-wrapper',
+	            ref: function ref(c) {
+	              _this4.cropWrapperRef = c;
+	            }
+	          },
+	          _react2.default.createElement('img', {
+	            ref: function ref(c) {
+	              _this4.imageCopyRef = c;
+	            },
+	            className: 'ReactCrop--image-copy',
+	            src: this.props.src,
+	            style: imageClip,
+	            alt: ''
+	          }),
 	          cropSelection
 	        ),
 	        this.props.children
@@ -825,7 +883,9 @@ module.exports =
 	  onComplete: _react.PropTypes.func,
 	  onImageLoaded: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
-	  ellipse: _react.PropTypes.bool
+	  ellipse: _react.PropTypes.bool,
+	  outputPixelUnits: _react.PropTypes.bool,
+	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
 	  disabled: false,

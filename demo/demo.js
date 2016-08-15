@@ -5,20 +5,20 @@ import ReactCrop from '../lib/ReactCrop';
 /**
  * Select an image file.
  */
-var imageType = /^image\//;
-var fileInput = document.querySelector('#file-picker');
+const imageType = /^image\//;
+const fileInput = document.querySelector('#file-picker');
 
-fileInput.addEventListener('change', function(e) {
-  var file = e.target.files.item(0);
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files.item(0);
 
   if (!file || !imageType.test(file.type)) {
     return;
   }
 
-  var reader = new FileReader();
+  const reader = new FileReader();
 
-  reader.onload = function(e) {
-    loadEditView(e.target.result);
+  reader.onload = (e2) => {
+    loadEditView(e2.target.result);
   };
 
   reader.readAsDataURL(file);
@@ -27,11 +27,10 @@ fileInput.addEventListener('change', function(e) {
 /**
  * Load the image in the crop editor.
  */
-var cropEditor = document.querySelector('#crop-editor');
+const cropEditor = document.querySelector('#crop-editor');
 
 function loadEditView(dataUrl) {
-  
-  var Parent = React.createClass({
+  const Parent = React.createClass({
     getInitialState: function() {
       return {
         crop: {
@@ -80,13 +79,14 @@ function loadEditView(dataUrl) {
             src={dataUrl}
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
+            outputPixelUnits
             // onChange={this.onCropChange}
           />
           <button onClick={this.onButtonClick}>Programatically set crop</button>
-          <button onClick={() => {this.setState({ foo: Date.now() })}}>Change foo state</button>
+          <button onClick={() => { this.setState({ foo: Date.now() }); }}>Change foo state</button>
         </div>
       );
-    }
+    },
   });
 
   ReactDOM.render(<Parent />, cropEditor);
