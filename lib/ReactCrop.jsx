@@ -475,7 +475,7 @@ class ReactCrop extends Component {
     newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
 
     if (crop.aspect) {
-      newWidth = (newHeight * crop.aspect) / imageAspect;
+      newWidth = this.clamp((newHeight * crop.aspect) / imageAspect, 0, 100);
     }
 
     return {
