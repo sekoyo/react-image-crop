@@ -88,25 +88,31 @@ If true is passed then selection can't be disabled if the user clicks outside th
 
 If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-#### onChange(crop) (optional)
+#### onChange(crop, pixelCrop) (optional)
 
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-#### onComplete(crop) (optional)
+*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
 
-A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
+#### onComplete(crop, pixelCrop) (optional)
 
-#### onImageLoaded(crop, image) (optional)
+A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element.
+*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+
+#### onImageLoaded(crop, image, pixelCrop) (optional)
+
+A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element, as well as a pixel-converted crop for your convenience.
+
+*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
 
 #### ellipse (optional)
 
 If true, the selection will have an ellipse shape rather than a rectangular one. If a fixed aspect ratio is also specified, the shape will be strictly circular.
 
-#### outputPixelUnits (optional)
+#### outputPixelUnits (optional) **DEPRECATED**
 
-If true, the crop value in callbacks will have pixel units instead of percentages.
+This option has been deprecated as of v1.0.0. A pixel converted crop is passed to all callbacks as the last argument. Pay careful attention not to set your crop state with the pixel units and then pass those to `ReactCrop`, use the non-converted crop instead.
 
 ## What about showing the crop on the client?
 

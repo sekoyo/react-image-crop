@@ -44,7 +44,7 @@ function loadEditView(dataUrl) {
 
     onCropComplete(crop) {
       console.log('Crop move complete:', crop);
-      // this.setState({ crop });
+      this.setState({ hello: Date.now(), crop });
     }
 
     // onCropChange: function(crop) {
