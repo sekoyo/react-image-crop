@@ -64,7 +64,10 @@ class ReactCrop extends Component {
     this.onComponentKeyDown = this.onComponentKeyDown.bind(this);
     this.onCropMouseTouchDown = this.onCropMouseTouchDown.bind(this);
 
-    this.state = { crop: this.nextCropState(this.props.crop) };
+    this.state = {
+      crop: this.nextCropState(this.props.crop),
+      polygonId: this.getRandomInt(1, 900000),
+    };
   }
 
   componentDidMount() {
@@ -484,6 +487,14 @@ class ReactCrop extends Component {
     };
   }
 
+  getRandomInt(min, max) {
+    return Math.floor(Math.random() * ((max - min) + 1)) + min;
+  }
+
+  getPolygonId() {
+    return `ReactCropClipPolygon-${this.state.polygonId}`;
+  }
+
   dragCrop() {
     const crop = this.state.crop;
     const evData = this.evData;
@@ -707,7 +718,7 @@ class ReactCrop extends Component {
     return (
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
-          <clipPath id="ReactCropperClipPolygon" clipPathUnits="objectBoundingBox">
+          <clipPath id={this.getPolygonId()} clipPathUnits="objectBoundingBox">
             {shape}
           </clipPath>
         </defs>
@@ -726,7 +737,7 @@ class ReactCrop extends Component {
           ? this.getEllipseClipPath()
           : this.getPolygonClipPath()
         ),
-        clipPath: 'url("#ReactCropperClipPolygon")',
+        clipPath: `url("#${this.getPolygonId()}")`,
       };
     }
 

@@ -350,6 +350,7 @@ module.exports =
 	      if (!outputPixelUnits) {
 	        return crop;
 	      }
+
 	      return {
 	        x: Math.round(this.imageRef.naturalWidth * (crop.x / 100)),
 	        y: Math.round(this.imageRef.naturalHeight * (crop.y / 100)),
@@ -510,7 +511,7 @@ module.exports =
 	      }
 
 	      if (evData.yCrossOver) {
-	        // Cap if polarity is inversed and the shape fills the y space.
+	        // Cap if polarity is inversed and the ape fills the y space.
 	        newHeight = Math.min(Math.abs(newHeight), evData.cropStartY);
 	      }
 
@@ -525,7 +526,7 @@ module.exports =
 	      newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
 
 	      if (crop.aspect) {
-	        newWidth = newHeight * crop.aspect / imageAspect;
+	        newWidth = this.clamp(newHeight * crop.aspect / imageAspect, 0, 100);
 	      }
 
 	      return {
@@ -890,7 +891,8 @@ module.exports =
 	ReactCrop.defaultProps = {
 	  disabled: false,
 	  maxWidth: 100,
-	  maxHeight: 100
+	  maxHeight: 100,
+	  outputPixelUnits: false
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];
