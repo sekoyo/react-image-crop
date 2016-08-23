@@ -83,7 +83,10 @@ module.exports =
 	    _this.onComponentKeyDown = _this.onComponentKeyDown.bind(_this);
 	    _this.onCropMouseTouchDown = _this.onCropMouseTouchDown.bind(_this);
 
-	    _this.state = { crop: _this.nextCropState(_this.props.crop) };
+	    _this.state = {
+	      crop: _this.nextCropState(_this.props.crop),
+	      polygonId: _this.getRandomInt(1, 900000)
+	    };
 	    return _this;
 	  }
 
@@ -535,6 +538,16 @@ module.exports =
 	      };
 	    }
 	  }, {
+	    key: 'getRandomInt',
+	    value: function getRandomInt(min, max) {
+	      return Math.floor(Math.random() * (max - min + 1)) + min;
+	    }
+	  }, {
+	    key: 'getPolygonId',
+	    value: function getPolygonId() {
+	      return 'ReactCropClipPolygon-' + this.state.polygonId;
+	    }
+	  }, {
 	    key: 'dragCrop',
 	    value: function dragCrop() {
 	      var crop = this.state.crop;
@@ -783,7 +796,7 @@ module.exports =
 	          null,
 	          _react2.default.createElement(
 	            'clipPath',
-	            { id: 'ReactCropperClipPolygon', clipPathUnits: 'objectBoundingBox' },
+	            { id: this.getPolygonId(), clipPathUnits: 'objectBoundingBox' },
 	            shape
 	          )
 	        )
@@ -801,7 +814,7 @@ module.exports =
 	        cropSelection = this.createCropSelection();
 	        imageClip = {
 	          WebkitClipPath: this.props.ellipse ? this.getEllipseClipPath() : this.getPolygonClipPath(),
-	          clipPath: 'url("#ReactCropperClipPolygon")'
+	          clipPath: 'url("#' + this.getPolygonId() + '")'
 	        };
 	      }
 
