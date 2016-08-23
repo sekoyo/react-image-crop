@@ -21602,14 +21602,19 @@
 	      document.addEventListener('touchend', this.onDocMouseTouchEnd);
 	      document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 
-	      if ((this.imageRef.complete || this.imageRef.readyState) && !this.imageRef.naturalWidth) {
-	        // Broken load on iOS, PR #51
-	        // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
-	        // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
-	        var src = this.imageRef.src;
-	        var emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-	        this.imageRef.src = emptyGif;
-	        this.imageRef.src = src;
+	      if (this.imageRef.complete || this.imageRef.readyState) {
+	        if (this.imageRef.naturalWidth === 0) {
+	          // Broken load on iOS, PR #51
+	          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
+	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
+	          var src = this.imageRef.src;
+	          var emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+	          this.imageRef.src = emptyGif;
+	          this.imageRef.src = src;
+	        } else {
+	          // Fixme: this is causing a double onImageLoaded event in normal cases.
+	          this.onImageLoad(this.imageRef);
+	        }
 	      }
 	    }
 	  }, {
