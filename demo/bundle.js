@@ -123,7 +123,7 @@
 	      key: 'onCropComplete',
 	      value: function onCropComplete(crop) {
 	        console.log('Crop move complete:', crop);
-	        // this.setState({ crop });
+	        this.setState({ hello: Date.now(), crop: crop });
 	      }
 
 	      // onCropChange: function(crop) {
@@ -21621,7 +21621,7 @@
 	        var nextCrop = this.nextCropState(nextProps.crop);
 
 	        if (nextCrop.aspect) {
-	          this.ensureAspectDimensions(nextCrop, this.imageRef);
+	          nextCrop = this.ensureAspectDimensions(nextCrop, this.imageRef);
 	        }
 
 	        this.cropInvalid = this.isCropInvalid(nextCrop);
@@ -21675,7 +21675,7 @@
 	      this.cropInvalid = false;
 
 	      if (this.props.onChange) {
-	        this.props.onChange(this.getCropValue());
+	        this.props.onChange(crop, this.getPixelCrop(crop));
 	      }
 
 	      this.setState({ crop: crop });
@@ -21817,10 +21817,10 @@
 
 	        this.setState({ crop: crop }, function () {
 	          if (_this2.props.onChange) {
-	            _this2.props.onChange(_this2.getCropValue());
+	            _this2.props.onChange(crop, _this2.getPixelCrop(crop));
 	          }
 	          if (_this2.props.onComplete) {
-	            _this2.props.onComplete(_this2.getCropValue());
+	            _this2.props.onComplete(crop, _this2.getPixelCrop(crop));
 	          }
 	        });
 	      }
@@ -21833,27 +21833,21 @@
 	      }
 
 	      if (this.mouseDownOnCrop) {
-	        this.cropInvalid = this.isCropInvalid(this.state.crop);
+	        var crop = this.state.crop;
+
+	        this.cropInvalid = this.isCropInvalid(crop);
 	        this.mouseDownOnCrop = false;
 
 	        if (this.props.onComplete) {
-	          this.props.onComplete(this.getCropValue());
+	          this.props.onComplete(crop, this.getPixelCrop(crop));
 	        }
 
 	        this.setState({ newCropIsBeingDrawn: false });
 	      }
 	    }
 	  }, {
-	    key: 'getCropValue',
-	    value: function getCropValue() {
-	      var crop = this.state.crop;
-	      var outputPixelUnits = this.props.outputPixelUnits;
-
-
-	      if (!outputPixelUnits) {
-	        return crop;
-	      }
-
+	    key: 'getPixelCrop',
+	    value: function getPixelCrop(crop) {
 	      return {
 	        x: Math.round(this.imageRef.naturalWidth * (crop.x / 100)),
 	        y: Math.round(this.imageRef.naturalHeight * (crop.y / 100)),
@@ -21865,6 +21859,7 @@
 	    key: 'getPolygonValues',
 	    value: function getPolygonValues(forSvg) {
 	      var crop = this.state.crop;
+
 	      var pTopLeft = [crop.x, crop.y];
 	      var pTopRight = [crop.x + crop.width, crop.y];
 	      var pBottomLeft = [crop.x, crop.y + crop.height];
@@ -21984,6 +21979,7 @@
 	    key: 'getNewSize',
 	    value: function getNewSize() {
 	      var crop = this.state.crop;
+
 	      var evData = this.evData;
 	      var imageAspect = evData.imageWidth / evData.imageHeight;
 
@@ -22041,6 +22037,7 @@
 	    key: 'dragCrop',
 	    value: function dragCrop() {
 	      var crop = this.state.crop;
+
 	      var evData = this.evData;
 	      crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
 	      crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
@@ -22049,6 +22046,7 @@
 	    key: 'resizeCrop',
 	    value: function resizeCrop() {
 	      var crop = this.state.crop;
+
 	      var evData = this.evData;
 	      var ord = evData.ord;
 
@@ -22129,12 +22127,12 @@
 	      // If there is a width or height then infer the other to
 	      // ensure the value is correct.
 	      if (crop.aspect) {
-	        this.ensureAspectDimensions(crop, imageEl);
+	        crop = this.ensureAspectDimensions(crop, imageEl);
 	        this.cropInvalid = this.isCropInvalid(crop);
 	        this.setState({ crop: crop });
 	      }
 	      if (this.props.onImageLoaded) {
-	        this.props.onImageLoaded(this.getCropValue(), imageEl);
+	        this.props.onImageLoaded(crop, imageEl, this.getPixelCrop(crop));
 	      }
 	    }
 	  }, {
@@ -22241,7 +22239,7 @@
 	      var imageWidth = imageEl.naturalWidth;
 	      var imageHeight = imageEl.naturalHeight;
 	      var imageAspect = imageWidth / imageHeight;
-	      var crop = cropObj;
+	      var crop = (0, _objectAssign2.default)({}, cropObj);
 
 	      if (crop.width) {
 	        crop.height = crop.width / crop.aspect * imageAspect;
@@ -22388,14 +22386,12 @@
 	  onImageLoaded: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
 	  ellipse: _react.PropTypes.bool,
-	  outputPixelUnits: _react.PropTypes.bool,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
 	  disabled: false,
 	  maxWidth: 100,
-	  maxHeight: 100,
-	  outputPixelUnits: false
+	  maxHeight: 100
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];
