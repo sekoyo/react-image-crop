@@ -21617,7 +21617,6 @@
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
-	      console.log('componentWillReceiveProps:', nextProps);
 	      if (nextProps.crop) {
 	        var nextCrop = this.nextCropState(nextProps.crop);
 
@@ -21639,12 +21638,6 @@
 	      document.removeEventListener('touchend', this.onDocMouseTouchEnd);
 	      document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
 	    }
-
-	    // shouldComponentUpdate(nextProps, nextState) {
-	    //   console.log('shouldComponentUpdate:', nextProps, nextState);
-	    //   return true;
-	    // }
-
 	  }, {
 	    key: 'onDocMouseTouchMove',
 	    value: function onDocMouseTouchMove(e) {

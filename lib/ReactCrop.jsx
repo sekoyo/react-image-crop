@@ -91,7 +91,6 @@ class ReactCrop extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps:', nextProps);
     if (nextProps.crop) {
       const nextCrop = this.nextCropState(nextProps.crop);
 
@@ -112,11 +111,6 @@ class ReactCrop extends Component {
     document.removeEventListener('touchend', this.onDocMouseTouchEnd);
     document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
   }
-
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   console.log('shouldComponentUpdate:', nextProps, nextState);
-  //   return true;
-  // }
 
   onDocMouseTouchMove(e) {
     if (this.props.disabled) {
