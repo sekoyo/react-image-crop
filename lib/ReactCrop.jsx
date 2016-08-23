@@ -76,18 +76,14 @@ class ReactCrop extends Component {
     document.addEventListener('touchend', this.onDocMouseTouchEnd);
     document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
 
-    if (this.imageRef.complete || this.imageRef.readyState) {
-      if (this.imageRef.naturalWidth === 0) {
-        // Broken load on iOS, PR #51
-        // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
-        // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
-        const src = this.imageRef.src;
-        const emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-        this.imageRef.src = emptyGif;
-        this.imageRef.src = src;
-      } else {
-        this.onImageLoad(this.imageRef);
-      }
+    if ((this.imageRef.complete || this.imageRef.readyState) && !this.imageRef.naturalWidth) {
+      // Broken load on iOS, PR #51
+      // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
+      // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
+      const src = this.imageRef.src;
+      const emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+      this.imageRef.src = emptyGif;
+      this.imageRef.src = src;
     }
   }
 
