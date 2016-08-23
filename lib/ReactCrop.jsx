@@ -19,7 +19,6 @@ class ReactCrop extends Component {
     onImageLoaded: PropTypes.func,
     disabled: PropTypes.bool,
     ellipse: PropTypes.bool,
-    outputPixelUnits: PropTypes.bool,
     children: React.PropTypes.oneOfType([
       React.PropTypes.arrayOf(React.PropTypes.node),
       React.PropTypes.node,
@@ -30,7 +29,6 @@ class ReactCrop extends Component {
     disabled: false,
     maxWidth: 100,
     maxHeight: 100,
-    outputPixelUnits: false,
   }
 
   static xOrds = ['e', 'w']
@@ -92,10 +90,10 @@ class ReactCrop extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.crop) {
-      const nextCrop = this.nextCropState(nextProps.crop);
+      let nextCrop = this.nextCropState(nextProps.crop);
 
       if (nextCrop.aspect) {
-        this.ensureAspectDimensions(nextCrop, this.imageRef);
+        nextCrop = this.ensureAspectDimensions(nextCrop, this.imageRef);
       }
 
       this.cropInvalid = this.isCropInvalid(nextCrop);
@@ -146,7 +144,7 @@ class ReactCrop extends Component {
     this.cropInvalid = false;
 
     if (this.props.onChange) {
-      this.props.onChange(this.getCropValue());
+      this.props.onChange(crop, this.getPixelCrop(crop));
     }
 
     this.setState({ crop });
@@ -281,10 +279,10 @@ class ReactCrop extends Component {
 
       this.setState({ crop }, () => {
         if (this.props.onChange) {
-          this.props.onChange(this.getCropValue());
+          this.props.onChange(crop, this.getPixelCrop(crop));
         }
         if (this.props.onComplete) {
-          this.props.onComplete(this.getCropValue());
+          this.props.onComplete(crop, this.getPixelCrop(crop));
         }
       });
     }
@@ -296,25 +294,19 @@ class ReactCrop extends Component {
     }
 
     if (this.mouseDownOnCrop) {
-      this.cropInvalid = this.isCropInvalid(this.state.crop);
+      const { crop } = this.state;
+      this.cropInvalid = this.isCropInvalid(crop);
       this.mouseDownOnCrop = false;
 
       if (this.props.onComplete) {
-        this.props.onComplete(this.getCropValue());
+        this.props.onComplete(crop, this.getPixelCrop(crop));
       }
 
       this.setState({ newCropIsBeingDrawn: false });
     }
   }
 
-  getCropValue() {
-    const { crop } = this.state;
-    const { outputPixelUnits } = this.props;
-
-    if (!outputPixelUnits) {
-      return crop;
-    }
-
+  getPixelCrop(crop) {
     return {
       x: Math.round(this.imageRef.naturalWidth * (crop.x / 100)),
       y: Math.round(this.imageRef.naturalHeight * (crop.y / 100)),
@@ -324,7 +316,7 @@ class ReactCrop extends Component {
   }
 
   getPolygonValues(forSvg) {
-    const crop = this.state.crop;
+    const { crop } = this.state;
     let pTopLeft = [crop.x, crop.y];
     let pTopRight = [crop.x + crop.width, crop.y];
     let pBottomLeft = [crop.x, crop.y + crop.height];
@@ -425,7 +417,7 @@ class ReactCrop extends Component {
   }
 
   getNewSize() {
-    const crop = this.state.crop;
+    const { crop } = this.state;
     const evData = this.evData;
     const imageAspect = evData.imageWidth / evData.imageHeight;
 
@@ -485,14 +477,14 @@ class ReactCrop extends Component {
   }
 
   dragCrop() {
-    const crop = this.state.crop;
+    const { crop } = this.state;
     const evData = this.evData;
     crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
     crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
   }
 
   resizeCrop() {
-    const crop = this.state.crop;
+    const { crop } = this.state;
     const evData = this.evData;
     const ord = evData.ord;
 
@@ -566,17 +558,17 @@ class ReactCrop extends Component {
   }
 
   onImageLoad(imageEl) {
-    const crop = this.state.crop;
+    let crop = this.state.crop;
 
     // If there is a width or height then infer the other to
     // ensure the value is correct.
     if (crop.aspect) {
-      this.ensureAspectDimensions(crop, imageEl);
+      crop = this.ensureAspectDimensions(crop, imageEl);
       this.cropInvalid = this.isCropInvalid(crop);
       this.setState({ crop });
     }
     if (this.props.onImageLoaded) {
-      this.props.onImageLoaded(this.getCropValue(), imageEl);
+      this.props.onImageLoaded(crop, imageEl, this.getPixelCrop(crop));
     }
   }
 
@@ -674,7 +666,7 @@ class ReactCrop extends Component {
     const imageWidth = imageEl.naturalWidth;
     const imageHeight = imageEl.naturalHeight;
     const imageAspect = imageWidth / imageHeight;
-    const crop = cropObj;
+    const crop = assign({}, cropObj);
 
     if (crop.width) {
       crop.height = (crop.width / crop.aspect) * imageAspect;
