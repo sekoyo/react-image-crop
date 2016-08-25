@@ -63,7 +63,7 @@ class ReactCrop extends Component {
     this.onCropMouseTouchDown = this.onCropMouseTouchDown.bind(this);
 
     this.state = {
-      crop: this.nextCropState(this.props.crop),
+      crop: this.nextCropState(props.crop),
       polygonId: this.getRandomInt(1, 900000),
     };
   }
