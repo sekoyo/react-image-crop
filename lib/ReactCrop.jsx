@@ -19,6 +19,7 @@ class ReactCrop extends Component {
     onImageLoaded: PropTypes.func,
     disabled: PropTypes.bool,
     ellipse: PropTypes.bool,
+    crossorigin: PropTypes.string,
     children: React.PropTypes.oneOfType([
       React.PropTypes.arrayOf(React.PropTypes.node),
       React.PropTypes.node,
@@ -29,6 +30,7 @@ class ReactCrop extends Component {
     disabled: false,
     maxWidth: 100,
     maxHeight: 100,
+    crossorigin: 'anonymous'
   }
 
   static xOrds = ['e', 'w']
@@ -766,7 +768,7 @@ class ReactCrop extends Component {
           ref={(c) => {
             this.imageRef = c;
           }}
-          crossorigin={(this.props.src.indexOf('data:') === -1) ? 'anonymous' : undefined;}
+          crossorigin={(this.props.src.indexOf('data:') === -1) ? this.props.crossorigin : undefined}
           className="ReactCrop--image"
           src={this.props.src}
           onLoad={(e) => { this.onImageLoad(e.target); }}
