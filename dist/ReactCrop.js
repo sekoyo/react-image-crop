@@ -74,7 +74,7 @@ module.exports =
 	  function ReactCrop(props) {
 	    _classCallCheck(this, ReactCrop);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ReactCrop).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call(this, props));
 
 	    _this.onDocMouseTouchMove = _this.onDocMouseTouchMove.bind(_this);
 	    _this.onDocMouseTouchEnd = _this.onDocMouseTouchEnd.bind(_this);
@@ -84,7 +84,7 @@ module.exports =
 	    _this.onCropMouseTouchDown = _this.onCropMouseTouchDown.bind(_this);
 
 	    _this.state = {
-	      crop: _this.nextCropState(_this.props.crop),
+	      crop: _this.nextCropState(props.crop),
 	      polygonId: _this.getRandomInt(1, 900000)
 	    };
 	    return _this;
@@ -849,7 +849,7 @@ module.exports =
 	          ref: function ref(c) {
 	            _this4.imageRef = c;
 	          },
-	          crossOrigin: 'anonymous',
+	          crossorigin: this.props.src.indexOf('data:') === -1 ? this.props.crossorigin : undefined,
 	          className: 'ReactCrop--image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
@@ -897,12 +897,14 @@ module.exports =
 	  onImageLoaded: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
 	  ellipse: _react.PropTypes.bool,
+	  crossorigin: _react.PropTypes.string,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
 	  disabled: false,
 	  maxWidth: 100,
-	  maxHeight: 100
+	  maxHeight: 100,
+	  crossorigin: 'anonymous'
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];

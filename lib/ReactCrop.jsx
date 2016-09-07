@@ -768,7 +768,7 @@ class ReactCrop extends Component {
           ref={(c) => {
             this.imageRef = c;
           }}
-          crossorigin={(this.props.src.indexOf('data:') === -1) ? this.props.crossorigin : undefined;}
+          crossorigin={(this.props.src.indexOf('data:') === -1) ? this.props.crossorigin : undefined}
           className="ReactCrop--image"
           src={this.props.src}
           onLoad={(e) => { this.onImageLoad(e.target); }}
