@@ -74,7 +74,7 @@ module.exports =
 	  function ReactCrop(props) {
 	    _classCallCheck(this, ReactCrop);
 
-	    var _this = _possibleConstructorReturn(this, (ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ReactCrop).call(this, props));
 
 	    _this.onDocMouseTouchMove = _this.onDocMouseTouchMove.bind(_this);
 	    _this.onDocMouseTouchEnd = _this.onDocMouseTouchEnd.bind(_this);
@@ -808,6 +808,7 @@ module.exports =
 
 	      var cropSelection = void 0;
 	      var imageClip = void 0;
+	      var isDataUrl = this.props.src.indexOf('data:') === 0;
 
 	      if (!this.cropInvalid) {
 	        cropSelection = this.createCropSelection();
@@ -849,11 +850,11 @@ module.exports =
 	          ref: function ref(c) {
 	            _this4.imageRef = c;
 	          },
-	          crossorigin: this.props.src.indexOf('data:') === -1 ? this.props.crossorigin : undefined,
+	          crossOrigin: isDataUrl ? this.props.crossorigin : undefined,
 	          className: 'ReactCrop--image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
-	            _this4.onImageLoad(e.target);
+	            return _this4.onImageLoad(e.target);
 	          },
 	          alt: ''
 	        }),

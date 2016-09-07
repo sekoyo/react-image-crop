@@ -108,8 +108,7 @@ A callback which happens when the image is loaded. Passes the current crop state
 
 #### crossorigin (optional)
 
-Allows to set the crossorigin attribute used for the img tag. Default value is ``anonymous```. Other option would be __use-credentials__
-
+Allows to set the crossorigin attribute used for the img tag. Default value is `anonymous`. Other option would be `use-credentials`.
 
 #### ellipse (optional)
 

@@ -724,6 +724,7 @@ class ReactCrop extends Component {
   render() {
     let cropSelection;
     let imageClip;
+    const isDataUrl = this.props.src.indexOf('data:') === 0;
 
     if (!this.cropInvalid) {
       cropSelection = this.createCropSelection();
@@ -768,10 +769,10 @@ class ReactCrop extends Component {
           ref={(c) => {
             this.imageRef = c;
           }}
-          crossorigin={(this.props.src.indexOf('data:') === -1) ? this.props.crossorigin : undefined}
+          crossOrigin={isDataUrl ? this.props.crossorigin : undefined}
           className="ReactCrop--image"
           src={this.props.src}
-          onLoad={(e) => { this.onImageLoad(e.target); }}
+          onLoad={(e) => this.onImageLoad(e.target)}
           alt=""
         />
 
