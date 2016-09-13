@@ -769,7 +769,7 @@ class ReactCrop extends Component {
           ref={(c) => {
             this.imageRef = c;
           }}
-          crossOrigin={isDataUrl ? this.props.crossorigin : undefined}
+          crossOrigin={isDataUrl ? undefined : this.props.crossorigin}
           className="ReactCrop--image"
           src={this.props.src}
           onLoad={(e) => this.onImageLoad(e.target)}
@@ -786,6 +786,7 @@ class ReactCrop extends Component {
             ref={(c) => {
               this.imageCopyRef = c;
             }}
+            crossOrigin={isDataUrl ? undefined : this.props.crossorigin}
             className="ReactCrop--image-copy"
             src={this.props.src}
             style={imageClip}
