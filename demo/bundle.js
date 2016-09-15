@@ -83,7 +83,7 @@
 	    function Parent() {
 	      _classCallCheck(this, Parent);
 
-	      var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Parent).call(this));
+	      var _this = _possibleConstructorReturn(this, (Parent.__proto__ || Object.getPrototypeOf(Parent)).call(this));
 
 	      _this.state = {
 	        crop: {
@@ -311,25 +311,40 @@
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
 	(function () {
 	    try {
-	        cachedSetTimeout = setTimeout;
-	    } catch (e) {
-	        cachedSetTimeout = function () {
-	            throw new Error('setTimeout is not defined');
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
 	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
 	    }
 	    try {
-	        cachedClearTimeout = clearTimeout;
-	    } catch (e) {
-	        cachedClearTimeout = function () {
-	            throw new Error('clearTimeout is not defined');
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
 	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
 	    }
 	} ())
 	function runTimeout(fun) {
 	    if (cachedSetTimeout === setTimeout) {
 	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
 	        return setTimeout(fun, 0);
 	    }
 	    try {
@@ -350,6 +365,11 @@
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
 	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
 	        return clearTimeout(marker);
 	    }
 	    try {
@@ -21576,7 +21596,7 @@
 	  function ReactCrop(props) {
 	    _classCallCheck(this, ReactCrop);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ReactCrop).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call(this, props));
 
 	    _this.onDocMouseTouchMove = _this.onDocMouseTouchMove.bind(_this);
 	    _this.onDocMouseTouchEnd = _this.onDocMouseTouchEnd.bind(_this);
@@ -21586,7 +21606,7 @@
 	    _this.onCropMouseTouchDown = _this.onCropMouseTouchDown.bind(_this);
 
 	    _this.state = {
-	      crop: _this.nextCropState(_this.props.crop),
+	      crop: _this.nextCropState(props.crop),
 	      polygonId: _this.getRandomInt(1, 900000)
 	    };
 	    return _this;
@@ -22310,6 +22330,7 @@
 
 	      var cropSelection = void 0;
 	      var imageClip = void 0;
+	      var isDataUrl = this.props.src.indexOf('data:') === 0;
 
 	      if (!this.cropInvalid) {
 	        cropSelection = this.createCropSelection();
@@ -22351,11 +22372,11 @@
 	          ref: function ref(c) {
 	            _this4.imageRef = c;
 	          },
-	          crossOrigin: 'anonymous',
+	          crossOrigin: isDataUrl ? this.props.crossorigin : undefined,
 	          className: 'ReactCrop--image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
-	            _this4.onImageLoad(e.target);
+	            return _this4.onImageLoad(e.target);
 	          },
 	          alt: ''
 	        }),
@@ -22399,12 +22420,14 @@
 	  onImageLoaded: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
 	  ellipse: _react.PropTypes.bool,
+	  crossorigin: _react.PropTypes.string,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
 	  disabled: false,
 	  maxWidth: 100,
-	  maxHeight: 100
+	  maxHeight: 100,
+	  crossorigin: 'anonymous'
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];
