@@ -74,7 +74,7 @@ module.exports =
 	  function ReactCrop(props) {
 	    _classCallCheck(this, ReactCrop);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ReactCrop).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call(this, props));
 
 	    _this.onDocMouseTouchMove = _this.onDocMouseTouchMove.bind(_this);
 	    _this.onDocMouseTouchEnd = _this.onDocMouseTouchEnd.bind(_this);
@@ -850,7 +850,7 @@ module.exports =
 	          ref: function ref(c) {
 	            _this4.imageRef = c;
 	          },
-	          crossOrigin: isDataUrl ? this.props.crossorigin : undefined,
+	          crossOrigin: isDataUrl ? undefined : this.props.crossorigin,
 	          className: 'ReactCrop--image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
@@ -870,6 +870,7 @@ module.exports =
 	            ref: function ref(c) {
 	              _this4.imageCopyRef = c;
 	            },
+	            crossOrigin: isDataUrl ? undefined : this.props.crossorigin,
 	            className: 'ReactCrop--image-copy',
 	            src: this.props.src,
 	            style: imageClip,
