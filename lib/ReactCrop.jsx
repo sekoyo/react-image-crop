@@ -98,7 +98,7 @@ class ReactCrop extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.crop) {
       let nextCrop = this.nextCropState(nextProps.crop);
-      let aspectRatioChanged = 
+      const aspectRatioChanged = 
         this.state.crop.aspect && nextCrop.aspect !== this.state.crop.aspect;
 
       if (nextCrop.aspect) {
