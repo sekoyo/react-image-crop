@@ -17,6 +17,7 @@ class ReactCrop extends Component {
     onChange: PropTypes.func,
     onComplete: PropTypes.func,
     onImageLoaded: PropTypes.func,
+    onAspectRatioChange: PropTypes.func,
     disabled: PropTypes.bool,
     ellipse: PropTypes.bool,
     crossorigin: PropTypes.string,
@@ -97,13 +98,19 @@ class ReactCrop extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.crop) {
       let nextCrop = this.nextCropState(nextProps.crop);
+      let aspectRatioChanged = 
+        this.state.crop.aspect && nextCrop.aspect !== this.state.crop.aspect;
 
       if (nextCrop.aspect) {
         nextCrop = this.ensureAspectDimensions(nextCrop, this.imageRef);
       }
 
       this.cropInvalid = this.isCropInvalid(nextCrop);
-      this.setState({ crop: nextCrop });
+      this.setState({ crop: nextCrop }, () => {
+        if (aspectRatioChanged && this.props.onAspectRatioChange) {
+          this.props.onAspectRatioChange(nextCrop, this.getPixelCrop(nextCrop));
+        }
+      });
     }
   }
 

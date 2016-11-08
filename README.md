@@ -106,6 +106,12 @@ A callback which happens when the image is loaded. Passes the current crop state
 
 *Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
 
+#### onAspectRatioChange(crop, pixelCrop) (optional)
+
+A callback which happens when the new aspect ratio is passed to the component. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
+
+*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+
 #### crossorigin (optional)
 
 Allows to set the crossorigin attribute used for the img tag. Default value is `anonymous`. Other option would be `use-credentials`.
