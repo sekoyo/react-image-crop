@@ -534,16 +534,18 @@ class ReactCrop extends Component {
       }
     }
 
-    crop.x = this.clamp(newX, 0, 100 - newSize.width);
-    crop.y = this.clamp(newY, 0, 100 - newSize.height);
-
-    // Apply width/height changes depending on ordinate (fixed aspect always applies both).
+    // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
     if (crop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
+      crop.x = this.clamp(newX, 0, 100 - newSize.width);
+      crop.y = this.clamp(newY, 0, 100 - newSize.height);
+
       crop.width = newSize.width;
       crop.height = newSize.height;
     } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
+      crop.x = this.clamp(newX, 0, 100 - newSize.width);
       crop.width = newSize.width;
     } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
+      crop.y = this.clamp(newY, 0, 100 - newSize.height);
       crop.height = newSize.height;
     }
 
