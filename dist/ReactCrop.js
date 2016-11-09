@@ -118,15 +118,24 @@ module.exports =
 	  }, {
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
+	      var _this2 = this;
+
 	      if (nextProps.crop) {
-	        var nextCrop = this.nextCropState(nextProps.crop);
+	        (function () {
+	          var nextCrop = _this2.nextCropState(nextProps.crop);
+	          var aspectRatioChanged = _this2.state.crop.aspect && nextCrop.aspect !== _this2.state.crop.aspect;
 
-	        if (nextCrop.aspect) {
-	          nextCrop = this.ensureAspectDimensions(nextCrop, this.imageRef);
-	        }
+	          if (nextCrop.aspect) {
+	            nextCrop = _this2.ensureAspectDimensions(nextCrop, _this2.imageRef);
+	          }
 
-	        this.cropInvalid = this.isCropInvalid(nextCrop);
-	        this.setState({ crop: nextCrop });
+	          _this2.cropInvalid = _this2.isCropInvalid(nextCrop);
+	          _this2.setState({ crop: nextCrop }, function () {
+	            if (aspectRatioChanged && _this2.props.onAspectRatioChange) {
+	              _this2.props.onAspectRatioChange(nextCrop, _this2.getPixelCrop(nextCrop));
+	            }
+	          });
+	        })();
 	      }
 	    }
 	  }, {
@@ -282,7 +291,7 @@ module.exports =
 	  }, {
 	    key: 'onComponentKeyDown',
 	    value: function onComponentKeyDown(e) {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      if (this.props.disabled) {
 	        return;
@@ -317,11 +326,11 @@ module.exports =
 	        crop.y = this.clamp(crop.y, 0, 100 - crop.height);
 
 	        this.setState({ crop: crop }, function () {
-	          if (_this2.props.onChange) {
-	            _this2.props.onChange(crop, _this2.getPixelCrop(crop));
+	          if (_this3.props.onChange) {
+	            _this3.props.onChange(crop, _this3.getPixelCrop(crop));
 	          }
-	          if (_this2.props.onComplete) {
-	            _this2.props.onComplete(crop, _this2.getPixelCrop(crop));
+	          if (_this3.props.onComplete) {
+	            _this3.props.onComplete(crop, _this3.getPixelCrop(crop));
 	          }
 	        });
 	      }
@@ -424,22 +433,20 @@ module.exports =
 	  }, {
 	    key: 'getPolygonClipPath',
 	    value: function getPolygonClipPath() {
-	      var _getPolygonValues = this.getPolygonValues();
-
-	      var top = _getPolygonValues.top;
-	      var bottom = _getPolygonValues.bottom;
+	      var _getPolygonValues = this.getPolygonValues(),
+	          top = _getPolygonValues.top,
+	          bottom = _getPolygonValues.bottom;
 
 	      return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
 	    }
 	  }, {
 	    key: 'getEllipseClipPath',
 	    value: function getEllipseClipPath() {
-	      var _getEllipseValues = this.getEllipseValues();
-
-	      var rx = _getEllipseValues.rx;
-	      var ry = _getEllipseValues.ry;
-	      var cx = _getEllipseValues.cx;
-	      var cy = _getEllipseValues.cy;
+	      var _getEllipseValues = this.getEllipseValues(),
+	          rx = _getEllipseValues.rx,
+	          ry = _getEllipseValues.ry,
+	          cx = _getEllipseValues.cx,
+	          cy = _getEllipseValues.cy;
 
 	      return 'ellipse(' + rx + ' ' + ry + ' at ' + cx + ' ' + cy + ')';
 	    }
@@ -593,16 +600,18 @@ module.exports =
 	        }
 	      }
 
-	      crop.x = this.clamp(newX, 0, 100 - newSize.width);
-	      crop.y = this.clamp(newY, 0, 100 - newSize.height);
-
-	      // Apply width/height changes depending on ordinate (fixed aspect always applies both).
+	      // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
 	      if (crop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
+	        crop.x = this.clamp(newX, 0, 100 - newSize.width);
+	        crop.y = this.clamp(newY, 0, 100 - newSize.height);
+
 	        crop.width = newSize.width;
 	        crop.height = newSize.height;
 	      } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
+	        crop.x = this.clamp(newX, 0, 100 - newSize.width);
 	        crop.width = newSize.width;
 	      } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
+	        crop.y = this.clamp(newY, 0, 100 - newSize.height);
 	        crop.height = newSize.height;
 	      }
 
@@ -649,7 +658,7 @@ module.exports =
 	  }, {
 	    key: 'arrayDividedBy100',
 	    value: function arrayDividedBy100(arr) {
-	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+	      var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
 
 	      return arr.map(function (number) {
 	        return number / 100;
@@ -658,7 +667,7 @@ module.exports =
 	  }, {
 	    key: 'arrayToPercent',
 	    value: function arrayToPercent(arr) {
-	      var delimeter = arguments.length <= 1 || arguments[1] === undefined ? ' ' : arguments[1];
+	      var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
 
 	      return arr.map(function (number) {
 	        return number + '%';
@@ -667,7 +676,7 @@ module.exports =
 	  }, {
 	    key: 'createCropSelection',
 	    value: function createCropSelection() {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      var style = this.getCropStyle();
 	      var aspect = this.state.crop.aspect;
@@ -678,7 +687,7 @@ module.exports =
 	        'div',
 	        {
 	          ref: function ref(c) {
-	            _this3.cropSelectRef = c;
+	            _this4.cropSelectRef = c;
 	          },
 	          style: style,
 	          className: 'ReactCrop--crop-selection',
@@ -779,10 +788,9 @@ module.exports =
 	      if (this.props.ellipse) {
 	        shape = _react2.default.createElement('ellipse', this.getEllipseValues(true));
 	      } else {
-	        var _getPolygonValues2 = this.getPolygonValues(true);
-
-	        var top = _getPolygonValues2.top;
-	        var bottom = _getPolygonValues2.bottom;
+	        var _getPolygonValues2 = this.getPolygonValues(true),
+	            top = _getPolygonValues2.top,
+	            bottom = _getPolygonValues2.bottom;
 
 	        shape = _react2.default.createElement('polygon', { points: top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left });
 	      }
@@ -804,7 +812,7 @@ module.exports =
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      var cropSelection = void 0;
 	      var imageClip = void 0;
@@ -837,7 +845,7 @@ module.exports =
 	        'div',
 	        {
 	          ref: function ref(c) {
-	            _this4.componentRef = c;
+	            _this5.componentRef = c;
 	          },
 	          className: componentClasses.join(' '),
 	          onTouchStart: this.onComponentMouseTouchDown,
@@ -848,13 +856,13 @@ module.exports =
 	        this.renderSvg(),
 	        _react2.default.createElement('img', {
 	          ref: function ref(c) {
-	            _this4.imageRef = c;
+	            _this5.imageRef = c;
 	          },
 	          crossOrigin: isDataUrl ? undefined : this.props.crossorigin,
 	          className: 'ReactCrop--image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
-	            return _this4.onImageLoad(e.target);
+	            return _this5.onImageLoad(e.target);
 	          },
 	          alt: ''
 	        }),
@@ -863,12 +871,12 @@ module.exports =
 	          {
 	            className: 'ReactCrop--crop-wrapper',
 	            ref: function ref(c) {
-	              _this4.cropWrapperRef = c;
+	              _this5.cropWrapperRef = c;
 	            }
 	          },
 	          _react2.default.createElement('img', {
 	            ref: function ref(c) {
-	              _this4.imageCopyRef = c;
+	              _this5.imageCopyRef = c;
 	            },
 	            crossOrigin: isDataUrl ? undefined : this.props.crossorigin,
 	            className: 'ReactCrop--image-copy',
@@ -897,6 +905,7 @@ module.exports =
 	  onChange: _react.PropTypes.func,
 	  onComplete: _react.PropTypes.func,
 	  onImageLoaded: _react.PropTypes.func,
+	  onAspectRatioChange: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
 	  ellipse: _react.PropTypes.bool,
 	  crossorigin: _react.PropTypes.string,
