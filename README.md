@@ -116,9 +116,11 @@ A callback which happens when the new aspect ratio is passed to the component. P
 
 Allows to set the crossorigin attribute used for the img tag. Default value is `anonymous`. Other option would be `use-credentials`.
 
-#### ellipse (optional)
+#### ellipse (optional) **DEPRECATED**
 
 If true, the selection will have an ellipse shape rather than a rectangular one. If a fixed aspect ratio is also specified, the shape will be strictly circular.
+
+This option will be removed in the next major version, it is buggy and not considered "core" enough to be supported.
 
 #### outputPixelUnits (optional) **DEPRECATED**
 
