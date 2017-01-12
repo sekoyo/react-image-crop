@@ -16,7 +16,7 @@ A responsive image cropping tool for React.
 
 ## Installation
 ```
-npm i react-image-crop
+npm i react-image-crop --save
 ```
 
 ## Usage
