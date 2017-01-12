@@ -14,6 +14,11 @@ A responsive image cropping tool for React.
 - Keyboard support for nudging selection
 - Min/max crop size
 
+## Installation
+```
+npm i react-image-crop
+```
+
 ## Usage
 
 Include the main js module, e.g.:
