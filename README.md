@@ -71,19 +71,19 @@ Please note that the values will be adjusted if the cropping area is outside of 
 
 #### minWidth (optional)
 
-A minimum crop width.
+A minimum crop width, as a percentage of the image width.
 
 #### minHeight (optional)
 
-A minimum crop height.
+A minimum crop height, as a percentage of the image height.
 
 #### maxWidth (optional)
 
-A maximum crop width.
+A maximum crop width, as a percentage of the image width.
 
 #### maxHeight (optional)
 
-A maximum crop height.
+A maximum crop height, as a percentage of the image height.
 
 #### keepSelection (optional)
 
