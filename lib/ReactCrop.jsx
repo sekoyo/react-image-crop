@@ -1,14 +1,108 @@
 import React, { Component, PropTypes } from 'react';
-import assign from 'object-assign';
 
-// Waiting for bug fix: https://github.com/yannickcr/eslint-plugin-react/issues/507
-/* eslint-disable react/sort-comp */
+const EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+function getElementOffset(el) {
+  const rect = el.getBoundingClientRect();
+  const docEl = document.documentElement;
+
+  const rectTop = (rect.top + window.pageYOffset) - docEl.clientTop;
+  const rectLeft = (rect.left + window.pageXOffset) - docEl.clientLeft;
+
+  return {
+    top: rectTop,
+    left: rectLeft,
+  };
+}
+
+function getClientPos(e) {
+  let pageX;
+  let pageY;
+
+  if (e.touches) {
+    pageX = e.touches[0].pageX;
+    pageY = e.touches[0].pageY;
+  } else {
+    pageX = e.pageX;
+    pageY = e.pageY;
+  }
+
+  return {
+    x: pageX,
+    y: pageY,
+  };
+}
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * ((max - min) + 1)) + min;
+}
+
+function arrayDividedBy100(arr, delimeter = ' ') {
+  return arr.map(number => number / 100).join(delimeter);
+}
+
+function arrayToPercent(arr, delimeter = ' ') {
+  return arr.map(number => `${number}%`).join(delimeter);
+}
+
+function clamp(num, min, max) {
+  return Math.min(Math.max(num, min), max);
+}
+
+function isCropInvalid(crop) {
+  return !crop.width || !crop.height;
+}
+
+function inverseOrd(ord) {
+  let inversedOrd;
+
+  if (ord === 'n') inversedOrd = 's';
+  else if (ord === 'ne') inversedOrd = 'sw';
+  else if (ord === 'e') inversedOrd = 'w';
+  else if (ord === 'se') inversedOrd = 'nw';
+  else if (ord === 's') inversedOrd = 'n';
+  else if (ord === 'sw') inversedOrd = 'ne';
+  else if (ord === 'w') inversedOrd = 'e';
+  else if (ord === 'nw') inversedOrd = 'se';
+
+  return inversedOrd;
+}
+
+function ensureAspectDimensions(cropObj, imageEl) {
+  const imageWidth = imageEl.naturalWidth;
+  const imageHeight = imageEl.naturalHeight;
+  const imageAspect = imageWidth / imageHeight;
+  const crop = { ...cropObj };
+
+  if (crop.width) {
+    crop.height = (crop.width / crop.aspect) * imageAspect;
+  } else if (crop.height) {
+    crop.width = (crop.height * crop.aspect) / imageAspect;
+  }
+
+  if (crop.y + crop.height > 100) {
+    crop.height = 100 - crop.y;
+    crop.width = (crop.height * crop.aspect) / imageAspect;
+  }
+  if (crop.x + crop.width > 100) {
+    crop.width = 100 - crop.x;
+    crop.height = (crop.width / crop.aspect) * imageAspect;
+  }
+
+  return crop;
+}
 
 class ReactCrop extends Component {
 
   static propTypes = {
     src: PropTypes.string.isRequired,
-    crop: PropTypes.object,
+    crop: PropTypes.shape({
+      x: PropTypes.number,
+      y: PropTypes.number,
+      width: PropTypes.number,
+      height: PropTypes.number,
+    }),
+    imageAlt: PropTypes.string,
     minWidth: PropTypes.number,
     minHeight: PropTypes.number,
     maxWidth: PropTypes.number,
@@ -19,7 +113,6 @@ class ReactCrop extends Component {
     onImageLoaded: PropTypes.func,
     onAspectRatioChange: PropTypes.func,
     disabled: PropTypes.bool,
-    ellipse: PropTypes.bool,
     crossorigin: PropTypes.string,
     children: React.PropTypes.oneOfType([
       React.PropTypes.arrayOf(React.PropTypes.node),
@@ -28,10 +121,11 @@ class ReactCrop extends Component {
   }
 
   static defaultProps = {
+    crossorigin: undefined,
     disabled: false,
+    imageAlt: '',
     maxWidth: 100,
     maxHeight: 100,
-    crossorigin: 'anonymous'
   }
 
   static xOrds = ['e', 'w']
@@ -67,7 +161,7 @@ class ReactCrop extends Component {
 
     this.state = {
       crop: this.nextCropState(props.crop),
-      polygonId: this.getRandomInt(1, 900000),
+      polygonId: getRandomInt(1, 900000),
     };
   }
 
@@ -85,8 +179,7 @@ class ReactCrop extends Component {
         // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
         // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
         const src = this.imageRef.src;
-        const emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-        this.imageRef.src = emptyGif;
+        this.imageRef.src = EMPTY_GIF;
         this.imageRef.src = src;
       } else {
         // Fixme: this is causing a double onImageLoaded event in normal cases.
@@ -98,14 +191,14 @@ class ReactCrop extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.crop) {
       let nextCrop = this.nextCropState(nextProps.crop);
-      const aspectRatioChanged = 
-        this.state.crop.aspect && nextCrop.aspect !== this.state.crop.aspect;
+      const aspectRatioChanged = this.state.crop.aspect &&
+        nextCrop.aspect !== this.state.crop.aspect;
 
       if (nextCrop.aspect) {
-        nextCrop = this.ensureAspectDimensions(nextCrop, this.imageRef);
+        nextCrop = ensureAspectDimensions(nextCrop, this.imageRef);
       }
 
-      this.cropInvalid = this.isCropInvalid(nextCrop);
+      this.cropInvalid = isCropInvalid(nextCrop);
       this.setState({ crop: nextCrop }, () => {
         if (aspectRatioChanged && this.props.onAspectRatioChange) {
           this.props.onAspectRatioChange(nextCrop, this.getPixelCrop(nextCrop));
@@ -136,7 +229,7 @@ class ReactCrop extends Component {
 
     const { crop } = this.state;
     const evData = this.evData;
-    const clientPos = this.getClientPos(e);
+    const clientPos = getClientPos(e);
 
     if (evData.isResize && crop.aspect && evData.cropOffset) {
       clientPos.y = this.straightenYPath(clientPos.x);
@@ -171,7 +264,7 @@ class ReactCrop extends Component {
     e.preventDefault(); // Stop drag selection.
 
     const { crop } = this.state;
-    const clientPos = this.getClientPos(e);
+    const clientPos = getClientPos(e);
 
     // Focus for detecting keypress.
     this.componentRef.focus();
@@ -183,7 +276,7 @@ class ReactCrop extends Component {
     let cropOffset;
 
     if (crop.aspect) {
-      cropOffset = this.getElementOffset(this.cropSelectRef);
+      cropOffset = getElementOffset(this.cropSelectRef);
     }
 
     this.evData = {
@@ -221,12 +314,12 @@ class ReactCrop extends Component {
     e.preventDefault(); // Stop drag selection.
 
     const crop = this.props.keepSelection === true ? {} : this.state.crop;
-    const clientPos = this.getClientPos(e);
+    const clientPos = getClientPos(e);
 
     // Focus for detecting keypress.
     this.componentRef.focus();
 
-    const imageOffset = this.getElementOffset(this.imageRef);
+    const imageOffset = getElementOffset(this.imageRef);
     const xPc = ((clientPos.x - imageOffset.left) / this.imageRef.width) * 100;
     const yPc = ((clientPos.y - imageOffset.top) / this.imageRef.height) * 100;
 
@@ -287,8 +380,8 @@ class ReactCrop extends Component {
 
     if (nudged) {
       e.preventDefault(); // Stop drag selection.
-      crop.x = this.clamp(crop.x, 0, 100 - crop.width);
-      crop.y = this.clamp(crop.y, 0, 100 - crop.height);
+      crop.x = clamp(crop.x, 0, 100 - crop.width);
+      crop.y = clamp(crop.y, 0, 100 - crop.height);
 
       this.setState({ crop }, () => {
         if (this.props.onChange) {
@@ -308,7 +401,7 @@ class ReactCrop extends Component {
 
     if (this.mouseDownOnCrop) {
       const { crop } = this.state;
-      this.cropInvalid = this.isCropInvalid(crop);
+      this.cropInvalid = isCropInvalid(crop);
       this.mouseDownOnCrop = false;
 
       if (this.props.onComplete) {
@@ -316,6 +409,21 @@ class ReactCrop extends Component {
       }
 
       this.setState({ newCropIsBeingDrawn: false });
+    }
+  }
+
+  onImageLoad(imageEl) {
+    let crop = this.state.crop;
+
+    // If there is a width or height then infer the other to
+    // ensure the value is correct.
+    if (crop.aspect) {
+      crop = ensureAspectDimensions(crop, imageEl);
+      this.cropInvalid = isCropInvalid(crop);
+      this.setState({ crop });
+    }
+    if (this.props.onImageLoaded) {
+      this.props.onImageLoaded(crop, imageEl, this.getPixelCrop(crop));
     }
   }
 
@@ -336,15 +444,15 @@ class ReactCrop extends Component {
     let pBottomRight = [crop.x + crop.width, crop.y + crop.height];
 
     if (forSvg) {
-      pTopLeft = this.arrayDividedBy100(pTopLeft);
-      pTopRight = this.arrayDividedBy100(pTopRight);
-      pBottomLeft = this.arrayDividedBy100(pBottomLeft);
-      pBottomRight = this.arrayDividedBy100(pBottomRight);
+      pTopLeft = arrayDividedBy100(pTopLeft);
+      pTopRight = arrayDividedBy100(pTopRight);
+      pBottomLeft = arrayDividedBy100(pBottomLeft);
+      pBottomRight = arrayDividedBy100(pBottomRight);
     } else {
-      pTopLeft = this.arrayToPercent(pTopLeft);
-      pTopRight = this.arrayToPercent(pTopRight);
-      pBottomLeft = this.arrayToPercent(pBottomLeft);
-      pBottomRight = this.arrayToPercent(pBottomRight);
+      pTopLeft = arrayToPercent(pTopLeft);
+      pTopRight = arrayToPercent(pTopRight);
+      pBottomLeft = arrayToPercent(pBottomLeft);
+      pBottomRight = arrayToPercent(pBottomRight);
     }
     return {
       top: {
@@ -367,66 +475,9 @@ class ReactCrop extends Component {
     };
   }
 
-  getEllipseValues(forSvg) {
-    const { crop } = this.state;
-    let rx = crop.width / 2;
-    let ry = crop.height / 2;
-    let cx = crop.x + rx;
-    let cy = crop.y + ry;
-
-    if (forSvg) {
-      rx /= 100;
-      ry /= 100;
-      cx /= 100;
-      cy /= 100;
-    } else {
-      rx += '%';
-      ry += '%';
-      cx += '%';
-      cy += '%';
-    }
-    return { cx, cy, rx, ry };
-  }
-
   getPolygonClipPath() {
     const { top, bottom } = this.getPolygonValues();
     return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
-  }
-
-  getEllipseClipPath() {
-    const { rx, ry, cx, cy } = this.getEllipseValues();
-    return `ellipse(${rx} ${ry} at ${cx} ${cy})`;
-  }
-
-  getElementOffset(el) {
-    const rect = el.getBoundingClientRect();
-    const docEl = document.documentElement;
-
-    const rectTop = (rect.top + window.pageYOffset) - docEl.clientTop;
-    const rectLeft = (rect.left + window.pageXOffset) - docEl.clientLeft;
-
-    return {
-      top: rectTop,
-      left: rectLeft,
-    };
-  }
-
-  getClientPos(e) {
-    let pageX;
-    let pageY;
-
-    if (e.touches) {
-      pageX = e.touches[0].pageX;
-      pageY = e.touches[0].pageY;
-    } else {
-      pageX = e.pageX;
-      pageY = e.pageY;
-    }
-
-    return {
-      x: pageX,
-      y: pageY,
-    };
   }
 
   getNewSize() {
@@ -448,10 +499,10 @@ class ReactCrop extends Component {
       maxWidth = (['nw', 'w', 'sw'].indexOf(evData.inversedXOrd || evData.ord) > -1) ?
         evData.cropStartX :
         100 - evData.cropStartX;
-      maxWidth = this.clamp(maxWidth, 100, this.props.maxWidth);
+      maxWidth = clamp(maxWidth, 100, this.props.maxWidth);
     }
 
-    newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
+    newWidth = clamp(newWidth, this.props.minWidth || 0, maxWidth);
 
     // New height.
     let newHeight;
@@ -474,23 +525,19 @@ class ReactCrop extends Component {
       maxHeight = (['nw', 'n', 'ne'].indexOf(evData.inversedYOrd || evData.ord) > -1) ?
         evData.cropStartY :
         100 - evData.cropStartY;
-      maxHeight = this.clamp(maxHeight, 100, this.props.maxHeight);
+      maxHeight = clamp(maxHeight, 100, this.props.maxHeight);
     }
 
-    newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
+    newHeight = clamp(newHeight, this.props.minHeight || 0, maxHeight);
 
     if (crop.aspect) {
-      newWidth = this.clamp((newHeight * crop.aspect) / imageAspect, 0, 100);
+      newWidth = clamp((newHeight * crop.aspect) / imageAspect, 0, 100);
     }
 
     return {
       width: newWidth,
       height: newHeight,
     };
-  }
-
-  getRandomInt(min, max) {
-    return Math.floor(Math.random() * ((max - min) + 1)) + min;
   }
 
   getPolygonId() {
@@ -500,8 +547,8 @@ class ReactCrop extends Component {
   dragCrop() {
     const { crop } = this.state;
     const evData = this.evData;
-    crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
-    crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
+    crop.x = clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
+    crop.y = clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
   }
 
   resizeCrop() {
@@ -543,16 +590,16 @@ class ReactCrop extends Component {
 
     // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
     if (crop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
-      crop.x = this.clamp(newX, 0, 100 - newSize.width);
-      crop.y = this.clamp(newY, 0, 100 - newSize.height);
+      crop.x = clamp(newX, 0, 100 - newSize.width);
+      crop.y = clamp(newY, 0, 100 - newSize.height);
 
       crop.width = newSize.width;
       crop.height = newSize.height;
     } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
-      crop.x = this.clamp(newX, 0, 100 - newSize.width);
+      crop.x = clamp(newX, 0, 100 - newSize.width);
       crop.width = newSize.width;
     } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
-      crop.y = this.clamp(newY, 0, 100 - newSize.height);
+      crop.y = clamp(newY, 0, 100 - newSize.height);
       crop.height = newSize.height;
     }
 
@@ -580,39 +627,12 @@ class ReactCrop extends Component {
     return (k * clientX) + d;
   }
 
-  onImageLoad(imageEl) {
-    let crop = this.state.crop;
-
-    // If there is a width or height then infer the other to
-    // ensure the value is correct.
-    if (crop.aspect) {
-      crop = this.ensureAspectDimensions(crop, imageEl);
-      this.cropInvalid = this.isCropInvalid(crop);
-      this.setState({ crop });
-    }
-    if (this.props.onImageLoaded) {
-      this.props.onImageLoaded(crop, imageEl, this.getPixelCrop(crop));
-    }
-  }
-
-  arrayDividedBy100(arr, delimeter = ' ') {
-    return arr.map(number => number / 100).join(delimeter);
-  }
-
-  arrayToPercent(arr, delimeter = ' ') {
-    return arr.map(number => `${number}%`).join(delimeter);
-  }
-
   createCropSelection() {
     const style = this.getCropStyle();
-    const { aspect } = this.state.crop;
-    const { ellipse } = this.props;
 
     return (
       <div
-        ref={(c) => {
-          this.cropSelectRef = c;
-        }}
+        ref={n => (this.cropSelectRef = n)}
         style={style}
         className="ReactCrop--crop-selection"
         onMouseDown={this.onCropMouseTouchDown}
@@ -624,30 +644,22 @@ class ReactCrop extends Component {
         <div className="ReactCrop--drag-bar ord-s" data-ord="s" />
         <div className="ReactCrop--drag-bar ord-w" data-ord="w" />
 
-        {ellipse ? null : <div className="ReactCrop--drag-handle ord-nw" data-ord="nw" />}
-        {aspect && !ellipse ? null : <div className="ReactCrop--drag-handle ord-n" data-ord="n" />}
-        {ellipse ? null : <div className="ReactCrop--drag-handle ord-ne" data-ord="ne" />}
-        {aspect && !ellipse ? null : <div className="ReactCrop--drag-handle ord-e" data-ord="e" />}
-        {ellipse ? null : <div className="ReactCrop--drag-handle ord-se" data-ord="se" />}
-        {aspect && !ellipse ? null : <div className="ReactCrop--drag-handle ord-s" data-ord="s" />}
-        {ellipse ? null : <div className="ReactCrop--drag-handle ord-sw" data-ord="sw" />}
-        {aspect && !ellipse ? null : <div className="ReactCrop--drag-handle ord-w" data-ord="w" />}
+        <div className="ReactCrop--drag-handle ord-nw" data-ord="nw" />
+        <div className="ReactCrop--drag-handle ord-n" data-ord="n" />
+        <div className="ReactCrop--drag-handle ord-ne" data-ord="ne" />
+        <div className="ReactCrop--drag-handle ord-e" data-ord="e" />
+        <div className="ReactCrop--drag-handle ord-se" data-ord="se" />
+        <div className="ReactCrop--drag-handle ord-s" data-ord="s" />
+        <div className="ReactCrop--drag-handle ord-sw" data-ord="sw" />
+        <div className="ReactCrop--drag-handle ord-w" data-ord="w" />
       </div>
     );
   }
 
-  isCropInvalid(crop) {
-    return !crop.width || !crop.height;
-  }
-
   nextCropState(crop) {
-    const nextCrop = assign({}, ReactCrop.defaultCrop, crop);
-    this.cropInvalid = this.isCropInvalid(nextCrop);
+    const nextCrop = { ...ReactCrop.defaultCrop, ...crop };
+    this.cropInvalid = isCropInvalid(nextCrop);
     return nextCrop;
-  }
-
-  clamp(num, min, max) {
-    return Math.min(Math.max(num, min), max);
   }
 
   crossOverCheck() {
@@ -666,64 +678,19 @@ class ReactCrop extends Component {
     const swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
     const swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
 
-    evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
-    evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
-  }
-
-  inverseOrd(ord) {
-    let inverseOrd;
-
-    if (ord === 'n') inverseOrd = 's';
-    else if (ord === 'ne') inverseOrd = 'sw';
-    else if (ord === 'e') inverseOrd = 'w';
-    else if (ord === 'se') inverseOrd = 'nw';
-    else if (ord === 's') inverseOrd = 'n';
-    else if (ord === 'sw') inverseOrd = 'ne';
-    else if (ord === 'w') inverseOrd = 'e';
-    else if (ord === 'nw') inverseOrd = 'se';
-
-    return inverseOrd;
-  }
-
-  ensureAspectDimensions(cropObj, imageEl) {
-    const imageWidth = imageEl.naturalWidth;
-    const imageHeight = imageEl.naturalHeight;
-    const imageAspect = imageWidth / imageHeight;
-    const crop = assign({}, cropObj);
-
-    if (crop.width) {
-      crop.height = (crop.width / crop.aspect) * imageAspect;
-    } else if (crop.height) {
-      crop.width = (crop.height * crop.aspect) / imageAspect;
-    }
-
-    if (crop.y + crop.height > 100) {
-      crop.height = 100 - crop.y;
-      crop.width = (crop.height * crop.aspect) / imageAspect;
-    }
-    if (crop.x + crop.width > 100) {
-      crop.width = 100 - crop.x;
-      crop.height = (crop.width / crop.aspect) * imageAspect;
-    }
-
-    return crop;
+    evData.inversedXOrd = swapXOrd ? inverseOrd(evData.ord) : false;
+    evData.inversedYOrd = swapYOrd ? inverseOrd(evData.ord) : false;
   }
 
   // Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
   renderSvg() {
-    let shape;
-    if (this.props.ellipse) {
-      shape = <ellipse {...this.getEllipseValues(true)} />;
-    } else {
-      const { top, bottom } = this.getPolygonValues(true);
-      shape = <polygon points={`${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}`} />;
-    }
+    const { top, bottom } = this.getPolygonValues(true);
 
     return (
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           <clipPath id={this.getPolygonId()} clipPathUnits="objectBoundingBox">
-            {shape}
+            <polygon points={`${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}`} />
           </clipPath>
         </defs>
       </svg>
@@ -733,15 +700,11 @@ class ReactCrop extends Component {
   render() {
     let cropSelection;
     let imageClip;
-    const isDataUrl = this.props.src.indexOf('data:') === 0;
 
     if (!this.cropInvalid) {
       cropSelection = this.createCropSelection();
       imageClip = {
-        WebkitClipPath: (this.props.ellipse
-          ? this.getEllipseClipPath()
-          : this.getPolygonClipPath()
-        ),
+        WebkitClipPath: this.getPolygonClipPath(),
         clipPath: `url("#${this.getPolygonId()}")`,
       };
     }
@@ -754,18 +717,13 @@ class ReactCrop extends Component {
     if (this.state.crop.aspect) {
       componentClasses.push('ReactCrop-fixed-aspect');
     }
-    if (this.props.ellipse) {
-      componentClasses.push('ReactCrop-ellipse');
-    }
     if (this.props.disabled) {
       componentClasses.push('ReactCrop--disabled');
     }
 
     return (
       <div
-        ref={(c) => {
-          this.componentRef = c;
-        }}
+        ref={n => (this.componentRef = n)}
         className={componentClasses.join(' ')}
         onTouchStart={this.onComponentMouseTouchDown}
         onMouseDown={this.onComponentMouseTouchDown}
@@ -775,31 +733,25 @@ class ReactCrop extends Component {
         {this.renderSvg()}
 
         <img
-          ref={(c) => {
-            this.imageRef = c;
-          }}
-          crossOrigin={isDataUrl ? undefined : this.props.crossorigin}
+          ref={n => (this.imageRef = n)}
+          crossOrigin={this.props.crossorigin}
           className="ReactCrop--image"
           src={this.props.src}
-          onLoad={(e) => this.onImageLoad(e.target)}
-          alt=""
+          onLoad={e => this.onImageLoad(e.target)}
+          alt={this.props.imageAlt}
         />
 
         <div
           className="ReactCrop--crop-wrapper"
-          ref={(c) => {
-            this.cropWrapperRef = c;
-          }}
+          ref={n => (this.cropWrapperRef = n)}
         >
           <img
-            ref={(c) => {
-              this.imageCopyRef = c;
-            }}
-            crossOrigin={isDataUrl ? undefined : this.props.crossorigin}
+            ref={n => (this.imageCopyRef = n)}
+            crossOrigin={this.props.crossorigin}
             className="ReactCrop--image-copy"
             src={this.props.src}
             style={imageClip}
-            alt=""
+            alt={this.props.imageAlt}
           />
           {cropSelection}
         </div>
