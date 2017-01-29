@@ -837,17 +837,6 @@
 	  }
 	};
 
-	var fiveArgumentPooler = function (a1, a2, a3, a4, a5) {
-	  var Klass = this;
-	  if (Klass.instancePool.length) {
-	    var instance = Klass.instancePool.pop();
-	    Klass.call(instance, a1, a2, a3, a4, a5);
-	    return instance;
-	  } else {
-	    return new Klass(a1, a2, a3, a4, a5);
-	  }
-	};
-
 	var standardReleaser = function (instance) {
 	  var Klass = this;
 	  !(instance instanceof Klass) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Trying to release an instance into a pool of a different type.') : _prodInvariant('25') : void 0;
@@ -887,8 +876,7 @@
 	  oneArgumentPooler: oneArgumentPooler,
 	  twoArgumentPooler: twoArgumentPooler,
 	  threeArgumentPooler: threeArgumentPooler,
-	  fourArgumentPooler: fourArgumentPooler,
-	  fiveArgumentPooler: fiveArgumentPooler
+	  fourArgumentPooler: fourArgumentPooler
 	};
 
 	module.exports = PooledClass;
@@ -3228,7 +3216,14 @@
 	    // We warn in this case but don't throw. We expect the element creation to
 	    // succeed and there will likely be errors in render.
 	    if (!validType) {
-	      process.env.NODE_ENV !== 'production' ? warning(false, 'React.createElement: type should not be null, undefined, boolean, or ' + 'number. It should be a string (for DOM elements) or a ReactClass ' + '(for composite components).%s', getDeclarationErrorAddendum()) : void 0;
+	      if (typeof type !== 'function' && typeof type !== 'string') {
+	        var info = '';
+	        if (type === undefined || typeof type === 'object' && type !== null && Object.keys(type).length === 0) {
+	          info += ' You likely forgot to export your component from the file ' + 'it\'s defined in.';
+	        }
+	        info += getDeclarationErrorAddendum();
+	        process.env.NODE_ENV !== 'production' ? warning(false, 'React.createElement: type is invalid -- expected a string (for ' + 'built-in components) or a class/function (for composite ' + 'components) but got: %s.%s', type == null ? type : typeof type, info) : void 0;
+	      }
 	    }
 
 	    var element = ReactElement.createElement.apply(this, arguments);
@@ -4199,7 +4194,7 @@
 
 	'use strict';
 
-	module.exports = '15.4.1';
+	module.exports = '15.4.2';
 
 /***/ },
 /* 31 */
@@ -4398,6 +4393,13 @@
 	var internalInstanceKey = '__reactInternalInstance$' + Math.random().toString(36).slice(2);
 
 	/**
+	 * Check if a given node should be cached.
+	 */
+	function shouldPrecacheNode(node, nodeID) {
+	  return node.nodeType === 1 && node.getAttribute(ATTR_NAME) === String(nodeID) || node.nodeType === 8 && node.nodeValue === ' react-text: ' + nodeID + ' ' || node.nodeType === 8 && node.nodeValue === ' react-empty: ' + nodeID + ' ';
+	}
+
+	/**
 	 * Drill down (through composites and empty components) until we get a host or
 	 * host text component.
 	 *
@@ -4462,7 +4464,7 @@
 	    }
 	    // We assume the child nodes are in the same order as the child instances.
 	    for (; childNode !== null; childNode = childNode.nextSibling) {
-	      if (childNode.nodeType === 1 && childNode.getAttribute(ATTR_NAME) === String(childID) || childNode.nodeType === 8 && childNode.nodeValue === ' react-text: ' + childID + ' ' || childNode.nodeType === 8 && childNode.nodeValue === ' react-empty: ' + childID + ' ') {
+	      if (shouldPrecacheNode(childNode, childID)) {
 	        precacheNode(childInst, childNode);
 	        continue outer;
 	      }
@@ -6703,17 +6705,6 @@
 	  }
 	};
 
-	var fiveArgumentPooler = function (a1, a2, a3, a4, a5) {
-	  var Klass = this;
-	  if (Klass.instancePool.length) {
-	    var instance = Klass.instancePool.pop();
-	    Klass.call(instance, a1, a2, a3, a4, a5);
-	    return instance;
-	  } else {
-	    return new Klass(a1, a2, a3, a4, a5);
-	  }
-	};
-
 	var standardReleaser = function (instance) {
 	  var Klass = this;
 	  !(instance instanceof Klass) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Trying to release an instance into a pool of a different type.') : _prodInvariant('25') : void 0;
@@ -6753,8 +6744,7 @@
 	  oneArgumentPooler: oneArgumentPooler,
 	  twoArgumentPooler: twoArgumentPooler,
 	  threeArgumentPooler: threeArgumentPooler,
-	  fourArgumentPooler: fourArgumentPooler,
-	  fiveArgumentPooler: fiveArgumentPooler
+	  fourArgumentPooler: fourArgumentPooler
 	};
 
 	module.exports = PooledClass;
@@ -11572,12 +11562,18 @@
 	    } else {
 	      var contentToUse = CONTENT_TYPES[typeof props.children] ? props.children : null;
 	      var childrenToUse = contentToUse != null ? null : props.children;
+	      // TODO: Validate that text is allowed as a child of this node
 	      if (contentToUse != null) {
-	        // TODO: Validate that text is allowed as a child of this node
-	        if (process.env.NODE_ENV !== 'production') {
-	          setAndValidateContentChildDev.call(this, contentToUse);
+	        // Avoid setting textContent when the text is empty. In IE11 setting
+	        // textContent on a text area will cause the placeholder to not
+	        // show within the textarea until it has been focused and blurred again.
+	        // https://github.com/facebook/react/issues/6731#issuecomment-254874553
+	        if (contentToUse !== '') {
+	          if (process.env.NODE_ENV !== 'production') {
+	            setAndValidateContentChildDev.call(this, contentToUse);
+	          }
+	          DOMLazyTree.queueText(lazyTree, contentToUse);
 	        }
-	        DOMLazyTree.queueText(lazyTree, contentToUse);
 	      } else if (childrenToUse != null) {
 	        var mountImages = this.mountChildren(childrenToUse, transaction, context);
 	        for (var i = 0; i < mountImages.length; i++) {
@@ -13497,7 +13493,17 @@
 	      }
 	    } else {
 	      if (props.value == null && props.defaultValue != null) {
-	        node.defaultValue = '' + props.defaultValue;
+	        // In Chrome, assigning defaultValue to certain input types triggers input validation.
+	        // For number inputs, the display value loses trailing decimal points. For email inputs,
+	        // Chrome raises "The specified value <x> is not a valid email address".
+	        //
+	        // Here we check to see if the defaultValue has actually changed, avoiding these problems
+	        // when the user is inputting text
+	        //
+	        // https://github.com/facebook/react/issues/7253
+	        if (node.defaultValue !== '' + props.defaultValue) {
+	          node.defaultValue = '' + props.defaultValue;
+	        }
 	      }
 	      if (props.checked == null && props.defaultChecked != null) {
 	        node.defaultChecked = !!props.defaultChecked;
@@ -14244,9 +14250,15 @@
 	    // This is in postMount because we need access to the DOM node, which is not
 	    // available until after the component has mounted.
 	    var node = ReactDOMComponentTree.getNodeFromInstance(inst);
+	    var textContent = node.textContent;
 
-	    // Warning: node.value may be the empty string at this point (IE11) if placeholder is set.
-	    node.value = node.textContent; // Detach value from defaultValue
+	    // Only set node.value if textContent is equal to the expected
+	    // initial value. In IE10/IE11 there is a bug where the placeholder attribute
+	    // will populate textContent as well.
+	    // https://developer.microsoft.com/microsoft-edge/platform/issues/101525/
+	    if (textContent === inst._wrapperState.initialValue) {
+	      node.value = textContent;
+	    }
 	  }
 	};
 
@@ -15048,7 +15060,17 @@
 	    instance = ReactEmptyComponent.create(instantiateReactComponent);
 	  } else if (typeof node === 'object') {
 	    var element = node;
-	    !(element && (typeof element.type === 'function' || typeof element.type === 'string')) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s', element.type == null ? element.type : typeof element.type, getDeclarationErrorAddendum(element._owner)) : _prodInvariant('130', element.type == null ? element.type : typeof element.type, getDeclarationErrorAddendum(element._owner)) : void 0;
+	    var type = element.type;
+	    if (typeof type !== 'function' && typeof type !== 'string') {
+	      var info = '';
+	      if (process.env.NODE_ENV !== 'production') {
+	        if (type === undefined || typeof type === 'object' && type !== null && Object.keys(type).length === 0) {
+	          info += ' You likely forgot to export your component from the file ' + 'it\'s defined in.';
+	        }
+	      }
+	      info += getDeclarationErrorAddendum(element._owner);
+	       true ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s', type == null ? type : typeof type, info) : _prodInvariant('130', type == null ? type : typeof type, info) : void 0;
+	    }
 
 	    // Special case string values
 	    if (typeof element.type === 'string') {
@@ -15338,7 +15360,7 @@
 	      // Since plain JS classes are defined without any special initialization
 	      // logic, we can not catch common errors early. Therefore, we have to
 	      // catch them here, at initialization time, instead.
-	      process.env.NODE_ENV !== 'production' ? warning(!inst.getInitialState || inst.getInitialState.isReactClassApproved, 'getInitialState was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Did you mean to define a state property instead?', this.getName() || 'a component') : void 0;
+	      process.env.NODE_ENV !== 'production' ? warning(!inst.getInitialState || inst.getInitialState.isReactClassApproved || inst.state, 'getInitialState was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Did you mean to define a state property instead?', this.getName() || 'a component') : void 0;
 	      process.env.NODE_ENV !== 'production' ? warning(!inst.getDefaultProps || inst.getDefaultProps.isReactClassApproved, 'getDefaultProps was defined on %s, a plain JavaScript class. ' + 'This is only supported for classes created using React.createClass. ' + 'Use a static property to define defaultProps instead.', this.getName() || 'a component') : void 0;
 	      process.env.NODE_ENV !== 'production' ? warning(!inst.propTypes, 'propTypes was defined as an instance property on %s. Use a static ' + 'property to define propTypes instead.', this.getName() || 'a component') : void 0;
 	      process.env.NODE_ENV !== 'production' ? warning(!inst.contextTypes, 'contextTypes was defined as an instance property on %s. Use a ' + 'static property to define contextTypes instead.', this.getName() || 'a component') : void 0;
@@ -16342,14 +16364,11 @@
 
 	'use strict';
 
-	var _prodInvariant = __webpack_require__(35),
-	    _assign = __webpack_require__(4);
+	var _prodInvariant = __webpack_require__(35);
 
 	var invariant = __webpack_require__(8);
 
 	var genericComponentClass = null;
-	// This registry keeps track of wrapper classes around host tags.
-	var tagToComponentClass = {};
 	var textComponentClass = null;
 
 	var ReactHostComponentInjection = {
@@ -16362,11 +16381,6 @@
 	  // rendered as props.
 	  injectTextComponentClass: function (componentClass) {
 	    textComponentClass = componentClass;
-	  },
-	  // This accepts a keyed object with classes as values. Each key represents a
-	  // tag. That particular tag will use this class instead of the generic one.
-	  injectComponentClasses: function (componentClasses) {
-	    _assign(tagToComponentClass, componentClasses);
 	  }
 	};
 
@@ -21221,7 +21235,7 @@
 
 	'use strict';
 
-	module.exports = '15.4.1';
+	module.exports = '15.4.2';
 
 /***/ },
 /* 172 */
@@ -21613,13 +21627,11 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
-
-	var _objectAssign = __webpack_require__(4);
-
-	var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21629,8 +21641,98 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	// Waiting for bug fix: https://github.com/yannickcr/eslint-plugin-react/issues/507
-	/* eslint-disable react/sort-comp */
+	var EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+	function getElementOffset(el) {
+	  var rect = el.getBoundingClientRect();
+	  var docEl = document.documentElement;
+
+	  var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
+	  var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
+
+	  return {
+	    top: rectTop,
+	    left: rectLeft
+	  };
+	}
+
+	function getClientPos(e) {
+	  var pageX = void 0;
+	  var pageY = void 0;
+
+	  if (e.touches) {
+	    pageX = e.touches[0].pageX;
+	    pageY = e.touches[0].pageY;
+	  } else {
+	    pageX = e.pageX;
+	    pageY = e.pageY;
+	  }
+
+	  return {
+	    x: pageX,
+	    y: pageY
+	  };
+	}
+
+	function getRandomInt(min, max) {
+	  return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	function arrayDividedBy100(arr) {
+	  var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
+
+	  return arr.map(function (number) {
+	    return number / 100;
+	  }).join(delimeter);
+	}
+
+	function arrayToPercent(arr) {
+	  var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
+
+	  return arr.map(function (number) {
+	    return number + '%';
+	  }).join(delimeter);
+	}
+
+	function clamp(num, min, max) {
+	  return Math.min(Math.max(num, min), max);
+	}
+
+	function isCropInvalid(crop) {
+	  return !crop.width || !crop.height;
+	}
+
+	function inverseOrd(ord) {
+	  var inversedOrd = void 0;
+
+	  if (ord === 'n') inversedOrd = 's';else if (ord === 'ne') inversedOrd = 'sw';else if (ord === 'e') inversedOrd = 'w';else if (ord === 'se') inversedOrd = 'nw';else if (ord === 's') inversedOrd = 'n';else if (ord === 'sw') inversedOrd = 'ne';else if (ord === 'w') inversedOrd = 'e';else if (ord === 'nw') inversedOrd = 'se';
+
+	  return inversedOrd;
+	}
+
+	function ensureAspectDimensions(cropObj, imageEl) {
+	  var imageWidth = imageEl.naturalWidth;
+	  var imageHeight = imageEl.naturalHeight;
+	  var imageAspect = imageWidth / imageHeight;
+	  var crop = _extends({}, cropObj);
+
+	  if (crop.width) {
+	    crop.height = crop.width / crop.aspect * imageAspect;
+	  } else if (crop.height) {
+	    crop.width = crop.height * crop.aspect / imageAspect;
+	  }
+
+	  if (crop.y + crop.height > 100) {
+	    crop.height = 100 - crop.y;
+	    crop.width = crop.height * crop.aspect / imageAspect;
+	  }
+	  if (crop.x + crop.width > 100) {
+	    crop.width = 100 - crop.x;
+	    crop.height = crop.width / crop.aspect * imageAspect;
+	  }
+
+	  return crop;
+	}
 
 	var ReactCrop = function (_Component) {
 	  _inherits(ReactCrop, _Component);
@@ -21649,7 +21751,7 @@
 
 	    _this.state = {
 	      crop: _this.nextCropState(props.crop),
-	      polygonId: _this.getRandomInt(1, 900000)
+	      polygonId: getRandomInt(1, 900000)
 	    };
 	    return _this;
 	  }
@@ -21670,8 +21772,7 @@
 	          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
 	          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
 	          var src = this.imageRef.src;
-	          var emptyGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-	          this.imageRef.src = emptyGif;
+	          this.imageRef.src = EMPTY_GIF;
 	          this.imageRef.src = src;
 	        } else {
 	          // Fixme: this is causing a double onImageLoaded event in normal cases.
@@ -21690,10 +21791,10 @@
 	          var aspectRatioChanged = _this2.state.crop.aspect && nextCrop.aspect !== _this2.state.crop.aspect;
 
 	          if (nextCrop.aspect) {
-	            nextCrop = _this2.ensureAspectDimensions(nextCrop, _this2.imageRef);
+	            nextCrop = ensureAspectDimensions(nextCrop, _this2.imageRef);
 	          }
 
-	          _this2.cropInvalid = _this2.isCropInvalid(nextCrop);
+	          _this2.cropInvalid = isCropInvalid(nextCrop);
 	          _this2.setState({ crop: nextCrop }, function () {
 	            if (aspectRatioChanged && _this2.props.onAspectRatioChange) {
 	              _this2.props.onAspectRatioChange(nextCrop, _this2.getPixelCrop(nextCrop));
@@ -21728,7 +21829,7 @@
 	      var crop = this.state.crop;
 
 	      var evData = this.evData;
-	      var clientPos = this.getClientPos(e);
+	      var clientPos = getClientPos(e);
 
 	      if (evData.isResize && crop.aspect && evData.cropOffset) {
 	        clientPos.y = this.straightenYPath(clientPos.x);
@@ -21765,7 +21866,7 @@
 
 	      var crop = this.state.crop;
 
-	      var clientPos = this.getClientPos(e);
+	      var clientPos = getClientPos(e);
 
 	      // Focus for detecting keypress.
 	      this.componentRef.focus();
@@ -21777,7 +21878,7 @@
 	      var cropOffset = void 0;
 
 	      if (crop.aspect) {
-	        cropOffset = this.getElementOffset(this.cropSelectRef);
+	        cropOffset = getElementOffset(this.cropSelectRef);
 	      }
 
 	      this.evData = {
@@ -21816,12 +21917,12 @@
 	      e.preventDefault(); // Stop drag selection.
 
 	      var crop = this.props.keepSelection === true ? {} : this.state.crop;
-	      var clientPos = this.getClientPos(e);
+	      var clientPos = getClientPos(e);
 
 	      // Focus for detecting keypress.
 	      this.componentRef.focus();
 
-	      var imageOffset = this.getElementOffset(this.imageRef);
+	      var imageOffset = getElementOffset(this.imageRef);
 	      var xPc = (clientPos.x - imageOffset.left) / this.imageRef.width * 100;
 	      var yPc = (clientPos.y - imageOffset.top) / this.imageRef.height * 100;
 
@@ -21886,8 +21987,8 @@
 
 	      if (nudged) {
 	        e.preventDefault(); // Stop drag selection.
-	        crop.x = this.clamp(crop.x, 0, 100 - crop.width);
-	        crop.y = this.clamp(crop.y, 0, 100 - crop.height);
+	        crop.x = clamp(crop.x, 0, 100 - crop.width);
+	        crop.y = clamp(crop.y, 0, 100 - crop.height);
 
 	        this.setState({ crop: crop }, function () {
 	          if (_this3.props.onChange) {
@@ -21909,7 +22010,7 @@
 	      if (this.mouseDownOnCrop) {
 	        var crop = this.state.crop;
 
-	        this.cropInvalid = this.isCropInvalid(crop);
+	        this.cropInvalid = isCropInvalid(crop);
 	        this.mouseDownOnCrop = false;
 
 	        if (this.props.onComplete) {
@@ -21917,6 +22018,22 @@
 	        }
 
 	        this.setState({ newCropIsBeingDrawn: false });
+	      }
+	    }
+	  }, {
+	    key: 'onImageLoad',
+	    value: function onImageLoad(imageEl) {
+	      var crop = this.state.crop;
+
+	      // If there is a width or height then infer the other to
+	      // ensure the value is correct.
+	      if (crop.aspect) {
+	        crop = ensureAspectDimensions(crop, imageEl);
+	        this.cropInvalid = isCropInvalid(crop);
+	        this.setState({ crop: crop });
+	      }
+	      if (this.props.onImageLoaded) {
+	        this.props.onImageLoaded(crop, imageEl, this.getPixelCrop(crop));
 	      }
 	    }
 	  }, {
@@ -21940,15 +22057,15 @@
 	      var pBottomRight = [crop.x + crop.width, crop.y + crop.height];
 
 	      if (forSvg) {
-	        pTopLeft = this.arrayDividedBy100(pTopLeft);
-	        pTopRight = this.arrayDividedBy100(pTopRight);
-	        pBottomLeft = this.arrayDividedBy100(pBottomLeft);
-	        pBottomRight = this.arrayDividedBy100(pBottomRight);
+	        pTopLeft = arrayDividedBy100(pTopLeft);
+	        pTopRight = arrayDividedBy100(pTopRight);
+	        pBottomLeft = arrayDividedBy100(pBottomLeft);
+	        pBottomRight = arrayDividedBy100(pBottomRight);
 	      } else {
-	        pTopLeft = this.arrayToPercent(pTopLeft);
-	        pTopRight = this.arrayToPercent(pTopRight);
-	        pBottomLeft = this.arrayToPercent(pBottomLeft);
-	        pBottomRight = this.arrayToPercent(pBottomRight);
+	        pTopLeft = arrayToPercent(pTopLeft);
+	        pTopRight = arrayToPercent(pTopRight);
+	        pBottomLeft = arrayToPercent(pBottomLeft);
+	        pBottomRight = arrayToPercent(pBottomRight);
 	      }
 	      return {
 	        top: {
@@ -21972,29 +22089,6 @@
 	      };
 	    }
 	  }, {
-	    key: 'getEllipseValues',
-	    value: function getEllipseValues(forSvg) {
-	      var crop = this.state.crop;
-
-	      var rx = crop.width / 2;
-	      var ry = crop.height / 2;
-	      var cx = crop.x + rx;
-	      var cy = crop.y + ry;
-
-	      if (forSvg) {
-	        rx /= 100;
-	        ry /= 100;
-	        cx /= 100;
-	        cy /= 100;
-	      } else {
-	        rx += '%';
-	        ry += '%';
-	        cx += '%';
-	        cy += '%';
-	      }
-	      return { cx: cx, cy: cy, rx: rx, ry: ry };
-	    }
-	  }, {
 	    key: 'getPolygonClipPath',
 	    value: function getPolygonClipPath() {
 	      var _getPolygonValues = this.getPolygonValues(),
@@ -22002,50 +22096,6 @@
 	          bottom = _getPolygonValues.bottom;
 
 	      return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
-	    }
-	  }, {
-	    key: 'getEllipseClipPath',
-	    value: function getEllipseClipPath() {
-	      var _getEllipseValues = this.getEllipseValues(),
-	          rx = _getEllipseValues.rx,
-	          ry = _getEllipseValues.ry,
-	          cx = _getEllipseValues.cx,
-	          cy = _getEllipseValues.cy;
-
-	      return 'ellipse(' + rx + ' ' + ry + ' at ' + cx + ' ' + cy + ')';
-	    }
-	  }, {
-	    key: 'getElementOffset',
-	    value: function getElementOffset(el) {
-	      var rect = el.getBoundingClientRect();
-	      var docEl = document.documentElement;
-
-	      var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
-	      var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
-
-	      return {
-	        top: rectTop,
-	        left: rectLeft
-	      };
-	    }
-	  }, {
-	    key: 'getClientPos',
-	    value: function getClientPos(e) {
-	      var pageX = void 0;
-	      var pageY = void 0;
-
-	      if (e.touches) {
-	        pageX = e.touches[0].pageX;
-	        pageY = e.touches[0].pageY;
-	      } else {
-	        pageX = e.pageX;
-	        pageY = e.pageY;
-	      }
-
-	      return {
-	        x: pageX,
-	        y: pageY
-	      };
 	    }
 	  }, {
 	    key: 'getNewSize',
@@ -22067,10 +22117,10 @@
 	      // Stop the box expanding on the opposite side when some edges are hit.
 	      if (!this.state.newCropIsBeingDrawn) {
 	        maxWidth = ['nw', 'w', 'sw'].indexOf(evData.inversedXOrd || evData.ord) > -1 ? evData.cropStartX : 100 - evData.cropStartX;
-	        maxWidth = this.clamp(maxWidth, 100, this.props.maxWidth);
+	        maxWidth = clamp(maxWidth, 100, this.props.maxWidth);
 	      }
 
-	      newWidth = this.clamp(newWidth, this.props.minWidth || 0, maxWidth);
+	      newWidth = clamp(newWidth, this.props.minWidth || 0, maxWidth);
 
 	      // New height.
 	      var newHeight = void 0;
@@ -22091,24 +22141,19 @@
 	      // Stop the box expanding on the opposite side when some edges are hit.
 	      if (!this.state.newCropIsBeingDrawn) {
 	        maxHeight = ['nw', 'n', 'ne'].indexOf(evData.inversedYOrd || evData.ord) > -1 ? evData.cropStartY : 100 - evData.cropStartY;
-	        maxHeight = this.clamp(maxHeight, 100, this.props.maxHeight);
+	        maxHeight = clamp(maxHeight, 100, this.props.maxHeight);
 	      }
 
-	      newHeight = this.clamp(newHeight, this.props.minHeight || 0, maxHeight);
+	      newHeight = clamp(newHeight, this.props.minHeight || 0, maxHeight);
 
 	      if (crop.aspect) {
-	        newWidth = this.clamp(newHeight * crop.aspect / imageAspect, 0, 100);
+	        newWidth = clamp(newHeight * crop.aspect / imageAspect, 0, 100);
 	      }
 
 	      return {
 	        width: newWidth,
 	        height: newHeight
 	      };
-	    }
-	  }, {
-	    key: 'getRandomInt',
-	    value: function getRandomInt(min, max) {
-	      return Math.floor(Math.random() * (max - min + 1)) + min;
 	    }
 	  }, {
 	    key: 'getPolygonId',
@@ -22121,8 +22166,8 @@
 	      var crop = this.state.crop;
 
 	      var evData = this.evData;
-	      crop.x = this.clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
-	      crop.y = this.clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
+	      crop.x = clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
+	      crop.y = clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
 	    }
 	  }, {
 	    key: 'resizeCrop',
@@ -22166,16 +22211,16 @@
 
 	      // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
 	      if (crop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
-	        crop.x = this.clamp(newX, 0, 100 - newSize.width);
-	        crop.y = this.clamp(newY, 0, 100 - newSize.height);
+	        crop.x = clamp(newX, 0, 100 - newSize.width);
+	        crop.y = clamp(newY, 0, 100 - newSize.height);
 
 	        crop.width = newSize.width;
 	        crop.height = newSize.height;
 	      } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
-	        crop.x = this.clamp(newX, 0, 100 - newSize.width);
+	        crop.x = clamp(newX, 0, 100 - newSize.width);
 	        crop.width = newSize.width;
 	      } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
-	        crop.y = this.clamp(newY, 0, 100 - newSize.height);
+	        crop.y = clamp(newY, 0, 100 - newSize.height);
 	        crop.height = newSize.height;
 	      }
 
@@ -22204,54 +22249,17 @@
 	      return k * clientX + d;
 	    }
 	  }, {
-	    key: 'onImageLoad',
-	    value: function onImageLoad(imageEl) {
-	      var crop = this.state.crop;
-
-	      // If there is a width or height then infer the other to
-	      // ensure the value is correct.
-	      if (crop.aspect) {
-	        crop = this.ensureAspectDimensions(crop, imageEl);
-	        this.cropInvalid = this.isCropInvalid(crop);
-	        this.setState({ crop: crop });
-	      }
-	      if (this.props.onImageLoaded) {
-	        this.props.onImageLoaded(crop, imageEl, this.getPixelCrop(crop));
-	      }
-	    }
-	  }, {
-	    key: 'arrayDividedBy100',
-	    value: function arrayDividedBy100(arr) {
-	      var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
-
-	      return arr.map(function (number) {
-	        return number / 100;
-	      }).join(delimeter);
-	    }
-	  }, {
-	    key: 'arrayToPercent',
-	    value: function arrayToPercent(arr) {
-	      var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
-
-	      return arr.map(function (number) {
-	        return number + '%';
-	      }).join(delimeter);
-	    }
-	  }, {
 	    key: 'createCropSelection',
 	    value: function createCropSelection() {
 	      var _this4 = this;
 
 	      var style = this.getCropStyle();
-	      var aspect = this.state.crop.aspect;
-	      var ellipse = this.props.ellipse;
-
 
 	      return _react2.default.createElement(
 	        'div',
 	        {
-	          ref: function ref(c) {
-	            _this4.cropSelectRef = c;
+	          ref: function ref(n) {
+	            return _this4.cropSelectRef = n;
 	          },
 	          style: style,
 	          className: 'ReactCrop--crop-selection',
@@ -22262,32 +22270,22 @@
 	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
 	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
 	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-	        ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-	        aspect && !ellipse ? null : _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
 	      );
-	    }
-	  }, {
-	    key: 'isCropInvalid',
-	    value: function isCropInvalid(crop) {
-	      return !crop.width || !crop.height;
 	    }
 	  }, {
 	    key: 'nextCropState',
 	    value: function nextCropState(crop) {
-	      var nextCrop = (0, _objectAssign2.default)({}, ReactCrop.defaultCrop, crop);
-	      this.cropInvalid = this.isCropInvalid(nextCrop);
+	      var nextCrop = _extends({}, ReactCrop.defaultCrop, crop);
+	      this.cropInvalid = isCropInvalid(nextCrop);
 	      return nextCrop;
-	    }
-	  }, {
-	    key: 'clamp',
-	    value: function clamp(num, min, max) {
-	      return Math.min(Math.max(num, min), max);
 	    }
 	  }, {
 	    key: 'crossOverCheck',
@@ -22305,42 +22303,8 @@
 	      var swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
 	      var swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
 
-	      evData.inversedXOrd = swapXOrd ? this.inverseOrd(evData.ord) : false;
-	      evData.inversedYOrd = swapYOrd ? this.inverseOrd(evData.ord) : false;
-	    }
-	  }, {
-	    key: 'inverseOrd',
-	    value: function inverseOrd(ord) {
-	      var inverseOrd = void 0;
-
-	      if (ord === 'n') inverseOrd = 's';else if (ord === 'ne') inverseOrd = 'sw';else if (ord === 'e') inverseOrd = 'w';else if (ord === 'se') inverseOrd = 'nw';else if (ord === 's') inverseOrd = 'n';else if (ord === 'sw') inverseOrd = 'ne';else if (ord === 'w') inverseOrd = 'e';else if (ord === 'nw') inverseOrd = 'se';
-
-	      return inverseOrd;
-	    }
-	  }, {
-	    key: 'ensureAspectDimensions',
-	    value: function ensureAspectDimensions(cropObj, imageEl) {
-	      var imageWidth = imageEl.naturalWidth;
-	      var imageHeight = imageEl.naturalHeight;
-	      var imageAspect = imageWidth / imageHeight;
-	      var crop = (0, _objectAssign2.default)({}, cropObj);
-
-	      if (crop.width) {
-	        crop.height = crop.width / crop.aspect * imageAspect;
-	      } else if (crop.height) {
-	        crop.width = crop.height * crop.aspect / imageAspect;
-	      }
-
-	      if (crop.y + crop.height > 100) {
-	        crop.height = 100 - crop.y;
-	        crop.width = crop.height * crop.aspect / imageAspect;
-	      }
-	      if (crop.x + crop.width > 100) {
-	        crop.width = 100 - crop.x;
-	        crop.height = crop.width / crop.aspect * imageAspect;
-	      }
-
-	      return crop;
+	      evData.inversedXOrd = swapXOrd ? inverseOrd(evData.ord) : false;
+	      evData.inversedYOrd = swapYOrd ? inverseOrd(evData.ord) : false;
 	    }
 
 	    // Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
@@ -22348,16 +22312,9 @@
 	  }, {
 	    key: 'renderSvg',
 	    value: function renderSvg() {
-	      var shape = void 0;
-	      if (this.props.ellipse) {
-	        shape = _react2.default.createElement('ellipse', this.getEllipseValues(true));
-	      } else {
-	        var _getPolygonValues2 = this.getPolygonValues(true),
-	            top = _getPolygonValues2.top,
-	            bottom = _getPolygonValues2.bottom;
-
-	        shape = _react2.default.createElement('polygon', { points: top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left });
-	      }
+	      var _getPolygonValues2 = this.getPolygonValues(true),
+	          top = _getPolygonValues2.top,
+	          bottom = _getPolygonValues2.bottom;
 
 	      return _react2.default.createElement(
 	        'svg',
@@ -22368,7 +22325,7 @@
 	          _react2.default.createElement(
 	            'clipPath',
 	            { id: this.getPolygonId(), clipPathUnits: 'objectBoundingBox' },
-	            shape
+	            _react2.default.createElement('polygon', { points: top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left })
 	          )
 	        )
 	      );
@@ -22380,12 +22337,11 @@
 
 	      var cropSelection = void 0;
 	      var imageClip = void 0;
-	      var isDataUrl = this.props.src.indexOf('data:') === 0;
 
 	      if (!this.cropInvalid) {
 	        cropSelection = this.createCropSelection();
 	        imageClip = {
-	          WebkitClipPath: this.props.ellipse ? this.getEllipseClipPath() : this.getPolygonClipPath(),
+	          WebkitClipPath: this.getPolygonClipPath(),
 	          clipPath: 'url("#' + this.getPolygonId() + '")'
 	        };
 	      }
@@ -22398,9 +22354,6 @@
 	      if (this.state.crop.aspect) {
 	        componentClasses.push('ReactCrop-fixed-aspect');
 	      }
-	      if (this.props.ellipse) {
-	        componentClasses.push('ReactCrop-ellipse');
-	      }
 	      if (this.props.disabled) {
 	        componentClasses.push('ReactCrop--disabled');
 	      }
@@ -22408,8 +22361,8 @@
 	      return _react2.default.createElement(
 	        'div',
 	        {
-	          ref: function ref(c) {
-	            _this5.componentRef = c;
+	          ref: function ref(n) {
+	            return _this5.componentRef = n;
 	          },
 	          className: componentClasses.join(' '),
 	          onTouchStart: this.onComponentMouseTouchDown,
@@ -22419,34 +22372,34 @@
 	        },
 	        this.renderSvg(),
 	        _react2.default.createElement('img', {
-	          ref: function ref(c) {
-	            _this5.imageRef = c;
+	          ref: function ref(n) {
+	            return _this5.imageRef = n;
 	          },
-	          crossOrigin: isDataUrl ? undefined : this.props.crossorigin,
+	          crossOrigin: this.props.crossorigin,
 	          className: 'ReactCrop--image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
 	            return _this5.onImageLoad(e.target);
 	          },
-	          alt: ''
+	          alt: this.props.imageAlt
 	        }),
 	        _react2.default.createElement(
 	          'div',
 	          {
 	            className: 'ReactCrop--crop-wrapper',
-	            ref: function ref(c) {
-	              _this5.cropWrapperRef = c;
+	            ref: function ref(n) {
+	              return _this5.cropWrapperRef = n;
 	            }
 	          },
 	          _react2.default.createElement('img', {
-	            ref: function ref(c) {
-	              _this5.imageCopyRef = c;
+	            ref: function ref(n) {
+	              return _this5.imageCopyRef = n;
 	            },
-	            crossOrigin: isDataUrl ? undefined : this.props.crossorigin,
+	            crossOrigin: this.props.crossorigin,
 	            className: 'ReactCrop--image-copy',
 	            src: this.props.src,
 	            style: imageClip,
-	            alt: ''
+	            alt: this.props.imageAlt
 	          }),
 	          cropSelection
 	        ),
@@ -22460,7 +22413,13 @@
 
 	ReactCrop.propTypes = {
 	  src: _react.PropTypes.string.isRequired,
-	  crop: _react.PropTypes.object,
+	  crop: _react.PropTypes.shape({
+	    x: _react.PropTypes.number,
+	    y: _react.PropTypes.number,
+	    width: _react.PropTypes.number,
+	    height: _react.PropTypes.number
+	  }),
+	  imageAlt: _react.PropTypes.string,
 	  minWidth: _react.PropTypes.number,
 	  minHeight: _react.PropTypes.number,
 	  maxWidth: _react.PropTypes.number,
@@ -22471,15 +22430,15 @@
 	  onImageLoaded: _react.PropTypes.func,
 	  onAspectRatioChange: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
-	  ellipse: _react.PropTypes.bool,
 	  crossorigin: _react.PropTypes.string,
 	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
+	  crossorigin: undefined,
 	  disabled: false,
+	  imageAlt: '',
 	  maxWidth: 100,
-	  maxHeight: 100,
-	  crossorigin: 'anonymous'
+	  maxHeight: 100
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];
