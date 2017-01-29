@@ -119,17 +119,7 @@ A callback which happens when the new aspect ratio is passed to the component. P
 
 #### crossorigin (optional)
 
-Allows to set the crossorigin attribute used for the img tag. Default value is `anonymous`. Other option would be `use-credentials`.
-
-#### ellipse (optional) **DEPRECATED**
-
-If true, the selection will have an ellipse shape rather than a rectangular one. If a fixed aspect ratio is also specified, the shape will be strictly circular.
-
-This option will be removed in the next major version, it is buggy and not considered "core" enough to be supported.
-
-#### outputPixelUnits (optional) **DEPRECATED**
-
-This option has been deprecated as of v1.0.0. A pixel converted crop is passed to all callbacks as the last argument. Pay careful attention not to set your crop state with the pixel units and then pass those to `ReactCrop`, use the non-converted crop instead.
+Allows to set the crossorigin attribute used for the img tag.
 
 ## What about showing the crop on the client?
 
