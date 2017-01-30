@@ -36,7 +36,7 @@ Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 #### src (required)
 
 ```jsx
-<ReactCrop src='path/to/image.jpg' />
+<ReactCrop src="path/to/image.jpg" />
 ```
 
 You can of course pass a blob path or base64 data.
@@ -53,7 +53,7 @@ var crop = {
 	height: 10
 }
 
-<ReactCrop src='path/to/image.jpg' crop={crop} />
+<ReactCrop src="path/to/image.jpg" crop={crop} />
 ```
 
 If you want a fixed aspect you only need to specify a width *or* a height:
@@ -119,7 +119,7 @@ A callback which happens when the new aspect ratio is passed to the component. P
 
 #### crossorigin (optional)
 
-Allows to set the crossorigin attribute used for the img tag.
+Allows setting the crossorigin attribute used for the img tags.
 
 ## What about showing the crop on the client?
 
