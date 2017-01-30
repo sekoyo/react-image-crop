@@ -92,6 +92,7 @@
 	        },
 	        maxHeight: 80
 	      };
+	      _this.onButtonClick = _this.onButtonClick.bind(_this);
 	      return _this;
 	    }
 

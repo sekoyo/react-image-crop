@@ -180,6 +180,13 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
   display: none;
 }
 
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-n,
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-e,
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-s,
+.ReactCrop-fixed-aspect .ReactCrop--drag-handle.ord-w {
+  display: none;
+}
+
 @media (max-width: $mobile-max-width) {
   .ReactCrop--drag-handle {
     width: $drag-handle-mobile-width;
