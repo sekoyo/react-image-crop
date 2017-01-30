@@ -18,6 +18,7 @@ function loadEditView(dataUrl) {
         },
         maxHeight: 80,
       };
+      this.onButtonClick = this.onButtonClick.bind(this);
     }
 
     onButtonClick() {
