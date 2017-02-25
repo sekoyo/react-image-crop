@@ -114,18 +114,27 @@ class ReactCrop extends Component {
     onAspectRatioChange: PropTypes.func,
     disabled: PropTypes.bool,
     crossorigin: PropTypes.string,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.node),
-      React.PropTypes.node,
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.node),
+      PropTypes.node,
     ]),
   }
 
   static defaultProps = {
+    crop: undefined,
     crossorigin: undefined,
     disabled: false,
     imageAlt: '',
     maxWidth: 100,
     maxHeight: 100,
+    minWidth: 0,
+    minHeight: 0,
+    keepSelection: false,
+    onChange: () => {},
+    onComplete: () => {},
+    onImageLoaded: () => {},
+    onAspectRatioChange: () => {},
+    children: undefined,
   }
 
   static xOrds = ['e', 'w']
@@ -200,7 +209,7 @@ class ReactCrop extends Component {
 
       this.cropInvalid = isCropInvalid(nextCrop);
       this.setState({ crop: nextCrop }, () => {
-        if (aspectRatioChanged && this.props.onAspectRatioChange) {
+        if (aspectRatioChanged) {
           this.props.onAspectRatioChange(nextCrop, this.getPixelCrop(nextCrop));
         }
       });
@@ -248,11 +257,7 @@ class ReactCrop extends Component {
     }
 
     this.cropInvalid = false;
-
-    if (this.props.onChange) {
-      this.props.onChange(crop, this.getPixelCrop(crop));
-    }
-
+    this.props.onChange(crop, this.getPixelCrop(crop));
     this.setState({ crop });
   }
 
@@ -384,12 +389,8 @@ class ReactCrop extends Component {
       crop.y = clamp(crop.y, 0, 100 - crop.height);
 
       this.setState({ crop }, () => {
-        if (this.props.onChange) {
-          this.props.onChange(crop, this.getPixelCrop(crop));
-        }
-        if (this.props.onComplete) {
-          this.props.onComplete(crop, this.getPixelCrop(crop));
-        }
+        this.props.onChange(crop, this.getPixelCrop(crop));
+        this.props.onComplete(crop, this.getPixelCrop(crop));
       });
     }
   }
@@ -404,10 +405,7 @@ class ReactCrop extends Component {
       this.cropInvalid = isCropInvalid(crop);
       this.mouseDownOnCrop = false;
 
-      if (this.props.onComplete) {
-        this.props.onComplete(crop, this.getPixelCrop(crop));
-      }
-
+      this.props.onComplete(crop, this.getPixelCrop(crop));
       this.setState({ newCropIsBeingDrawn: false });
     }
   }
@@ -502,7 +500,7 @@ class ReactCrop extends Component {
       maxWidth = clamp(maxWidth, 100, this.props.maxWidth);
     }
 
-    newWidth = clamp(newWidth, this.props.minWidth || 0, maxWidth);
+    newWidth = clamp(newWidth, this.props.minWidth, maxWidth);
 
     // New height.
     let newHeight;
@@ -528,7 +526,7 @@ class ReactCrop extends Component {
       maxHeight = clamp(maxHeight, 100, this.props.maxHeight);
     }
 
-    newHeight = clamp(newHeight, this.props.minHeight || 0, maxHeight);
+    newHeight = clamp(newHeight, this.props.minHeight, maxHeight);
 
     if (crop.aspect) {
       newWidth = clamp((newHeight * crop.aspect) / imageAspect, 0, 100);
