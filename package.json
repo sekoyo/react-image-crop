@@ -8,7 +8,7 @@
   "style": "dist/ReactCrop.css",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --progress --colors --watch --config demo/webpack.config.js & npm run sass-watch",
+    "start": "webpack --progress --colors --watch --config demo/webpack.config.js & npm run sass-watch & npm run release",
     "sass-watch": "node-sass lib/ReactCrop.scss dist/ReactCrop.css --watch",
     "release-js": "cross-env NODE_ENV=production webpack",
     "release-css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
