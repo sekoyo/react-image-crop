@@ -478,6 +478,17 @@ class ReactCrop extends Component {
     return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
   }
 
+  getRectClip() {
+    const { crop } = this.state;
+
+    const topLeft = crop.trackHeight / 100 * crop.y,
+      topRight = crop.trackWidth / 100 * (crop.x + crop.width),
+      bottomRight = crop.trackHeight / 100 * (crop.y + crop.height),
+      bottomLeft = crop.trackWidth / 100 * crop.x
+
+    return `rect(${topLeft}px, ${topRight}px, ${bottomRight}px, ${bottomLeft}px)`;
+  }
+
   getNewSize() {
     const { crop } = this.state;
     const evData = this.evData;
@@ -702,8 +713,9 @@ class ReactCrop extends Component {
     if (!this.cropInvalid) {
       cropSelection = this.createCropSelection();
       imageClip = {
-        WebkitClipPath: this.getPolygonClipPath(),
-        clipPath: `url("#${this.getPolygonId()}")`,
+        //WebkitClipPath: this.getPolygonClipPath(),
+        clip:this.getRectClip(),
+        clipPath: `url("#${this.getPolygonId()}")`
       };
     }
 
