@@ -33,18 +33,6 @@ function getClientPos(e) {
   };
 }
 
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * ((max - min) + 1)) + min;
-}
-
-function arrayDividedBy100(arr, delimeter = ' ') {
-  return arr.map(number => number / 100).join(delimeter);
-}
-
-function arrayToPercent(arr, delimeter = ' ') {
-  return arr.map(number => `${number}%`).join(delimeter);
-}
-
 function clamp(num, min, max) {
   return Math.min(Math.max(num, min), max);
 }
@@ -170,7 +158,6 @@ class ReactCrop extends Component {
 
     this.state = {
       crop: this.nextCropState(props.crop),
-      polygonId: getRandomInt(1, 900000),
     };
   }
 
@@ -434,36 +421,6 @@ class ReactCrop extends Component {
     };
   }
 
-  getPolygonValues(forSvg) {
-    const { crop } = this.state;
-    let pTopLeft = [crop.x, crop.y];
-    let pTopRight = [crop.x + crop.width, crop.y];
-    let pBottomLeft = [crop.x, crop.y + crop.height];
-    let pBottomRight = [crop.x + crop.width, crop.y + crop.height];
-
-    if (forSvg) {
-      pTopLeft = arrayDividedBy100(pTopLeft);
-      pTopRight = arrayDividedBy100(pTopRight);
-      pBottomLeft = arrayDividedBy100(pBottomLeft);
-      pBottomRight = arrayDividedBy100(pBottomRight);
-    } else {
-      pTopLeft = arrayToPercent(pTopLeft);
-      pTopRight = arrayToPercent(pTopRight);
-      pBottomLeft = arrayToPercent(pBottomLeft);
-      pBottomRight = arrayToPercent(pBottomRight);
-    }
-    return {
-      top: {
-        left: pTopLeft,
-        right: pTopRight,
-      },
-      bottom: {
-        left: pBottomLeft,
-        right: pBottomRight,
-      },
-    };
-  }
-
   getCropStyle() {
     return {
       top: `${this.state.crop.y}%`,
@@ -471,11 +428,6 @@ class ReactCrop extends Component {
       width: `${this.state.crop.width}%`,
       height: `${this.state.crop.height}%`,
     };
-  }
-
-  getPolygonClipPath() {
-    const { top, bottom } = this.getPolygonValues();
-    return `polygon(${top.left}, ${top.right}, ${bottom.right}, ${bottom.left})`;
   }
 
   getNewSize() {
@@ -536,10 +488,6 @@ class ReactCrop extends Component {
       width: newWidth,
       height: newHeight,
     };
-  }
-
-  getPolygonId() {
-    return `ReactCropClipPolygon-${this.state.polygonId}`;
   }
 
   dragCrop() {
@@ -632,24 +580,24 @@ class ReactCrop extends Component {
       <div
         ref={n => (this.cropSelectRef = n)}
         style={style}
-        className="ReactCrop--crop-selection"
+        className="ReactCrop__crop-selection"
         onMouseDown={this.onCropMouseTouchDown}
         onTouchStart={this.onCropMouseTouchDown}
       >
 
-        <div className="ReactCrop--drag-bar ord-n" data-ord="n" />
-        <div className="ReactCrop--drag-bar ord-e" data-ord="e" />
-        <div className="ReactCrop--drag-bar ord-s" data-ord="s" />
-        <div className="ReactCrop--drag-bar ord-w" data-ord="w" />
+        <div className="ReactCrop__drag-bar ord-n" data-ord="n" />
+        <div className="ReactCrop__drag-bar ord-e" data-ord="e" />
+        <div className="ReactCrop__drag-bar ord-s" data-ord="s" />
+        <div className="ReactCrop__drag-bar ord-w" data-ord="w" />
 
-        <div className="ReactCrop--drag-handle ord-nw" data-ord="nw" />
-        <div className="ReactCrop--drag-handle ord-n" data-ord="n" />
-        <div className="ReactCrop--drag-handle ord-ne" data-ord="ne" />
-        <div className="ReactCrop--drag-handle ord-e" data-ord="e" />
-        <div className="ReactCrop--drag-handle ord-se" data-ord="se" />
-        <div className="ReactCrop--drag-handle ord-s" data-ord="s" />
-        <div className="ReactCrop--drag-handle ord-sw" data-ord="sw" />
-        <div className="ReactCrop--drag-handle ord-w" data-ord="w" />
+        <div className="ReactCrop__drag-handle ord-nw" data-ord="nw" />
+        <div className="ReactCrop__drag-handle ord-n" data-ord="n" />
+        <div className="ReactCrop__drag-handle ord-ne" data-ord="ne" />
+        <div className="ReactCrop__drag-handle ord-e" data-ord="e" />
+        <div className="ReactCrop__drag-handle ord-se" data-ord="se" />
+        <div className="ReactCrop__drag-handle ord-s" data-ord="s" />
+        <div className="ReactCrop__drag-handle ord-sw" data-ord="sw" />
+        <div className="ReactCrop__drag-handle ord-w" data-ord="w" />
       </div>
     );
   }
@@ -680,40 +628,20 @@ class ReactCrop extends Component {
     evData.inversedYOrd = swapYOrd ? inverseOrd(evData.ord) : false;
   }
 
-  // Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
-  renderSvg() {
-    const { top, bottom } = this.getPolygonValues(true);
-
-    return (
-      <svg width="0" height="0" style={{ position: 'absolute' }}>
-        <defs>
-          <clipPath id={this.getPolygonId()} clipPathUnits="objectBoundingBox">
-            <polygon points={`${top.left}, ${top.right}, ${bottom.right}, ${bottom.left}`} />
-          </clipPath>
-        </defs>
-      </svg>
-    );
-  }
-
   render() {
     let cropSelection;
-    let imageClip;
 
     if (!this.cropInvalid) {
       cropSelection = this.createCropSelection();
-      imageClip = {
-        WebkitClipPath: this.getPolygonClipPath(),
-        clipPath: `url("#${this.getPolygonId()}")`,
-      };
     }
 
     const componentClasses = ['ReactCrop'];
 
     if (this.state.newCropIsBeingDrawn) {
-      componentClasses.push('ReactCrop-new-crop');
+      componentClasses.push('ReactCrop--new-crop');
     }
     if (this.state.crop.aspect) {
-      componentClasses.push('ReactCrop-fixed-aspect');
+      componentClasses.push('ReactCrop--fixed-aspect');
     }
     if (this.props.disabled) {
       componentClasses.push('ReactCrop--disabled');
@@ -728,27 +656,24 @@ class ReactCrop extends Component {
         tabIndex="1"
         onKeyDown={this.onComponentKeyDown}
       >
-        {this.renderSvg()}
-
         <img
           ref={n => (this.imageRef = n)}
           crossOrigin={this.props.crossorigin}
-          className="ReactCrop--image"
+          className="ReactCrop__image"
           src={this.props.src}
           onLoad={e => this.onImageLoad(e.target)}
           alt={this.props.imageAlt}
         />
 
         <div
-          className="ReactCrop--crop-wrapper"
+          className="ReactCrop__crop-wrapper"
           ref={n => (this.cropWrapperRef = n)}
         >
           <img
             ref={n => (this.imageCopyRef = n)}
             crossOrigin={this.props.crossorigin}
-            className="ReactCrop--image-copy"
+            className="ReactCrop__image-copy"
             src={this.props.src}
-            style={imageClip}
             alt={this.props.imageAlt}
           />
           {cropSelection}
