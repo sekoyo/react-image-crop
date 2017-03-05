@@ -21675,26 +21675,6 @@
 	  };
 	}
 
-	function getRandomInt(min, max) {
-	  return Math.floor(Math.random() * (max - min + 1)) + min;
-	}
-
-	function arrayDividedBy100(arr) {
-	  var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
-
-	  return arr.map(function (number) {
-	    return number / 100;
-	  }).join(delimeter);
-	}
-
-	function arrayToPercent(arr) {
-	  var delimeter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ' ';
-
-	  return arr.map(function (number) {
-	    return number + '%';
-	  }).join(delimeter);
-	}
-
 	function clamp(num, min, max) {
 	  return Math.min(Math.max(num, min), max);
 	}
@@ -21751,8 +21731,7 @@
 	    _this.onCropMouseTouchDown = _this.onCropMouseTouchDown.bind(_this);
 
 	    _this.state = {
-	      crop: _this.nextCropState(props.crop),
-	      polygonId: getRandomInt(1, 900000)
+	      crop: _this.nextCropState(props.crop)
 	    };
 	    return _this;
 	  }
@@ -21797,7 +21776,7 @@
 
 	          _this2.cropInvalid = isCropInvalid(nextCrop);
 	          _this2.setState({ crop: nextCrop }, function () {
-	            if (aspectRatioChanged && _this2.props.onAspectRatioChange) {
+	            if (aspectRatioChanged) {
 	              _this2.props.onAspectRatioChange(nextCrop, _this2.getPixelCrop(nextCrop));
 	            }
 	          });
@@ -21849,11 +21828,7 @@
 	      }
 
 	      this.cropInvalid = false;
-
-	      if (this.props.onChange) {
-	        this.props.onChange(crop, this.getPixelCrop(crop));
-	      }
-
+	      this.props.onChange(crop, this.getPixelCrop(crop));
 	      this.setState({ crop: crop });
 	    }
 	  }, {
@@ -21992,12 +21967,8 @@
 	        crop.y = clamp(crop.y, 0, 100 - crop.height);
 
 	        this.setState({ crop: crop }, function () {
-	          if (_this3.props.onChange) {
-	            _this3.props.onChange(crop, _this3.getPixelCrop(crop));
-	          }
-	          if (_this3.props.onComplete) {
-	            _this3.props.onComplete(crop, _this3.getPixelCrop(crop));
-	          }
+	          _this3.props.onChange(crop, _this3.getPixelCrop(crop));
+	          _this3.props.onComplete(crop, _this3.getPixelCrop(crop));
 	        });
 	      }
 	    }
@@ -22014,10 +21985,7 @@
 	        this.cropInvalid = isCropInvalid(crop);
 	        this.mouseDownOnCrop = false;
 
-	        if (this.props.onComplete) {
-	          this.props.onComplete(crop, this.getPixelCrop(crop));
-	        }
-
+	        this.props.onComplete(crop, this.getPixelCrop(crop));
 	        this.setState({ newCropIsBeingDrawn: false });
 	      }
 	    }
@@ -22048,38 +22016,6 @@
 	      };
 	    }
 	  }, {
-	    key: 'getPolygonValues',
-	    value: function getPolygonValues(forSvg) {
-	      var crop = this.state.crop;
-
-	      var pTopLeft = [crop.x, crop.y];
-	      var pTopRight = [crop.x + crop.width, crop.y];
-	      var pBottomLeft = [crop.x, crop.y + crop.height];
-	      var pBottomRight = [crop.x + crop.width, crop.y + crop.height];
-
-	      if (forSvg) {
-	        pTopLeft = arrayDividedBy100(pTopLeft);
-	        pTopRight = arrayDividedBy100(pTopRight);
-	        pBottomLeft = arrayDividedBy100(pBottomLeft);
-	        pBottomRight = arrayDividedBy100(pBottomRight);
-	      } else {
-	        pTopLeft = arrayToPercent(pTopLeft);
-	        pTopRight = arrayToPercent(pTopRight);
-	        pBottomLeft = arrayToPercent(pBottomLeft);
-	        pBottomRight = arrayToPercent(pBottomRight);
-	      }
-	      return {
-	        top: {
-	          left: pTopLeft,
-	          right: pTopRight
-	        },
-	        bottom: {
-	          left: pBottomLeft,
-	          right: pBottomRight
-	        }
-	      };
-	    }
-	  }, {
 	    key: 'getCropStyle',
 	    value: function getCropStyle() {
 	      return {
@@ -22088,15 +22024,6 @@
 	        width: this.state.crop.width + '%',
 	        height: this.state.crop.height + '%'
 	      };
-	    }
-	  }, {
-	    key: 'getPolygonClipPath',
-	    value: function getPolygonClipPath() {
-	      var _getPolygonValues = this.getPolygonValues(),
-	          top = _getPolygonValues.top,
-	          bottom = _getPolygonValues.bottom;
-
-	      return 'polygon(' + top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left + ')';
 	    }
 	  }, {
 	    key: 'getNewSize',
@@ -22121,7 +22048,7 @@
 	        maxWidth = clamp(maxWidth, 100, this.props.maxWidth);
 	      }
 
-	      newWidth = clamp(newWidth, this.props.minWidth || 0, maxWidth);
+	      newWidth = clamp(newWidth, this.props.minWidth, maxWidth);
 
 	      // New height.
 	      var newHeight = void 0;
@@ -22145,7 +22072,7 @@
 	        maxHeight = clamp(maxHeight, 100, this.props.maxHeight);
 	      }
 
-	      newHeight = clamp(newHeight, this.props.minHeight || 0, maxHeight);
+	      newHeight = clamp(newHeight, this.props.minHeight, maxHeight);
 
 	      if (crop.aspect) {
 	        newWidth = clamp(newHeight * crop.aspect / imageAspect, 0, 100);
@@ -22155,11 +22082,6 @@
 	        width: newWidth,
 	        height: newHeight
 	      };
-	    }
-	  }, {
-	    key: 'getPolygonId',
-	    value: function getPolygonId() {
-	      return 'ReactCropClipPolygon-' + this.state.polygonId;
 	    }
 	  }, {
 	    key: 'dragCrop',
@@ -22263,22 +22185,22 @@
 	            return _this4.cropSelectRef = n;
 	          },
 	          style: style,
-	          className: 'ReactCrop--crop-selection',
+	          className: 'ReactCrop__crop-selection',
 	          onMouseDown: this.onCropMouseTouchDown,
 	          onTouchStart: this.onCropMouseTouchDown
 	        },
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-n', 'data-ord': 'n' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-e', 'data-ord': 'e' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-s', 'data-ord': 's' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-bar ord-w', 'data-ord': 'w' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-nw', 'data-ord': 'nw' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-n', 'data-ord': 'n' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-ne', 'data-ord': 'ne' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-e', 'data-ord': 'e' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-se', 'data-ord': 'se' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-s', 'data-ord': 's' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-sw', 'data-ord': 'sw' }),
-	        _react2.default.createElement('div', { className: 'ReactCrop--drag-handle ord-w', 'data-ord': 'w' })
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-n', 'data-ord': 'n' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-e', 'data-ord': 'e' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-s', 'data-ord': 's' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-w', 'data-ord': 'w' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-nw', 'data-ord': 'nw' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-n', 'data-ord': 'n' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-ne', 'data-ord': 'ne' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-e', 'data-ord': 'e' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-se', 'data-ord': 'se' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-s', 'data-ord': 's' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-sw', 'data-ord': 'sw' }),
+	        _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-w', 'data-ord': 'w' })
 	      );
 	    }
 	  }, {
@@ -22307,53 +22229,24 @@
 	      evData.inversedXOrd = swapXOrd ? inverseOrd(evData.ord) : false;
 	      evData.inversedYOrd = swapYOrd ? inverseOrd(evData.ord) : false;
 	    }
-
-	    // Unfortunately some modern browsers like Firefox still don't support svg's as a css property..
-
-	  }, {
-	    key: 'renderSvg',
-	    value: function renderSvg() {
-	      var _getPolygonValues2 = this.getPolygonValues(true),
-	          top = _getPolygonValues2.top,
-	          bottom = _getPolygonValues2.bottom;
-
-	      return _react2.default.createElement(
-	        'svg',
-	        { width: '0', height: '0', style: { position: 'absolute' } },
-	        _react2.default.createElement(
-	          'defs',
-	          null,
-	          _react2.default.createElement(
-	            'clipPath',
-	            { id: this.getPolygonId(), clipPathUnits: 'objectBoundingBox' },
-	            _react2.default.createElement('polygon', { points: top.left + ', ' + top.right + ', ' + bottom.right + ', ' + bottom.left })
-	          )
-	        )
-	      );
-	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _this5 = this;
 
 	      var cropSelection = void 0;
-	      var imageClip = void 0;
 
 	      if (!this.cropInvalid) {
 	        cropSelection = this.createCropSelection();
-	        imageClip = {
-	          WebkitClipPath: this.getPolygonClipPath(),
-	          clipPath: 'url("#' + this.getPolygonId() + '")'
-	        };
 	      }
 
 	      var componentClasses = ['ReactCrop'];
 
 	      if (this.state.newCropIsBeingDrawn) {
-	        componentClasses.push('ReactCrop-new-crop');
+	        componentClasses.push('ReactCrop--new-crop');
 	      }
 	      if (this.state.crop.aspect) {
-	        componentClasses.push('ReactCrop-fixed-aspect');
+	        componentClasses.push('ReactCrop--fixed-aspect');
 	      }
 	      if (this.props.disabled) {
 	        componentClasses.push('ReactCrop--disabled');
@@ -22371,13 +22264,12 @@
 	          tabIndex: '1',
 	          onKeyDown: this.onComponentKeyDown
 	        },
-	        this.renderSvg(),
 	        _react2.default.createElement('img', {
 	          ref: function ref(n) {
 	            return _this5.imageRef = n;
 	          },
 	          crossOrigin: this.props.crossorigin,
-	          className: 'ReactCrop--image',
+	          className: 'ReactCrop__image',
 	          src: this.props.src,
 	          onLoad: function onLoad(e) {
 	            return _this5.onImageLoad(e.target);
@@ -22387,7 +22279,7 @@
 	        _react2.default.createElement(
 	          'div',
 	          {
-	            className: 'ReactCrop--crop-wrapper',
+	            className: 'ReactCrop__crop-wrapper',
 	            ref: function ref(n) {
 	              return _this5.cropWrapperRef = n;
 	            }
@@ -22397,9 +22289,8 @@
 	              return _this5.imageCopyRef = n;
 	            },
 	            crossOrigin: this.props.crossorigin,
-	            className: 'ReactCrop--image-copy',
+	            className: 'ReactCrop__image-copy',
 	            src: this.props.src,
-	            style: imageClip,
 	            alt: this.props.imageAlt
 	          }),
 	          cropSelection
@@ -22432,14 +22323,23 @@
 	  onAspectRatioChange: _react.PropTypes.func,
 	  disabled: _react.PropTypes.bool,
 	  crossorigin: _react.PropTypes.string,
-	  children: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.arrayOf(_react2.default.PropTypes.node), _react2.default.PropTypes.node])
+	  children: _react.PropTypes.oneOfType([_react.PropTypes.arrayOf(_react.PropTypes.node), _react.PropTypes.node])
 	};
 	ReactCrop.defaultProps = {
+	  crop: undefined,
 	  crossorigin: undefined,
 	  disabled: false,
 	  imageAlt: '',
 	  maxWidth: 100,
-	  maxHeight: 100
+	  maxHeight: 100,
+	  minWidth: 0,
+	  minHeight: 0,
+	  keepSelection: false,
+	  onChange: function onChange() {},
+	  onComplete: function onComplete() {},
+	  onImageLoaded: function onImageLoaded() {},
+	  onAspectRatioChange: function onAspectRatioChange() {},
+	  children: undefined
 	};
 	ReactCrop.xOrds = ['e', 'w'];
 	ReactCrop.yOrds = ['n', 's'];
