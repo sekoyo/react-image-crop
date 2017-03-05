@@ -13,9 +13,10 @@ function loadEditView(dataUrl) {
       super();
       this.state = {
         crop: {
-          width: 50,
-          height: 50,
+          x: 0,
+          y: 0,
         },
+        maxHeight: 80,
       };
       this.onButtonClick = this.onButtonClick.bind(this);
     }

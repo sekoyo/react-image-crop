@@ -87,9 +87,10 @@
 
 	      _this.state = {
 	        crop: {
-	          width: 50,
-	          height: 50
-	        }
+	          x: 0,
+	          y: 0
+	        },
+	        maxHeight: 80
 	      };
 	      _this.onButtonClick = _this.onButtonClick.bind(_this);
 	      return _this;
