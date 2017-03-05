@@ -146,7 +146,3 @@ To develop run `npm start`, this will recompile your JS and SCSS on changes.
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
 
 When you are happy with your changes you can build to dist with `npm run release`.
-
-## Browser compatibility
-
-Should work on any modern browser, however the darkened non-selected part of the image will not work in IE11 or IE Edge due to a lack of [clipPath](http://caniuse.com/#search=clippath) support.
