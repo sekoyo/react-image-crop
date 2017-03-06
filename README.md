@@ -85,6 +85,14 @@ A maximum crop width, as a percentage of the image width.
 
 A maximum crop height, as a percentage of the image height.
 
+#### originalWidth (optional, use together with originalHeight)
+
+If you're using a scaled down version of an original image, originalWidth lets you specify the width of the original image so you can get the pixel-converted values for the original image instead of values for the scaled down image.
+
+#### originalHeight (optional, use together with originalWidth)
+
+If you're using a scaled down version of an original image, originalHeight lets you specify the height of the original image so you can get the pixel-converted values for the original image instead of values for the scaled down image.
+
 #### keepSelection (optional)
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.

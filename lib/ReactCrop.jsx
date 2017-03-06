@@ -95,6 +95,8 @@ class ReactCrop extends Component {
     minHeight: PropTypes.number,
     maxWidth: PropTypes.number,
     maxHeight: PropTypes.number,
+    originalWidth: PropTypes.number,
+    originalHeight: PropTypes.number,
     keepSelection: PropTypes.bool,
     onChange: PropTypes.func,
     onComplete: PropTypes.func,
@@ -155,6 +157,7 @@ class ReactCrop extends Component {
     this.onComponentMouseTouchDown = this.onComponentMouseTouchDown.bind(this);
     this.onComponentKeyDown = this.onComponentKeyDown.bind(this);
     this.onCropMouseTouchDown = this.onCropMouseTouchDown.bind(this);
+    this.getPixelCrop = this.getPixelCrop.bind(this);
 
     this.state = {
       crop: this.nextCropState(props.crop),
@@ -413,11 +416,17 @@ class ReactCrop extends Component {
   }
 
   getPixelCrop(crop) {
+    let { originalWidth: width, originalHeight: height } = this.props;
+    if(!width || !height) {
+      width = this.imageRef.naturalWidth;
+      height = this.imageRef.naturalHeight;
+    }
+ 
     return {
-      x: Math.round(this.imageRef.naturalWidth * (crop.x / 100)),
-      y: Math.round(this.imageRef.naturalHeight * (crop.y / 100)),
-      width: Math.round(this.imageRef.naturalWidth * (crop.width / 100)),
-      height: Math.round(this.imageRef.naturalHeight * (crop.height / 100)),
+      x: Math.round(width * (crop.x / 100)),
+      y: Math.round(height * (crop.y / 100)),
+      width: Math.round(width * (crop.width / 100)),
+      height: Math.round(height * (crop.height / 100)),
     };
   }
 
