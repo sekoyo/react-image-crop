@@ -1,6 +1,6 @@
 module.exports = {
-  eval: 'eval-source-map',
-  entry: `${__dirname}/demo.jsx`,
+  devtool: '#cheap-eval-source-map',
+  entry: `${__dirname}/demo`,
   output: {
     path: __dirname,
     filename: 'bundle.js',
@@ -9,10 +9,7 @@ module.exports = {
     loaders: [{
       test: /\.(js|jsx)$/,
       exclude: /node_modules/,
-      loader: 'babel',
+      loader: 'babel-loader',
     }],
-  },
-  resolve: {
-    extensions: ['', '.js', '.jsx'],
   },
 };
