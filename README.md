@@ -47,10 +47,10 @@ All crop values are in percentages, and are relative to the image. All crop para
 
 ```jsx
 var crop = {
-	x: 20,
-	y: 10,
-	width: 30,
-	height: 10
+  x: 20,
+  y: 10,
+  width: 30,
+  height: 10
 }
 
 <ReactCrop src="path/to/image.jpg" crop={crop} />
@@ -60,8 +60,8 @@ If you want a fixed aspect you only need to specify a width *or* a height:
 
  ```jsx
 var crop = {
-	width: 30,
-	aspect: 16/9
+  width: 30,
+  aspect: 16/9
 }
 ```
 
