@@ -117,6 +117,14 @@ A callback which happens when the new aspect ratio is passed to the component. P
 
 *Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
 
+#### onDragStart() (optional)
+
+A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
+
+#### onDragEnd() (optional)
+
+A callback which happens when a user releases the cursor or touch after dragging or resizing.
+
 #### crossorigin (optional)
 
 Allows setting the crossorigin attribute used for the img tags.
