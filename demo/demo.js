@@ -58,8 +58,9 @@ function loadEditView(dataUrl) {
           <ReactCrop
             {...this.state}
             src={dataUrl}
-            onImageLoaded={(crop) => this.onImageLoaded(crop)}
-            onComplete={(crop) => this.onCropComplete(crop)}
+            onImageLoaded={crop => this.onImageLoaded(crop)}
+            onComplete={crop => this.onCropComplete(crop)}
+            // onAspectRatioChange={() => console.log('onAspectRatioChange')}
             // onChange={this.onCropChange}
           />
           <button onClick={this.onButtonClick}>Programatically set crop</button>
