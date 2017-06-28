@@ -980,13 +980,8 @@ var ReactCrop = function (_Component) {
       var evData = this.evData;
       var rotation = this.props.rotation;
 
-      if (rotation < 180) {
-        crop.x = clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
-        crop.y = clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
-      } else {
-        crop.x = clamp(evData.cropStartX - evData.xDiffPc, 0, 100 + crop.width);
-        crop.y = clamp(evData.cropStartY - evData.yDiffPc, 0, 100 + crop.height);
-      }
+      crop.x = clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - crop.width);
+      crop.y = clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - crop.height);
     }
   }, {
     key: 'resizeCrop',
