@@ -47,10 +47,10 @@ All crop values are in percentages, and are relative to the image. All crop para
 
 ```jsx
 var crop = {
-	x: 20,
-	y: 10,
-	width: 30,
-	height: 10
+  x: 20,
+  y: 10,
+  width: 30,
+  height: 10
 }
 
 <ReactCrop src="path/to/image.jpg" crop={crop} />
@@ -60,8 +60,8 @@ If you want a fixed aspect you only need to specify a width *or* a height:
 
  ```jsx
 var crop = {
-	width: 30,
-	aspect: 16/9
+  width: 30,
+  aspect: 16/9
 }
 ```
 
@@ -95,7 +95,7 @@ If true then the user cannot modify or draw a new crop. A class of `ReactCrop--d
 
 #### onChange(crop, pixelCrop) (optional)
 
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience. This callback is not called on the load even if the crop was adjusted.
 
 *Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
 
@@ -107,7 +107,7 @@ A callback which happens after a resize, drag, or nudge. Passes the current crop
 
 #### onImageLoaded(crop, image, pixelCrop) (optional)
 
-A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element, as well as a pixel-converted crop for your convenience.
+A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element, as well as a pixel-converted crop for your convenience. If the crop was adjusted during the load, this callback gives you the adjusted crop.
 
 *Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
 
@@ -116,6 +116,14 @@ A callback which happens when the image is loaded. Passes the current crop state
 A callback which happens when the new aspect ratio is passed to the component. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
 *Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+
+#### onDragStart() (optional)
+
+A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
+
+#### onDragEnd() (optional)
+
+A callback which happens when a user releases the cursor or touch after dragging or resizing.
 
 #### crossorigin (optional)
 
@@ -146,7 +154,3 @@ To develop run `npm start`, this will recompile your JS and SCSS on changes.
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
 
 When you are happy with your changes you can build to dist with `npm run release`.
-
-## Browser compatibility
-
-Should work on any modern browser, however the darkened non-selected part of the image will not work in IE11 or IE Edge due to a lack of [clipPath](http://caniuse.com/#search=clippath) support.
