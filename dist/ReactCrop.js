@@ -699,10 +699,14 @@ var ReactCrop = function (_Component) {
         clientPos.y = this.straightenYPath(clientPos.x);
       }
 
-      var rotation = this.props.rotation;
+      var _props = this.props,
+          rotation = _props.rotation,
+          isFlipped = _props.isFlipped;
 
       var factor = rotation < 90 || rotation > 270 ? 1 : -1;
-      var xDiffPx = factor * (clientPos.x - evData.clientStartX);
+      var flippedFactor = isFlipped ? factor *= -1 : factor;
+
+      var xDiffPx = flippedFactor * (clientPos.x - evData.clientStartX);
       evData.xDiffPc = xDiffPx / evData.imageWidth * 100;
 
       var yDiffPx = factor * (clientPos.y - evData.clientStartY);
