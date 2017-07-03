@@ -704,7 +704,8 @@ var ReactCrop = function (_Component) {
           isFlipped = _props.isFlipped;
 
       var factor = rotation < 90 || rotation > 270 ? 1 : -1;
-      var flippedFactor = isFlipped ? factor *= -1 : factor;
+      var factorWithFlip = factor;
+      var flippedFactor = isFlipped ? factorWithFlip *= -1 : factorWithFlip;
 
       var xDiffPx = flippedFactor * (clientPos.x - evData.clientStartX);
       evData.xDiffPc = xDiffPx / evData.imageWidth * 100;
