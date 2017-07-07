@@ -45,7 +45,7 @@ You can of course pass a blob path or base64 data.
 
 All crop values are in percentages, and are relative to the image. All crop params are optional.
 
-```jsx
+```js
 var crop = {
   x: 20,
   y: 10,
@@ -58,7 +58,7 @@ var crop = {
 
 If you want a fixed aspect you only need to specify a width *or* a height:
 
- ```jsx
+ ```js
 var crop = {
   width: 30,
   aspect: 16/9
@@ -68,6 +68,14 @@ var crop = {
 ..Or you can omit both and only specify the aspect.
 
 Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
+
+Be aware that if the parent re-renders the crop will be reset to whatever it initially was, unless you keep it updated:
+
+```js
+onCropComplete(crop) {
+  this.setState({ crop });
+}
+```
 
 #### minWidth (optional)
 
