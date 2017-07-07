@@ -63,11 +63,20 @@ var crop = {
   width: 30,
   aspect: 16/9
 }
-```
+ ```
 
 ..Or you can omit both and only specify the aspect.
 
 Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
+
+If you passed crop values, it should be updated when crop completed too, or the cropping area will disappear.
+For examples:
+
+```jsx
+onComplete(crop) {
+  this.props.crop = crop;
+}
+```
 
 #### minWidth (optional)
 
