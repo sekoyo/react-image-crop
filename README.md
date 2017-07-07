@@ -69,7 +69,7 @@ var crop = {
 
 Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
 
-Be aware that if the parent re-renders the crop will be reset to whatever it initially was, unless you keep it updated:
+Be aware that if the parent re-renders, the crop will be reset to whatever it initially was, unless you keep it updated:
 
 ```js
 onCropComplete(crop) {
