@@ -41,8 +41,8 @@
     "eslint-plugin-react": "^6.10.3",
     "node-sass": "^4.5.1",
     "prop-types": "^15.5.8",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2",
+    "react": "^15.4.2 || ^16",
+    "react-dom": "^15.4.2 || ^16",
     "webpack": "^2.2.1"
   },
   "peerDependencies": {
