@@ -137,6 +137,10 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 Allows setting the crossorigin attribute used for the img tags.
 
+#### imageHeight, imageWidth (optional)
+
+Allows you to set the height and width of the image to crop (a number, in pixels). Returned crop values will be relative to these dimensions, not the dimensions of the original image.
+
 ## What about showing the crop on the client?
 
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend. However here are some tips for client-side crop previews:
