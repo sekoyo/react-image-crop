@@ -33,7 +33,7 @@ function loadEditView(dataUrl) {
       });
     }
 
-    onImageLoaded(crop) {
+    onImageLoaded = (crop) => {
       console.log('Image was loaded. Crop:', crop);
       // this.setState({
       //  crop: {
@@ -43,8 +43,8 @@ function loadEditView(dataUrl) {
       // });
     }
 
-    onCropComplete(crop) {
-      console.log('Crop move complete:', crop);
+    onCropComplete = (crop, pixelCrop) => {
+      console.log('Crop move complete:', crop, pixelCrop);
       this.setState({ hello: Date.now(), crop });
     }
 
@@ -58,8 +58,8 @@ function loadEditView(dataUrl) {
           <ReactCrop
             {...this.state}
             src={dataUrl}
-            onImageLoaded={crop => this.onImageLoaded(crop)}
-            onComplete={crop => this.onCropComplete(crop)}
+            onImageLoaded={this.onImageLoaded}
+            onComplete={this.onCropComplete}
             // onAspectRatioChange={() => console.log('onAspectRatioChange')}
             // onChange={this.onCropChange}
           />
