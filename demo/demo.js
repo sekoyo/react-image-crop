@@ -30,6 +30,7 @@ function loadEditView(dataUrl) {
           width: 30,
           height: 50,
         },
+        disabled: true,
       });
     }
 
