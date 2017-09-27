@@ -155,6 +155,21 @@ I wanted to keep this component focused so I didn't provide this. Normally a cro
 
 [Example gist](https://gist.github.com/DominicTobias/b1fb501349893922ec7f)
 
+## Usage as a HOC
+
+Under the hood, this component is made up of a `HOC`(Higher Order Component) which is also exposed should you require more "fine-tuned" control over its usage.  An example using with a library such as [recompose](https://github.com/acdlite/recompose) is as follows:
+
+```js
+import { withCrop } from 'react-image-crop'
+
+const myWrappedComponent = compose(
+  withCrop,
+  withOtherHOC,
+  withAnotherHOC
+)(MyComponent)
+```
+> For a full example, take a look at the how [ReactCrop.js](./lib/ReactCrop.js) is wrapped from `withCrop`!
+
 ## Contributing / Developing
 
 To develop run `npm start`, this will recompile your JS and SCSS on changes.
