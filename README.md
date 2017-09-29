@@ -105,7 +105,7 @@ If true then the user cannot modify or draw a new crop. A class of `ReactCrop--d
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* you must implement this callback and update your crop state, otherwise nothing will change!
+*Note* you _must_ implement this callback and update your crop state, otherwise nothing will change!
 
 #### onComplete(crop, pixelCrop) (optional)
 
@@ -113,11 +113,26 @@ A callback which happens after a resize, drag, or nudge. Passes the current crop
 
 #### onImageLoaded(image) (optional)
 
-A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element, as well as a pixel-converted crop for your convenience. If the crop was adjusted during the load, this callback gives you the adjusted crop.
+A callback which happens when the image is loaded. Passes the image DOM element.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+*Note* you should set your crop here if you're using `crop.aspect`, since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio. If you already know the image ratio then you can go ahead and set the crop earlier.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+```js
+import ReactCrop, { makeAspectCrop } from 'ReactCrop';
+
+onImageLoaded = (image) => {
+  this.setState({
+    crop: makeAspectCrop({
+      x: 0,
+      y: 0,
+      aspect: 16 / 9,
+      width: 50,
+    }, image.naturalWidth / image.naturalHeight),
+  });
+}
+```
+
+Of course if you already know the image ratio you can set the crop earlier!
 
 #### onDragStart() (optional)
 
