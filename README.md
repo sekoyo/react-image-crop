@@ -101,27 +101,21 @@ If true is passed then selection can't be disabled if the user clicks outside th
 
 If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-#### onChange(crop, pixelCrop) (optional)
+#### onChange(crop, pixelCrop)
 
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience. This callback is not called on the load even if the crop was adjusted.
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+*Note* you must implement this callback and update your crop state, otherwise nothing will change!
 
 #### onComplete(crop, pixelCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
-
-#### onImageLoaded(crop, image, pixelCrop) (optional)
+#### onImageLoaded(image) (optional)
 
 A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element, as well as a pixel-converted crop for your convenience. If the crop was adjusted during the load, this callback gives you the adjusted crop.
 
 *Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
-
-#### onAspectRatioChange(crop, pixelCrop) (optional)
-
-A callback which happens when the new aspect ratio is passed to the component. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
 *Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
 
