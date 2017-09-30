@@ -67,7 +67,7 @@ var crop = {
 
 ..Or you can omit both and only specify the aspect.
 
-If you do specify a width _or_ height along with an aspect, you must know the ratio of the image. Checkout `onImageLoaded` for instructions on how to do that.
+If you do specify a width _or_ height along with an aspect, you must know the ratio of the image. Checkout [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for instructions on how to do that.
 
 #### minWidth (optional)
 
