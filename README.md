@@ -67,15 +67,7 @@ var crop = {
 
 ..Or you can omit both and only specify the aspect.
 
-Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
-
-Be aware that if the parent re-renders, the crop will be reset to whatever it initially was, unless you keep it updated:
-
-```js
-onCropComplete(crop) {
-  this.setState({ crop });
-}
-```
+If you do specify a width _or_ height along with an aspect, you must know the ratio of the image. Checkout `onImageLoaded` for instructions on how to do that.
 
 #### minWidth (optional)
 
@@ -101,29 +93,38 @@ If true is passed then selection can't be disabled if the user clicks outside th
 
 If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-#### onChange(crop, pixelCrop) (optional)
+#### onChange(crop, pixelCrop)
 
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience. This callback is not called on the load even if the crop was adjusted.
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+*Note* you _must_ implement this callback and update your crop state, otherwise nothing will change!
 
 #### onComplete(crop, pixelCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+#### onImageLoaded(image) (optional)
 
-#### onImageLoaded(crop, image, pixelCrop) (optional)
+A callback which happens when the image is loaded. Passes the image DOM element.
 
-A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element, as well as a pixel-converted crop for your convenience. If the crop was adjusted during the load, this callback gives you the adjusted crop.
+*Note* you should set your crop here if you're using `crop.aspect` along with a width _or_ height. Since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+```js
+import ReactCrop, { makeAspectCrop } from 'ReactCrop';
 
-#### onAspectRatioChange(crop, pixelCrop) (optional)
+onImageLoaded = (image) => {
+  this.setState({
+    crop: makeAspectCrop({
+      x: 0,
+      y: 0,
+      aspect: 16 / 9,
+      width: 50,
+    }, image.naturalWidth / image.naturalHeight),
+  });
+}
+```
 
-A callback which happens when the new aspect ratio is passed to the component. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
-
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+Of course if you already know the image ratio you can set the crop earlier!
 
 #### onDragStart() (optional)
 
@@ -135,7 +136,7 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 #### crossorigin (optional)
 
-Allows setting the crossorigin attribute used for the img tags.
+Allows setting the crossorigin attribute on the image.
 
 ## What about showing the crop on the client?
 

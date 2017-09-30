@@ -1,6 +1,7 @@
+/* globals document, FileReader */
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
-import ReactCrop from '../lib/ReactCrop';
+import ReactCrop, { makeAspectCrop } from '../lib/ReactCrop';
 
 /**
  * Load the image in the crop editor.
@@ -12,57 +13,53 @@ function loadEditView(dataUrl) {
     constructor() {
       super();
       this.state = {
-        crop: {
-          x: 0,
-          y: 0,
-        },
         maxHeight: 80,
       };
       this.onButtonClick = this.onButtonClick.bind(this);
     }
 
-    onButtonClick() {
+    onButtonClick = () => {
       this.setState({
-        crop: {
+        crop: makeAspectCrop({
           x: 20,
           y: 5,
           aspect: 1,
-          width: 30,
           height: 50,
-        },
+        }, this.state.image),
         disabled: true,
       });
     }
 
-    onImageLoaded = (crop) => {
-      console.log('Image was loaded. Crop:', crop);
-      // this.setState({
-      //  crop: {
-      //    aspect: 16/9,
-      //    width: 30,
-      //  }
-      // });
+    onImageLoaded = (image) => {
+      this.setState({
+        crop: makeAspectCrop({
+          x: 0,
+          y: 0,
+          aspect: 16 / 9,
+          width: 50,
+        }, image),
+        image,
+      });
     }
 
     onCropComplete = (crop, pixelCrop) => {
-      console.log('Crop move complete:', crop, pixelCrop);
-      this.setState({ hello: Date.now(), crop });
+      console.log('onCropComplete, pixelCrop:', pixelCrop);
     }
 
-    // onCropChange: function(crop) {
-    //  console.log('Crop change');
-    // },
+    onCropChange = (crop) => {
+      this.setState({ crop });
+    }
 
     render() {
       return (
         <div>
           <ReactCrop
             {...this.state}
+            keepSelection
             src={dataUrl}
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
-            // onAspectRatioChange={() => console.log('onAspectRatioChange')}
-            // onChange={this.onCropChange}
+            onChange={this.onCropChange}
           />
           <button onClick={this.onButtonClick}>Programatically set crop</button>
           <button onClick={() => { this.setState({ foo: Date.now() }); }}>Change foo state</button>

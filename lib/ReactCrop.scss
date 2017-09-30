@@ -5,8 +5,6 @@ $drag-handle-border: 1px solid rgba(255,255,255,0.7);
 
 $drag-bar-size: 6px;
 
-$cropped-area-overlay-color: rgba(0,0,0,0.6);
-
 $mobile-max-width: 768px;
 $drag-handle-mobile-width: $drag-handle-width + 8;
 $drag-handle-mobile-height: $drag-handle-height + 8;
@@ -30,21 +28,6 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
   &__image {
     display: block;
     max-width: 100%;
-  }
-  &__image-copy {
-    position: absolute;
-    top: 0;
-    left: 0;
-    max-width: 100%;
-  }
-
-  &__crop-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: $cropped-area-overlay-color;
   }
 
   &__crop-selection {
