@@ -67,15 +67,7 @@ var crop = {
 
 ..Or you can omit both and only specify the aspect.
 
-Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
-
-Be aware that if the parent re-renders, the crop will be reset to whatever it initially was, unless you keep it updated:
-
-```js
-onCropComplete(crop) {
-  this.setState({ crop });
-}
-```
+If you do specify a width _or_ height along with an aspect, you must know the ratio of the image. Checkout `onImageLoaded` for instructions on how to do that.
 
 #### minWidth (optional)
 
@@ -115,7 +107,7 @@ A callback which happens after a resize, drag, or nudge. Passes the current crop
 
 A callback which happens when the image is loaded. Passes the image DOM element.
 
-*Note* you should set your crop here if you're using `crop.aspect`, since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio. If you already know the image ratio then you can go ahead and set the crop earlier.
+*Note* you should set your crop here if you're using `crop.aspect` along with a width _or_ height. Since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio.
 
 ```js
 import ReactCrop, { makeAspectCrop } from 'ReactCrop';
@@ -144,7 +136,7 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 #### crossorigin (optional)
 
-Allows setting the crossorigin attribute used for the img tags.
+Allows setting the crossorigin attribute on the image.
 
 ## What about showing the crop on the client?
 
