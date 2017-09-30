@@ -110,7 +110,7 @@ A callback which happens when the image is loaded. Passes the image DOM element.
 *Note* you should set your crop here if you're using `crop.aspect` along with a width _or_ height. Since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio.
 
 ```js
-import ReactCrop, { makeAspectCrop } from 'ReactCrop';
+import ReactCrop, { makeAspectCrop } from 'react-image-crop';
 
 onImageLoaded = (image) => {
   this.setState({
