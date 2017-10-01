@@ -13,19 +13,25 @@ function loadEditView(dataUrl) {
     constructor() {
       super();
       this.state = {
+        crop: {
+          x: 0,
+          y: 0,
+          // aspect: 16 / 9,
+        },
         maxHeight: 80,
       };
       this.onButtonClick = this.onButtonClick.bind(this);
     }
 
     onButtonClick = () => {
+      const { image } = this.state;
       this.setState({
         crop: makeAspectCrop({
           x: 20,
           y: 5,
           aspect: 1,
           height: 50,
-        }, this.state.image),
+        }, image.naturalWidth / image.naturalHeight),
         disabled: true,
       });
     }
@@ -37,7 +43,7 @@ function loadEditView(dataUrl) {
           y: 0,
           aspect: 16 / 9,
           width: 50,
-        }, image),
+        }, image.naturalWidth / image.naturalHeight),
         image,
       });
     }
@@ -55,7 +61,6 @@ function loadEditView(dataUrl) {
         <div>
           <ReactCrop
             {...this.state}
-            keepSelection
             src={dataUrl}
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
