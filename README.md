@@ -56,18 +56,15 @@ var crop = {
 <ReactCrop src="path/to/image.jpg" crop={crop} />
 ```
 
-If you want a fixed aspect you only need to specify a width *or* a height:
+If you want a fixed aspect can either omit `width` and `height`:
 
  ```js
 var crop = {
-  width: 30,
   aspect: 16/9
 }
 ```
 
-..Or you can omit both and only specify the aspect.
-
-If you do specify a width _or_ height along with an aspect, you must know the ratio of the image. Checkout [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for instructions on how to do that.
+Or you need to specify both. As ReactCrop is based on percentages you will need to know the ratio of the image. If you don't know it then see [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for instructions on how to set your crop in there.
 
 #### minWidth (optional)
 
@@ -124,7 +121,7 @@ onImageLoaded = (image) => {
 }
 ```
 
-Of course if you already know the image ratio you can set the crop earlier!
+Of course if you already know the image ratio (or just specifying the aspect) you can set the crop earlier!
 
 #### onDragStart() (optional)
 
