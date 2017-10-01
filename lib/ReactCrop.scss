@@ -16,18 +16,23 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
   cursor: crosshair;
   overflow: hidden;
   max-width: 100%;
-
-  &--disabled {
-    cursor: inherit;
-  }
+  background-color: #000;
 
   &:focus {
     outline: none;
   }
 
+  &--disabled {
+    cursor: inherit;
+  }
+
   &__image {
     display: block;
     max-width: 100%;
+  }
+
+  &--crop-invisible &__image {
+    opacity: 0.5;
   }
 
   &__crop-selection {

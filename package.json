@@ -43,7 +43,7 @@
     "prop-types": "^15.5.8",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "webpack": "^2.2.1"
+    "webpack": "^3.6.0"
   },
   "peerDependencies": {
     "prop-types": ">=15.5.8",
