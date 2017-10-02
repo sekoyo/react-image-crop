@@ -116,7 +116,7 @@ onImageLoaded = (image) => {
       y: 0,
       aspect: 16 / 9,
       width: 50,
-    }, image.naturalWidth / image.naturalHeight),
+    }, image.width / image.height),
   });
 }
 ```
