@@ -31,9 +31,9 @@ import ReactCrop from 'react-image-crop';
 
 Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
-```css
+```js
 import 'react-image-crop/dist/ReactCrop.css';
-// or scss
+// or scss:
 import 'react-image-crop/lib/ReactCrop.scss';
 ```
 
