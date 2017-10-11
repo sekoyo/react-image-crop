@@ -102,6 +102,12 @@ A callback which happens for every change of the crop (i.e. many times as you ar
 
 *Note* you _must_ implement this callback and update your crop state, otherwise nothing will change!
 
+```js
+onChange = (crop) => {
+  this.setState({ crop });
+}
+```
+
 #### onComplete(crop, pixelCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
