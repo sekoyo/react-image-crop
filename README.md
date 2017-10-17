@@ -148,10 +148,52 @@ A callback which happens when a user releases the cursor or touch after dragging
 Allows setting the crossorigin attribute on the image.
 
 ## What about showing the crop on the client?
-
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend. However here are some tips for client-side crop previews:
 
-- You can fake a crop in pure CSS, but in order to do this you need to know the maximum width & height of the crop preview and then perform the calc again if the container size changes (since this technique is only possible using pixels). It's advantage is that it's instantaneous:
+Here is a ready to use function that returns a file blob for the cropped part after providing some parameters you already have when you use this package:
+```js
+/**
+ * @param {File} image - Image File Object
+ * @param {Object} pixelCrop - pixelCrop Object provided by react-image-crop
+ * @param {String} fileName - Name of the returned file in Promise
+ */
+function getCroppedImg(image, pixelCrop, fileName) {
+
+  const canvas = document.createElement('canvas');
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+  const ctx = canvas.getContext('2d');
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  // As Base64 string
+  // const base64Image = canvas.toDataURL('image/jpeg');
+
+  // As a blob
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(file => {
+      file.name = fileName;
+      resolve(file);
+    }, 'image/jpeg');
+  });
+}
+
+async test() {
+  const croppedImg = await getCroppedImg(image, pixelCrop, returnedFileName);
+}
+```
+
+- Also, there is other approaches; for instance, you can fake a crop in pure CSS, but in order to do this you need to know the maximum width & height of the crop preview and then perform the calc again if the container size changes (since this technique is only possible using pixels). It's advantage is that it's instantaneous:
 
 [Example gist](https://gist.github.com/DominicTobias/6aa43d03bc12232ef723)
 
