@@ -148,9 +148,10 @@ A callback which happens when a user releases the cursor or touch after dragging
 Allows setting the crossorigin attribute on the image.
 
 ## What about showing the crop on the client?
-I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend. However here are some tips for client-side crop previews:
+I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend.
 
-Here is a ready to use function that returns a file blob for the cropped part after providing some parameters you already have when you use this package:
+However here's a ready to use function that returns a file blob for the cropped part after providing some parameters you already have when you use this package:
+
 ```js
 /**
  * @param {File} image - Image File Object
