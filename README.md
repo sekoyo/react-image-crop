@@ -201,8 +201,6 @@ Some things to note:
 
 3. Another option to make the conversion faster is to scale the image down before converting it.
 
-[Example gist](https://gist.github.com/DominicTobias/b1fb501349893922ec7f)
-
 ## Contributing / Developing
 
 To develop run `npm start`, this will recompile your JS and SCSS on changes.
