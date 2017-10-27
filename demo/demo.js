@@ -1,5 +1,5 @@
 /* globals document, FileReader */
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
 import ReactCrop, { makeAspectCrop } from '../lib/ReactCrop';
 
@@ -9,18 +9,14 @@ import ReactCrop, { makeAspectCrop } from '../lib/ReactCrop';
 const cropEditor = document.querySelector('#crop-editor');
 
 function loadEditView(dataUrl) {
-  class Parent extends Component {
-    constructor() {
-      super();
-      this.state = {
-        crop: {
-          x: 0,
-          y: 0,
-          // aspect: 16 / 9,
-        },
-        maxHeight: 80,
-      };
-      this.onButtonClick = this.onButtonClick.bind(this);
+  class Parent extends PureComponent {
+    state = {
+      crop: {
+        x: 0,
+        y: 0,
+        // aspect: 16 / 9,
+      },
+      maxHeight: 80,
     }
 
     onButtonClick = () => {
@@ -32,6 +28,19 @@ function loadEditView(dataUrl) {
           aspect: 1,
           height: 50,
         }, image.naturalWidth / image.naturalHeight),
+        disabled: false,
+      });
+    }
+
+    onButtonClick2 = () => {
+      const { image } = this.state;
+      this.setState({
+        crop: makeAspectCrop({
+          x: 20,
+          y: 5,
+          aspect: 16 / 9,
+          height: 20,
+        }, image.naturalWidth / image.naturalHeight),
         disabled: true,
       });
     }
@@ -41,7 +50,7 @@ function loadEditView(dataUrl) {
         crop: makeAspectCrop({
           x: 0,
           y: 0,
-          aspect: 16 / 9,
+          aspect: 10 / 4,
           width: 50,
         }, image.naturalWidth / image.naturalHeight),
         image,
@@ -67,7 +76,7 @@ function loadEditView(dataUrl) {
             onChange={this.onCropChange}
           />
           <button onClick={this.onButtonClick}>Programatically set crop</button>
-          <button onClick={() => { this.setState({ foo: Date.now() }); }}>Change foo state</button>
+          <button onClick={this.onButtonClick2}>Programatically set crop 2</button>
         </div>
       );
     }
