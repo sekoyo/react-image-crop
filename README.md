@@ -70,7 +70,7 @@ var crop = {
 }
 ```
 
-Or you need to specify both. As ReactCrop is based on percentages you will need to know the ratio of the image. If you don't see [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for how to set your crop in there.
+Or you need to specify both. As ReactCrop is based on percentages you will need to know the ratio of the image. If you don't, see [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for how to set your crop in there.
 
 #### minWidth (optional)
 
