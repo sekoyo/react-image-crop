@@ -100,7 +100,7 @@ If true then the user cannot modify or draw a new crop. A class of `ReactCrop--d
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* you _must_ implement this callback and update your crop state, otherwise nothing will change!
+**Note you _must_ implement this callback** and update your crop state, otherwise nothing will change!
 
 ```js
 onChange = (crop) => {
