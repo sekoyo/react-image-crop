@@ -12,7 +12,7 @@ function getConfig(minified) {
     },
     target: 'web',
     externals: {
-      react: 'react',
+      react: 'React',
     },
     module: {
       loaders: [{
