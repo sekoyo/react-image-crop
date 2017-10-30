@@ -37,6 +37,17 @@ import 'react-image-crop/dist/ReactCrop.css';
 import 'react-image-crop/lib/ReactCrop.scss';
 ```
 
+## CDN
+
+If you prefer to include ReactCrop globally by marking `react-image-crop` as external in your application, then include `react-image-crop` from one of the following CDNs:
+
+* **cdnjs** *(Coming soon)*
+
+* [**unpkg**](https://unpkg.com/react-image-crop/)
+```html
+<script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
+```
+
 ## Props
 
 #### src (required)
