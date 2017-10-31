@@ -5,14 +5,14 @@ function getConfig(minified) {
   const config = {
     entry: './lib/ReactCrop',
     output: {
-      path: path.join(__dirname, 'dist'),
+      path: path.resolve('dist'),
       library: 'ReactCrop',
       libraryTarget: 'umd',
-      filename: 'ReactCrop' + (minified ? '.min' : '') + '.js',
+      filename: minified ? 'ReactCrop.js' : 'ReactCrop.min.js',
     },
     target: 'web',
     externals: {
-      react: 'React',
+      react: 'react',
     },
     module: {
       loaders: [{
@@ -20,7 +20,7 @@ function getConfig(minified) {
         exclude: /node_modules/,
         loader: 'babel-loader',
       }],
-    }
+    },
   };
 
   if (minified) {
