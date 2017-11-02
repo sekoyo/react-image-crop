@@ -1,1 +1,2046 @@
-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t(require("react")):"function"==typeof define&&define.amd?define(["react"],t):"object"==typeof exports?exports.ReactCrop=t(require("react")):e.ReactCrop=t(e.React)}(this,function(e){return function(e){function t(o){if(r[o])return r[o].exports;var n=r[o]={i:o,l:!1,exports:{}};return e[o].call(n.exports,n,n.exports,t),n.l=!0,n.exports}var r={};return t.m=e,t.c=r,t.d=function(e,r,o){t.o(e,r)||Object.defineProperty(e,r,{configurable:!1,enumerable:!0,get:o})},t.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(r,"a",r),r},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="",t(t.s=0)}([function(e,t,r){"use strict";function o(e){return e&&e.__esModule?e:{default:e}}function n(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function a(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function i(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}function s(e){var t=e.getBoundingClientRect(),r=document.documentElement;return{top:t.top+window.pageYOffset-r.clientTop,left:t.left+window.pageXOffset-r.clientLeft}}function c(e){var t=void 0,r=void 0;return e.touches?(t=e.touches[0].pageX,r=e.touches[0].pageY):(t=e.pageX,r=e.pageY),{x:t,y:r}}function d(e,t,r){return Math.min(Math.max(e,t),r)}function u(e){return e&&e.width&&e.height}function h(e){var t=void 0;return"n"===e?t="s":"ne"===e?t="sw":"e"===e?t="w":"se"===e?t="nw":"s"===e?t="n":"sw"===e?t="ne":"w"===e?t="e":"nw"===e&&(t="se"),t}function p(e,t){var r=l({},e);return e.width?r.height=e.width/e.aspect*t:e.height&&(r.width=e.height*e.aspect/t),e.y+e.height>100&&(r.height=100-e.y,r.width=e.height*e.aspect/t),e.x+e.width>100&&(r.width=100-e.x,r.height=e.width/e.aspect*t),r}var f=function(){function e(e,t){for(var r=0;r<t.length;r++){var o=t[r];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(e,o.key,o)}}return function(t,r,o){return r&&e(t.prototype,r),o&&e(t,o),t}}(),l=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var r=arguments[t];for(var o in r)Object.prototype.hasOwnProperty.call(r,o)&&(e[o]=r[o])}return e},v=r(1),g=o(v),m=r(2),y=o(m),w=function(e){function t(){var e,r,o,i;n(this,t);for(var h=arguments.length,p=Array(h),f=0;f<h;f++)p[f]=arguments[f];return r=o=a(this,(e=t.__proto__||Object.getPrototypeOf(t)).call.apply(e,[this].concat(p))),o.state={},o.onCropMouseTouchDown=function(e){var t=o.props,r=t.crop;if(!t.disabled){e.preventDefault();var n=c(e);o.componentRef.focus();var a=e.target.dataset.ord,i="nw"===a||"w"===a||"sw"===a,d="nw"===a||"n"===a||"ne"===a,u=void 0;r.aspect&&(u=s(o.cropSelectRef)),o.evData={clientStartX:n.x,clientStartY:n.y,cropStartWidth:r.width,cropStartHeight:r.height,cropStartX:i?r.x+r.width:r.x,cropStartY:d?r.y+r.height:r.y,xInversed:i,yInversed:d,xCrossOver:i,yCrossOver:d,startXCrossOver:i,startYCrossOver:d,isResize:e.target!==o.cropSelectRef,ord:a,cropOffset:u},o.mouseDownOnCrop=!0,o.setState({cropIsActive:!0})}},o.onComponentMouseTouchDown=function(e){var t=o.props,r=t.crop,n=t.disabled,a=t.keepSelection,i=t.onChange;if(e.target===o.imageRef&&!(n||a&&u(r))){e.preventDefault();var d=c(e);o.componentRef.focus();var h=s(o.imageRef),p=(d.x-h.left)/o.imageRef.width*100,f=(d.y-h.top)/o.imageRef.height*100,l={aspect:r?r.aspect:void 0,x:p,y:f,width:0,height:0};o.evData={clientStartX:d.x,clientStartY:d.y,cropStartWidth:l.width,cropStartHeight:l.height,cropStartX:l.x,cropStartY:l.y,xInversed:!1,yInversed:!1,xCrossOver:!1,yCrossOver:!1,startXCrossOver:!1,startYCrossOver:!1,isResize:!0,ord:"nw"},o.mouseDownOnCrop=!0,i(l,o.getPixelCrop(l)),o.setState({cropIsActive:!0})}},o.onDocMouseTouchMove=function(e){var t=o.props,r=t.crop,n=t.disabled,a=t.onChange;if((0,t.onDragStart)(),!n&&o.mouseDownOnCrop){e.preventDefault();var i=o.evData,s=c(e);i.isResize&&r.aspect&&i.cropOffset&&(s.y=o.straightenYPath(s.x));var d=s.x-i.clientStartX;i.xDiffPc=d/o.imageRef.width*100;var u=s.y-i.clientStartY;i.yDiffPc=u/o.imageRef.height*100;var h=void 0;h=i.isResize?o.resizeCrop():o.dragCrop(),a(h,o.getPixelCrop(h))}},o.onComponentKeyDown=function(e){var r=o.props,n=r.crop,a=r.disabled,i=r.onChange,s=r.onComplete;if(!a){var c=e.which,h=!1;if(u(n)){var p=o.makeNewCrop();c===t.arrowKey.left?(p.x-=t.nudgeStep,h=!0):c===t.arrowKey.right?(p.x+=t.nudgeStep,h=!0):c===t.arrowKey.up?(p.y-=t.nudgeStep,h=!0):c===t.arrowKey.down&&(p.y+=t.nudgeStep,h=!0),h&&(e.preventDefault(),p.x=d(p.x,0,100-p.width),p.y=d(p.y,0,100-p.height),i(p,o.getPixelCrop(p)),s(p,o.getPixelCrop(p)))}}},o.onDocMouseTouchEnd=function(){var e=o.props,t=e.crop,r=e.disabled,n=e.onComplete;(0,e.onDragEnd)(),r||o.mouseDownOnCrop&&(o.mouseDownOnCrop=!1,n(t,o.getPixelCrop(t)),o.setState({cropIsActive:!1}))},i=r,a(o,i)}return i(t,e),f(t,[{key:"componentDidMount",value:function(){if(document.addEventListener("mousemove",this.onDocMouseTouchMove),document.addEventListener("touchmove",this.onDocMouseTouchMove),document.addEventListener("mouseup",this.onDocMouseTouchEnd),document.addEventListener("touchend",this.onDocMouseTouchEnd),document.addEventListener("touchcancel",this.onDocMouseTouchEnd),this.imageRef.complete||this.imageRef.readyState)if(0===this.imageRef.naturalWidth){var e=this.imageRef.src;this.imageRef.src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",this.imageRef.src=e}else this.onImageLoad(this.imageRef)}},{key:"componentWillUnmount",value:function(){document.removeEventListener("mousemove",this.onDocMouseTouchMove),document.removeEventListener("touchmove",this.onDocMouseTouchMove),document.removeEventListener("mouseup",this.onDocMouseTouchEnd),document.removeEventListener("touchend",this.onDocMouseTouchEnd),document.removeEventListener("touchcancel",this.onDocMouseTouchEnd)}},{key:"onImageLoad",value:function(e){this.props.onImageLoaded(e)}},{key:"getPixelCrop",value:function(e){var t=this.imageRef;return{x:Math.round(t.naturalWidth*(e.x/100)),y:Math.round(t.naturalHeight*(e.y/100)),width:Math.round(t.naturalWidth*(e.width/100)),height:Math.round(t.naturalHeight*(e.height/100))}}},{key:"getCropStyle",value:function(){var e=this.props.crop;return{top:e.y+"%",left:e.x+"%",width:e.width+"%",height:e.height+"%"}}},{key:"getNewSize",value:function(){var e=this.props,t=e.crop,r=e.minWidth,o=e.maxWidth,n=e.minHeight,a=e.maxHeight,i=this.evData,s=this.imageRef.width/this.imageRef.height,c=i.cropStartWidth+i.xDiffPc;i.xCrossOver&&(c=Math.abs(c)),c=d(c,r,o);var u=void 0;return u=t.aspect?c/t.aspect*s:i.cropStartHeight+i.yDiffPc,i.yCrossOver&&(u=Math.min(Math.abs(u),i.cropStartY)),u=d(u,n,a),t.aspect&&(c=d(u*t.aspect/s,0,100)),{width:c,height:u}}},{key:"dragCrop",value:function(){var e=this.makeNewCrop(),t=this.evData;return e.x=d(t.cropStartX+t.xDiffPc,0,100-e.width),e.y=d(t.cropStartY+t.yDiffPc,0,100-e.height),e}},{key:"resizeCrop",value:function(){var e=this.props.crop,r=this.makeNewCrop(),o=this.evData,n=o.ord,a=this.imageRef.width/this.imageRef.height;o.xInversed&&(o.xDiffPc-=2*o.cropStartWidth),o.yInversed&&(o.yDiffPc-=2*o.cropStartHeight);var i=this.getNewSize(),s=o.cropStartX,c=o.cropStartY;o.xCrossOver&&(s=r.x+(r.width-i.width)),o.yCrossOver&&(c=!1===o.lastYCrossover?r.y-i.height:r.y+(r.height-i.height));var d=!1;s+i.width>100?(i.width=e.width+(100-(e.x+e.width)),s=e.x+(100-(e.x+i.width)),d=!0):s<0&&(i.width=e.x+e.width,s=0,d=!0),d&&e.aspect&&(i.height=i.width/e.aspect*a,c<e.y&&(c=e.y+(e.height-i.height)));var u=!1;return c+i.height>100?(i.height=e.height+(100-(e.y+e.height)),c=e.y+(100-(e.y+i.height)),u=!0):c<0&&(i.height=e.y+e.height,c=0,u=!0),u&&e.aspect&&(i.width=i.height*e.aspect/a,s<e.x&&(s=e.x+(e.width-i.width))),r.aspect||t.xyOrds.indexOf(n)>-1?(r.x=s,r.y=c,r.width=i.width,r.height=i.height):t.xOrds.indexOf(n)>-1?(r.x=s,r.width=i.width):t.yOrds.indexOf(n)>-1&&(r.y=c,r.height=i.height),o.lastYCrossover=o.yCrossOver,this.crossOverCheck(),r}},{key:"straightenYPath",value:function(e){var t=this.evData,r=t.ord,o=t.cropOffset,n=t.cropStartWidth/100*this.imageRef.width,a=t.cropStartHeight/100*this.imageRef.height,i=void 0,s=void 0;return"nw"===r||"se"===r?(i=a/n,s=o.top-o.left*i):(i=-a/n,s=o.top+(a-o.left*i)),i*e+s}},{key:"createCropSelection",value:function(){var e=this,t=this.props.disabled,r=this.getCropStyle();return g.default.createElement("div",{ref:function(t){e.cropSelectRef=t},style:r,className:"ReactCrop__crop-selection",onMouseDown:this.onCropMouseTouchDown,onTouchStart:this.onCropMouseTouchDown},!t&&g.default.createElement("div",{className:"ReactCrop__drag-elements"},g.default.createElement("div",{className:"ReactCrop__drag-bar ord-n","data-ord":"n"}),g.default.createElement("div",{className:"ReactCrop__drag-bar ord-e","data-ord":"e"}),g.default.createElement("div",{className:"ReactCrop__drag-bar ord-s","data-ord":"s"}),g.default.createElement("div",{className:"ReactCrop__drag-bar ord-w","data-ord":"w"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-nw","data-ord":"nw"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-n","data-ord":"n"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-ne","data-ord":"ne"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-e","data-ord":"e"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-se","data-ord":"se"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-s","data-ord":"s"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-sw","data-ord":"sw"}),g.default.createElement("div",{className:"ReactCrop__drag-handle ord-w","data-ord":"w"})))}},{key:"makeNewCrop",value:function(){return l({},t.defaultCrop,this.props.crop)}},{key:"crossOverCheck",value:function(){var e=this.evData;(!e.xCrossOver&&-Math.abs(e.cropStartWidth)-e.xDiffPc>=0||e.xCrossOver&&-Math.abs(e.cropStartWidth)-e.xDiffPc<=0)&&(e.xCrossOver=!e.xCrossOver),(!e.yCrossOver&&-Math.abs(e.cropStartHeight)-e.yDiffPc>=0||e.yCrossOver&&-Math.abs(e.cropStartHeight)-e.yDiffPc<=0)&&(e.yCrossOver=!e.yCrossOver);var t=e.xCrossOver!==e.startXCrossOver,r=e.yCrossOver!==e.startYCrossOver;e.inversedXOrd=!!t&&h(e.ord),e.inversedYOrd=!!r&&h(e.ord)}},{key:"render",value:function(){var e=this,t=this.props,r=t.children,o=t.crossorigin,n=t.crop,a=t.disabled,i=t.imageAlt,s=t.src,c=this.state.cropIsActive,d=void 0;u(n)&&(d=this.createCropSelection());var h=["ReactCrop"];return c&&h.push("ReactCrop--active"),n&&(n.aspect&&h.push("ReactCrop--fixed-aspect"),!c||n.width&&n.height||h.push("ReactCrop--crop-invisible")),a&&h.push("ReactCrop--disabled"),g.default.createElement("div",{ref:function(t){e.componentRef=t},className:h.join(" "),onTouchStart:this.onComponentMouseTouchDown,onMouseDown:this.onComponentMouseTouchDown,tabIndex:"1",onKeyDown:this.onComponentKeyDown},g.default.createElement("img",{ref:function(t){e.imageRef=t},crossOrigin:o,className:"ReactCrop__image",src:s,onLoad:function(t){return e.onImageLoad(t.target)},alt:i}),d,r)}}]),t}(v.PureComponent);w.xOrds=["e","w"],w.yOrds=["n","s"],w.xyOrds=["nw","ne","se","sw"],w.arrowKey={left:37,up:38,right:39,down:40},w.nudgeStep=.2,w.defaultCrop={x:0,y:0,width:0,height:0},w.propTypes={src:y.default.string.isRequired,crop:y.default.shape({aspect:y.default.number,x:y.default.number,y:y.default.number,width:y.default.number,height:y.default.number}),imageAlt:y.default.string,minWidth:y.default.number,minHeight:y.default.number,maxWidth:y.default.number,maxHeight:y.default.number,keepSelection:y.default.bool,onChange:y.default.func.isRequired,onComplete:y.default.func,onImageLoaded:y.default.func,onDragStart:y.default.func,onDragEnd:y.default.func,disabled:y.default.bool,crossorigin:y.default.string,children:y.default.oneOfType([y.default.arrayOf(y.default.node),y.default.node])},w.defaultProps={crop:void 0,crossorigin:void 0,disabled:!1,imageAlt:"",maxWidth:100,maxHeight:100,minWidth:0,minHeight:0,keepSelection:!1,onComplete:function(){},onImageLoaded:function(){},onDragStart:function(){},onDragEnd:function(){},children:void 0},e.exports=w,e.exports.makeAspectCrop=p},function(t,r){t.exports=e},function(e,t,r){e.exports=r(3)()},function(e,t,r){"use strict";var o=r(4),n=r(5),a=r(6);e.exports=function(){function e(e,t,r,o,i,s){s!==a&&n(!1,"Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types")}function t(){return e}e.isRequired=e;var r={array:e,bool:e,func:e,number:e,object:e,string:e,symbol:e,any:e,arrayOf:t,element:e,instanceOf:t,node:e,objectOf:t,oneOf:t,oneOfType:t,shape:t,exact:t};return r.checkPropTypes=o,r.PropTypes=r,r}},function(e,t,r){"use strict";function o(e){return function(){return e}}var n=function(){};n.thatReturns=o,n.thatReturnsFalse=o(!1),n.thatReturnsTrue=o(!0),n.thatReturnsNull=o(null),n.thatReturnsThis=function(){return this},n.thatReturnsArgument=function(e){return e},e.exports=n},function(e,t,r){"use strict";function o(e,t,r,o,a,i,s,c){if(n(t),!e){var d;if(void 0===t)d=new Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var u=[r,o,a,i,s,c],h=0;d=new Error(t.replace(/%s/g,function(){return u[h++]})),d.name="Invariant Violation"}throw d.framesToPop=1,d}}var n=function(e){};e.exports=o},function(e,t,r){"use strict";e.exports="SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED"}])});
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("react"));
+	else if(typeof define === 'function' && define.amd)
+		define(["react"], factory);
+	else if(typeof exports === 'object')
+		exports["ReactCrop"] = factory(require("react"));
+	else
+		root["ReactCrop"] = factory(root["React"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_6__) {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * 
+ */
+
+function makeEmptyFunction(arg) {
+  return function () {
+    return arg;
+  };
+}
+
+/**
+ * This function accepts and discards inputs; it has no side effects. This is
+ * primarily useful idiomatically for overridable function endpoints which
+ * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
+ */
+var emptyFunction = function emptyFunction() {};
+
+emptyFunction.thatReturns = makeEmptyFunction;
+emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
+emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
+emptyFunction.thatReturnsNull = makeEmptyFunction(null);
+emptyFunction.thatReturnsThis = function () {
+  return this;
+};
+emptyFunction.thatReturnsArgument = function (arg) {
+  return arg;
+};
+
+module.exports = emptyFunction;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+
+
+/**
+ * Use invariant() to assert state which your program assumes to be true.
+ *
+ * Provide sprintf-style format (only %s is supported) and arguments
+ * to provide information about what broke and what you were
+ * expecting.
+ *
+ * The invariant message will be stripped in production, but the invariant
+ * will remain to ensure logic does not differ in production.
+ */
+
+var validateFormat = function validateFormat(format) {};
+
+if (process.env.NODE_ENV !== 'production') {
+  validateFormat = function validateFormat(format) {
+    if (format === undefined) {
+      throw new Error('invariant requires an error message argument');
+    }
+  };
+}
+
+function invariant(condition, format, a, b, c, d, e, f) {
+  validateFormat(format);
+
+  if (!condition) {
+    var error;
+    if (format === undefined) {
+      error = new Error('Minified exception occurred; use the non-minified dev environment ' + 'for the full error message and additional helpful warnings.');
+    } else {
+      var args = [a, b, c, d, e, f];
+      var argIndex = 0;
+      error = new Error(format.replace(/%s/g, function () {
+        return args[argIndex++];
+      }));
+      error.name = 'Invariant Violation';
+    }
+
+    error.framesToPop = 1; // we don't care about invariant's own frame
+    throw error;
+  }
+}
+
+module.exports = invariant;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+
+
+var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
+
+module.exports = ReactPropTypesSecret;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+
+
+var emptyFunction = __webpack_require__(1);
+
+/**
+ * Similar to invariant but only logs a warning if the condition is not met.
+ * This can be used to log issues in development environments in critical
+ * paths. Removing the logging code for production environments will keep the
+ * same logic and follow the same code paths.
+ */
+
+var warning = emptyFunction;
+
+if (process.env.NODE_ENV !== 'production') {
+  var printWarning = function printWarning(format) {
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    var argIndex = 0;
+    var message = 'Warning: ' + format.replace(/%s/g, function () {
+      return args[argIndex++];
+    });
+    if (typeof console !== 'undefined') {
+      console.error(message);
+    }
+    try {
+      // --- Welcome to debugging React ---
+      // This error was thrown as a convenience so that you can use this stack
+      // to find the callsite that caused this warning to fire.
+      throw new Error(message);
+    } catch (x) {}
+  };
+
+  warning = function warning(condition, format) {
+    if (format === undefined) {
+      throw new Error('`warning(condition, format, ...args)` requires a warning ' + 'message argument');
+    }
+
+    if (format.indexOf('Failed Composite propType: ') === 0) {
+      return; // Ignore CompositeComponent proptype check.
+    }
+
+    if (!condition) {
+      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+        args[_key2 - 2] = arguments[_key2];
+      }
+
+      printWarning.apply(undefined, [format].concat(args));
+    }
+  };
+}
+
+module.exports = warning;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /* globals document, window */
+
+
+var _react = __webpack_require__(6);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(7);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+function getElementOffset(el) {
+  var rect = el.getBoundingClientRect();
+  var docEl = document.documentElement;
+
+  var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
+  var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
+
+  return {
+    top: rectTop,
+    left: rectLeft
+  };
+}
+
+function getClientPos(e) {
+  var pageX = void 0;
+  var pageY = void 0;
+
+  if (e.touches) {
+    pageX = e.touches[0].pageX;
+    pageY = e.touches[0].pageY;
+  } else {
+    pageX = e.pageX;
+    pageY = e.pageY;
+  }
+
+  return {
+    x: pageX,
+    y: pageY
+  };
+}
+
+function clamp(num, min, max) {
+  return Math.min(Math.max(num, min), max);
+}
+
+function isCropValid(crop) {
+  return crop && crop.width && crop.height;
+}
+
+function inverseOrd(ord) {
+  var inversedOrd = void 0;
+
+  if (ord === 'n') inversedOrd = 's';else if (ord === 'ne') inversedOrd = 'sw';else if (ord === 'e') inversedOrd = 'w';else if (ord === 'se') inversedOrd = 'nw';else if (ord === 's') inversedOrd = 'n';else if (ord === 'sw') inversedOrd = 'ne';else if (ord === 'w') inversedOrd = 'e';else if (ord === 'nw') inversedOrd = 'se';
+
+  return inversedOrd;
+}
+
+function makeAspectCrop(crop, imageAspect) {
+  var completeCrop = _extends({}, crop);
+
+  if (crop.width) {
+    completeCrop.height = crop.width / crop.aspect * imageAspect;
+  } else if (crop.height) {
+    completeCrop.width = crop.height * crop.aspect / imageAspect;
+  }
+
+  if (crop.y + crop.height > 100) {
+    completeCrop.height = 100 - crop.y;
+    completeCrop.width = crop.height * crop.aspect / imageAspect;
+  }
+
+  if (crop.x + crop.width > 100) {
+    completeCrop.width = 100 - crop.x;
+    completeCrop.height = crop.width / crop.aspect * imageAspect;
+  }
+
+  return completeCrop;
+}
+
+var ReactCrop = function (_PureComponent) {
+  _inherits(ReactCrop, _PureComponent);
+
+  function ReactCrop() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
+    _classCallCheck(this, ReactCrop);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call.apply(_ref, [this].concat(args))), _this), _this.state = {}, _this.onCropMouseTouchDown = function (e) {
+      var _this$props = _this.props,
+          crop = _this$props.crop,
+          disabled = _this$props.disabled;
+
+
+      if (disabled) {
+        return;
+      }
+
+      e.preventDefault(); // Stop drag selection.
+
+      var clientPos = getClientPos(e);
+
+      // Focus for detecting keypress.
+      _this.componentRef.focus();
+
+      var ord = e.target.dataset.ord;
+      var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
+      var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
+
+      var cropOffset = void 0;
+
+      if (crop.aspect) {
+        cropOffset = getElementOffset(_this.cropSelectRef);
+      }
+
+      _this.evData = {
+        clientStartX: clientPos.x,
+        clientStartY: clientPos.y,
+        cropStartWidth: crop.width,
+        cropStartHeight: crop.height,
+        cropStartX: xInversed ? crop.x + crop.width : crop.x,
+        cropStartY: yInversed ? crop.y + crop.height : crop.y,
+        xInversed: xInversed,
+        yInversed: yInversed,
+        xCrossOver: xInversed,
+        yCrossOver: yInversed,
+        startXCrossOver: xInversed,
+        startYCrossOver: yInversed,
+        isResize: e.target !== _this.cropSelectRef,
+        ord: ord,
+        cropOffset: cropOffset
+      };
+
+      _this.mouseDownOnCrop = true;
+      _this.setState({ cropIsActive: true });
+    }, _this.onComponentMouseTouchDown = function (e) {
+      var _this$props2 = _this.props,
+          crop = _this$props2.crop,
+          disabled = _this$props2.disabled,
+          keepSelection = _this$props2.keepSelection,
+          onChange = _this$props2.onChange;
+
+
+      if (e.target !== _this.imageRef) {
+        return;
+      }
+
+      if (disabled || keepSelection && isCropValid(crop)) {
+        return;
+      }
+
+      e.preventDefault(); // Stop drag selection.
+
+      var clientPos = getClientPos(e);
+
+      // Focus for detecting keypress.
+      _this.componentRef.focus();
+
+      var imageOffset = getElementOffset(_this.imageRef);
+      var xPc = (clientPos.x - imageOffset.left) / _this.imageRef.width * 100;
+      var yPc = (clientPos.y - imageOffset.top) / _this.imageRef.height * 100;
+
+      var nextCrop = {
+        aspect: crop ? crop.aspect : undefined,
+        x: xPc,
+        y: yPc,
+        width: 0,
+        height: 0
+      };
+
+      _this.evData = {
+        clientStartX: clientPos.x,
+        clientStartY: clientPos.y,
+        cropStartWidth: nextCrop.width,
+        cropStartHeight: nextCrop.height,
+        cropStartX: nextCrop.x,
+        cropStartY: nextCrop.y,
+        xInversed: false,
+        yInversed: false,
+        xCrossOver: false,
+        yCrossOver: false,
+        startXCrossOver: false,
+        startYCrossOver: false,
+        isResize: true,
+        ord: 'nw'
+      };
+
+      _this.mouseDownOnCrop = true;
+      onChange(nextCrop, _this.getPixelCrop(nextCrop));
+      _this.setState({ cropIsActive: true });
+    }, _this.onDocMouseTouchMove = function (e) {
+      var _this$props3 = _this.props,
+          crop = _this$props3.crop,
+          disabled = _this$props3.disabled,
+          onChange = _this$props3.onChange,
+          onDragStart = _this$props3.onDragStart;
+
+
+      onDragStart();
+
+      if (disabled) {
+        return;
+      }
+
+      if (!_this.mouseDownOnCrop) {
+        return;
+      }
+
+      e.preventDefault(); // Stop drag selection.
+
+      var evData = _this.evData;
+      var clientPos = getClientPos(e);
+
+      if (evData.isResize && crop.aspect && evData.cropOffset) {
+        clientPos.y = _this.straightenYPath(clientPos.x);
+      }
+
+      var xDiffPx = clientPos.x - evData.clientStartX;
+      evData.xDiffPc = xDiffPx / _this.imageRef.width * 100;
+
+      var yDiffPx = clientPos.y - evData.clientStartY;
+      evData.yDiffPc = yDiffPx / _this.imageRef.height * 100;
+
+      var nextCrop = void 0;
+
+      if (evData.isResize) {
+        nextCrop = _this.resizeCrop();
+      } else {
+        nextCrop = _this.dragCrop();
+      }
+
+      onChange(nextCrop, _this.getPixelCrop(nextCrop));
+    }, _this.onComponentKeyDown = function (e) {
+      var _this$props4 = _this.props,
+          crop = _this$props4.crop,
+          disabled = _this$props4.disabled,
+          onChange = _this$props4.onChange,
+          onComplete = _this$props4.onComplete;
+
+
+      if (disabled) {
+        return;
+      }
+
+      var keyCode = e.which;
+      var nudged = false;
+
+      if (!isCropValid(crop)) {
+        return;
+      }
+
+      var nextCrop = _this.makeNewCrop();
+
+      if (keyCode === ReactCrop.arrowKey.left) {
+        nextCrop.x -= ReactCrop.nudgeStep;
+        nudged = true;
+      } else if (keyCode === ReactCrop.arrowKey.right) {
+        nextCrop.x += ReactCrop.nudgeStep;
+        nudged = true;
+      } else if (keyCode === ReactCrop.arrowKey.up) {
+        nextCrop.y -= ReactCrop.nudgeStep;
+        nudged = true;
+      } else if (keyCode === ReactCrop.arrowKey.down) {
+        nextCrop.y += ReactCrop.nudgeStep;
+        nudged = true;
+      }
+
+      if (nudged) {
+        e.preventDefault(); // Stop drag selection.
+        nextCrop.x = clamp(nextCrop.x, 0, 100 - nextCrop.width);
+        nextCrop.y = clamp(nextCrop.y, 0, 100 - nextCrop.height);
+
+        onChange(nextCrop, _this.getPixelCrop(nextCrop));
+        onComplete(nextCrop, _this.getPixelCrop(nextCrop));
+      }
+    }, _this.onDocMouseTouchEnd = function () {
+      var _this$props5 = _this.props,
+          crop = _this$props5.crop,
+          disabled = _this$props5.disabled,
+          onComplete = _this$props5.onComplete,
+          onDragEnd = _this$props5.onDragEnd;
+
+
+      onDragEnd();
+
+      if (disabled) {
+        return;
+      }
+
+      if (_this.mouseDownOnCrop) {
+        _this.mouseDownOnCrop = false;
+
+        onComplete(crop, _this.getPixelCrop(crop));
+        _this.setState({ cropIsActive: false });
+      }
+    }, _temp), _possibleConstructorReturn(_this, _ret);
+  }
+
+  _createClass(ReactCrop, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      document.addEventListener('mousemove', this.onDocMouseTouchMove);
+      document.addEventListener('touchmove', this.onDocMouseTouchMove);
+
+      document.addEventListener('mouseup', this.onDocMouseTouchEnd);
+      document.addEventListener('touchend', this.onDocMouseTouchEnd);
+      document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
+
+      if (this.imageRef.complete || this.imageRef.readyState) {
+        if (this.imageRef.naturalWidth === 0) {
+          // Broken load on iOS, PR #51
+          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
+          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
+          var src = this.imageRef.src;
+          this.imageRef.src = EMPTY_GIF;
+          this.imageRef.src = src;
+        } else {
+          this.onImageLoad(this.imageRef);
+        }
+      }
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      document.removeEventListener('mousemove', this.onDocMouseTouchMove);
+      document.removeEventListener('touchmove', this.onDocMouseTouchMove);
+
+      document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
+      document.removeEventListener('touchend', this.onDocMouseTouchEnd);
+      document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
+    }
+  }, {
+    key: 'onImageLoad',
+    value: function onImageLoad(image) {
+      this.props.onImageLoaded(image);
+    }
+  }, {
+    key: 'getPixelCrop',
+    value: function getPixelCrop(crop) {
+      var imageRef = this.imageRef;
+
+      return {
+        x: Math.round(imageRef.naturalWidth * (crop.x / 100)),
+        y: Math.round(imageRef.naturalHeight * (crop.y / 100)),
+        width: Math.round(imageRef.naturalWidth * (crop.width / 100)),
+        height: Math.round(imageRef.naturalHeight * (crop.height / 100))
+      };
+    }
+  }, {
+    key: 'getCropStyle',
+    value: function getCropStyle() {
+      var crop = this.props.crop;
+
+      return {
+        top: crop.y + '%',
+        left: crop.x + '%',
+        width: crop.width + '%',
+        height: crop.height + '%'
+      };
+    }
+  }, {
+    key: 'getNewSize',
+    value: function getNewSize() {
+      var _props = this.props,
+          crop = _props.crop,
+          minWidth = _props.minWidth,
+          maxWidth = _props.maxWidth,
+          minHeight = _props.minHeight,
+          maxHeight = _props.maxHeight;
+
+      var evData = this.evData;
+      var imageAspect = this.imageRef.width / this.imageRef.height;
+
+      // New width.
+      var newWidth = evData.cropStartWidth + evData.xDiffPc;
+
+      if (evData.xCrossOver) {
+        newWidth = Math.abs(newWidth);
+      }
+
+      newWidth = clamp(newWidth, minWidth, maxWidth);
+
+      // New height.
+      var newHeight = void 0;
+
+      if (crop.aspect) {
+        newHeight = newWidth / crop.aspect * imageAspect;
+      } else {
+        newHeight = evData.cropStartHeight + evData.yDiffPc;
+      }
+
+      if (evData.yCrossOver) {
+        // Cap if polarity is inversed and the height fills the y space.
+        newHeight = Math.min(Math.abs(newHeight), evData.cropStartY);
+      }
+
+      newHeight = clamp(newHeight, minHeight, maxHeight);
+
+      if (crop.aspect) {
+        newWidth = clamp(newHeight * crop.aspect / imageAspect, 0, 100);
+      }
+
+      return {
+        width: newWidth,
+        height: newHeight
+      };
+    }
+  }, {
+    key: 'dragCrop',
+    value: function dragCrop() {
+      var nextCrop = this.makeNewCrop();
+      var evData = this.evData;
+      nextCrop.x = clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - nextCrop.width);
+      nextCrop.y = clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - nextCrop.height);
+      return nextCrop;
+    }
+  }, {
+    key: 'resizeCrop',
+    value: function resizeCrop() {
+      var crop = this.props.crop;
+
+      var nextCrop = this.makeNewCrop();
+      var evData = this.evData;
+      var ord = evData.ord;
+      var imageAspect = this.imageRef.width / this.imageRef.height;
+
+      // On the inverse change the diff so it's the same and
+      // the same algo applies.
+      if (evData.xInversed) {
+        evData.xDiffPc -= evData.cropStartWidth * 2;
+      }
+      if (evData.yInversed) {
+        evData.yDiffPc -= evData.cropStartHeight * 2;
+      }
+
+      // New size.
+      var newSize = this.getNewSize();
+
+      // Adjust x/y to give illusion of 'staticness' as width/height is increased
+      // when polarity is inversed.
+      var newX = evData.cropStartX;
+      var newY = evData.cropStartY;
+
+      if (evData.xCrossOver) {
+        newX = nextCrop.x + (nextCrop.width - newSize.width);
+      }
+
+      if (evData.yCrossOver) {
+        // This not only removes the little "shake" when inverting at a diagonal, but for some
+        // reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
+        // figure out why.
+        if (evData.lastYCrossover === false) {
+          newY = nextCrop.y - newSize.height;
+        } else {
+          newY = nextCrop.y + (nextCrop.height - newSize.height);
+        }
+      }
+
+      // Don't let the crop grow on the opposite side when hitting an x image boundary.
+      var cropXAdjusted = false;
+      if (newX + newSize.width > 100) {
+        newSize.width = crop.width + (100 - (crop.x + crop.width));
+        newX = crop.x + (100 - (crop.x + newSize.width));
+        cropXAdjusted = true;
+      } else if (newX < 0) {
+        newSize.width = crop.x + crop.width;
+        newX = 0;
+        cropXAdjusted = true;
+      }
+
+      if (cropXAdjusted && crop.aspect) {
+        // Adjust height to the resized width to maintain aspect.
+        newSize.height = newSize.width / crop.aspect * imageAspect;
+        // If sizing in up direction we need to pin Y at the point it
+        // would be at the boundary.
+        if (newY < crop.y) {
+          newY = crop.y + (crop.height - newSize.height);
+        }
+      }
+
+      // Don't let the crop grow on the opposite side when hitting a y image boundary.
+      var cropYAdjusted = false;
+      if (newY + newSize.height > 100) {
+        newSize.height = crop.height + (100 - (crop.y + crop.height));
+        newY = crop.y + (100 - (crop.y + newSize.height));
+        cropYAdjusted = true;
+      } else if (newY < 0) {
+        newSize.height = crop.y + crop.height;
+        newY = 0;
+        cropYAdjusted = true;
+      }
+
+      if (cropYAdjusted && crop.aspect) {
+        // Adjust width to the resized height to maintain aspect.
+        newSize.width = newSize.height * crop.aspect / imageAspect;
+        // If sizing in up direction we need to pin X at the point it
+        // would be at the boundary.
+        if (newX < crop.x) {
+          newX = crop.x + (crop.width - newSize.width);
+        }
+      }
+
+      // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
+      if (nextCrop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
+        nextCrop.x = newX;
+        nextCrop.y = newY;
+        nextCrop.width = newSize.width;
+        nextCrop.height = newSize.height;
+      } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
+        nextCrop.x = newX;
+        nextCrop.width = newSize.width;
+      } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
+        nextCrop.y = newY;
+        nextCrop.height = newSize.height;
+      }
+
+      evData.lastYCrossover = evData.yCrossOver;
+      this.crossOverCheck();
+      return nextCrop;
+    }
+  }, {
+    key: 'straightenYPath',
+    value: function straightenYPath(clientX) {
+      var evData = this.evData;
+      var ord = evData.ord;
+      var cropOffset = evData.cropOffset;
+      var cropStartWidth = evData.cropStartWidth / 100 * this.imageRef.width;
+      var cropStartHeight = evData.cropStartHeight / 100 * this.imageRef.height;
+      var k = void 0;
+      var d = void 0;
+
+      if (ord === 'nw' || ord === 'se') {
+        k = cropStartHeight / cropStartWidth;
+        d = cropOffset.top - cropOffset.left * k;
+      } else {
+        k = -cropStartHeight / cropStartWidth;
+        d = cropOffset.top + (cropStartHeight - cropOffset.left * k);
+      }
+
+      return k * clientX + d;
+    }
+  }, {
+    key: 'createCropSelection',
+    value: function createCropSelection() {
+      var _this2 = this;
+
+      var disabled = this.props.disabled;
+
+      var style = this.getCropStyle();
+
+      return _react2.default.createElement(
+        'div',
+        {
+          ref: function ref(n) {
+            _this2.cropSelectRef = n;
+          },
+          style: style,
+          className: 'ReactCrop__crop-selection',
+          onMouseDown: this.onCropMouseTouchDown,
+          onTouchStart: this.onCropMouseTouchDown
+        },
+        !disabled && _react2.default.createElement(
+          'div',
+          { className: 'ReactCrop__drag-elements' },
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-n', 'data-ord': 'n' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-e', 'data-ord': 'e' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-s', 'data-ord': 's' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-w', 'data-ord': 'w' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-nw', 'data-ord': 'nw' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-n', 'data-ord': 'n' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-ne', 'data-ord': 'ne' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-e', 'data-ord': 'e' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-se', 'data-ord': 'se' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-s', 'data-ord': 's' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-sw', 'data-ord': 'sw' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-w', 'data-ord': 'w' })
+        )
+      );
+    }
+  }, {
+    key: 'makeNewCrop',
+    value: function makeNewCrop() {
+      return _extends({}, ReactCrop.defaultCrop, this.props.crop);
+    }
+  }, {
+    key: 'crossOverCheck',
+    value: function crossOverCheck() {
+      var evData = this.evData;
+
+      if (!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc >= 0 || evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc <= 0) {
+        evData.xCrossOver = !evData.xCrossOver;
+      }
+
+      if (!evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc >= 0 || evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiffPc <= 0) {
+        evData.yCrossOver = !evData.yCrossOver;
+      }
+
+      var swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
+      var swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
+
+      evData.inversedXOrd = swapXOrd ? inverseOrd(evData.ord) : false;
+      evData.inversedYOrd = swapYOrd ? inverseOrd(evData.ord) : false;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      var _props2 = this.props,
+          children = _props2.children,
+          crossorigin = _props2.crossorigin,
+          crop = _props2.crop,
+          disabled = _props2.disabled,
+          imageAlt = _props2.imageAlt,
+          src = _props2.src;
+      var cropIsActive = this.state.cropIsActive;
+
+      var cropSelection = void 0;
+
+      if (isCropValid(crop)) {
+        cropSelection = this.createCropSelection();
+      }
+
+      var componentClasses = ['ReactCrop'];
+
+      if (cropIsActive) {
+        componentClasses.push('ReactCrop--active');
+      }
+
+      if (crop) {
+        if (crop.aspect) {
+          componentClasses.push('ReactCrop--fixed-aspect');
+        }
+
+        // In this case we have to shadow the image, since the box-shadow
+        // on the crop won't work.
+        if (cropIsActive && (!crop.width || !crop.height)) {
+          componentClasses.push('ReactCrop--crop-invisible');
+        }
+      }
+
+      if (disabled) {
+        componentClasses.push('ReactCrop--disabled');
+      }
+
+      return _react2.default.createElement(
+        'div',
+        {
+          ref: function ref(n) {
+            _this3.componentRef = n;
+          },
+          className: componentClasses.join(' '),
+          onTouchStart: this.onComponentMouseTouchDown,
+          onMouseDown: this.onComponentMouseTouchDown,
+          tabIndex: '1',
+          onKeyDown: this.onComponentKeyDown
+        },
+        _react2.default.createElement('img', {
+          ref: function ref(n) {
+            _this3.imageRef = n;
+          },
+          crossOrigin: crossorigin,
+          className: 'ReactCrop__image',
+          src: src,
+          onLoad: function onLoad(e) {
+            return _this3.onImageLoad(e.target);
+          },
+          alt: imageAlt
+        }),
+        cropSelection,
+        children
+      );
+    }
+  }]);
+
+  return ReactCrop;
+}(_react.PureComponent);
+
+ReactCrop.xOrds = ['e', 'w'];
+ReactCrop.yOrds = ['n', 's'];
+ReactCrop.xyOrds = ['nw', 'ne', 'se', 'sw'];
+
+ReactCrop.arrowKey = {
+  left: 37,
+  up: 38,
+  right: 39,
+  down: 40
+};
+
+ReactCrop.nudgeStep = 0.2;
+
+ReactCrop.defaultCrop = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0
+};
+
+ReactCrop.propTypes = {
+  src: _propTypes2.default.string.isRequired,
+  crop: _propTypes2.default.shape({
+    aspect: _propTypes2.default.number,
+    x: _propTypes2.default.number,
+    y: _propTypes2.default.number,
+    width: _propTypes2.default.number,
+    height: _propTypes2.default.number
+  }),
+  imageAlt: _propTypes2.default.string,
+  minWidth: _propTypes2.default.number,
+  minHeight: _propTypes2.default.number,
+  maxWidth: _propTypes2.default.number,
+  maxHeight: _propTypes2.default.number,
+  keepSelection: _propTypes2.default.bool,
+  onChange: _propTypes2.default.func.isRequired,
+  onComplete: _propTypes2.default.func,
+  onImageLoaded: _propTypes2.default.func,
+  onDragStart: _propTypes2.default.func,
+  onDragEnd: _propTypes2.default.func,
+  disabled: _propTypes2.default.bool,
+  crossorigin: _propTypes2.default.string,
+  children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node])
+};
+
+ReactCrop.defaultProps = {
+  crop: undefined,
+  crossorigin: undefined,
+  disabled: false,
+  imageAlt: '',
+  maxWidth: 100,
+  maxHeight: 100,
+  minWidth: 0,
+  minHeight: 0,
+  keepSelection: false,
+  onComplete: function onComplete() {},
+  onImageLoaded: function onImageLoaded() {},
+  onDragStart: function onDragStart() {},
+  onDragEnd: function onDragEnd() {},
+  children: undefined
+};
+
+module.exports = ReactCrop;
+module.exports.makeAspectCrop = makeAspectCrop;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_6__;
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+if (process.env.NODE_ENV !== 'production') {
+  var REACT_ELEMENT_TYPE = (typeof Symbol === 'function' &&
+    Symbol.for &&
+    Symbol.for('react.element')) ||
+    0xeac7;
+
+  var isValidElement = function(object) {
+    return typeof object === 'object' &&
+      object !== null &&
+      object.$$typeof === REACT_ELEMENT_TYPE;
+  };
+
+  // By explicitly using `prop-types` you are opting into new development behavior.
+  // http://fb.me/prop-types-in-prod
+  var throwOnDirectAccess = true;
+  module.exports = __webpack_require__(8)(isValidElement, throwOnDirectAccess);
+} else {
+  // By explicitly using `prop-types` you are opting into new production behavior.
+  // http://fb.me/prop-types-in-prod
+  module.exports = __webpack_require__(11)();
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+
+
+var emptyFunction = __webpack_require__(1);
+var invariant = __webpack_require__(2);
+var warning = __webpack_require__(4);
+var assign = __webpack_require__(9);
+
+var ReactPropTypesSecret = __webpack_require__(3);
+var checkPropTypes = __webpack_require__(10);
+
+module.exports = function(isValidElement, throwOnDirectAccess) {
+  /* global Symbol */
+  var ITERATOR_SYMBOL = typeof Symbol === 'function' && Symbol.iterator;
+  var FAUX_ITERATOR_SYMBOL = '@@iterator'; // Before Symbol spec.
+
+  /**
+   * Returns the iterator method function contained on the iterable object.
+   *
+   * Be sure to invoke the function with the iterable as context:
+   *
+   *     var iteratorFn = getIteratorFn(myIterable);
+   *     if (iteratorFn) {
+   *       var iterator = iteratorFn.call(myIterable);
+   *       ...
+   *     }
+   *
+   * @param {?object} maybeIterable
+   * @return {?function}
+   */
+  function getIteratorFn(maybeIterable) {
+    var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
+    if (typeof iteratorFn === 'function') {
+      return iteratorFn;
+    }
+  }
+
+  /**
+   * Collection of methods that allow declaration and validation of props that are
+   * supplied to React components. Example usage:
+   *
+   *   var Props = require('ReactPropTypes');
+   *   var MyArticle = React.createClass({
+   *     propTypes: {
+   *       // An optional string prop named "description".
+   *       description: Props.string,
+   *
+   *       // A required enum prop named "category".
+   *       category: Props.oneOf(['News','Photos']).isRequired,
+   *
+   *       // A prop named "dialog" that requires an instance of Dialog.
+   *       dialog: Props.instanceOf(Dialog).isRequired
+   *     },
+   *     render: function() { ... }
+   *   });
+   *
+   * A more formal specification of how these methods are used:
+   *
+   *   type := array|bool|func|object|number|string|oneOf([...])|instanceOf(...)
+   *   decl := ReactPropTypes.{type}(.isRequired)?
+   *
+   * Each and every declaration produces a function with the same signature. This
+   * allows the creation of custom validation functions. For example:
+   *
+   *  var MyLink = React.createClass({
+   *    propTypes: {
+   *      // An optional string or URI prop named "href".
+   *      href: function(props, propName, componentName) {
+   *        var propValue = props[propName];
+   *        if (propValue != null && typeof propValue !== 'string' &&
+   *            !(propValue instanceof URI)) {
+   *          return new Error(
+   *            'Expected a string or an URI for ' + propName + ' in ' +
+   *            componentName
+   *          );
+   *        }
+   *      }
+   *    },
+   *    render: function() {...}
+   *  });
+   *
+   * @internal
+   */
+
+  var ANONYMOUS = '<<anonymous>>';
+
+  // Important!
+  // Keep this list in sync with production version in `./factoryWithThrowingShims.js`.
+  var ReactPropTypes = {
+    array: createPrimitiveTypeChecker('array'),
+    bool: createPrimitiveTypeChecker('boolean'),
+    func: createPrimitiveTypeChecker('function'),
+    number: createPrimitiveTypeChecker('number'),
+    object: createPrimitiveTypeChecker('object'),
+    string: createPrimitiveTypeChecker('string'),
+    symbol: createPrimitiveTypeChecker('symbol'),
+
+    any: createAnyTypeChecker(),
+    arrayOf: createArrayOfTypeChecker,
+    element: createElementTypeChecker(),
+    instanceOf: createInstanceTypeChecker,
+    node: createNodeChecker(),
+    objectOf: createObjectOfTypeChecker,
+    oneOf: createEnumTypeChecker,
+    oneOfType: createUnionTypeChecker,
+    shape: createShapeTypeChecker,
+    exact: createStrictShapeTypeChecker,
+  };
+
+  /**
+   * inlined Object.is polyfill to avoid requiring consumers ship their own
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
+   */
+  /*eslint-disable no-self-compare*/
+  function is(x, y) {
+    // SameValue algorithm
+    if (x === y) {
+      // Steps 1-5, 7-10
+      // Steps 6.b-6.e: +0 != -0
+      return x !== 0 || 1 / x === 1 / y;
+    } else {
+      // Step 6.a: NaN == NaN
+      return x !== x && y !== y;
+    }
+  }
+  /*eslint-enable no-self-compare*/
+
+  /**
+   * We use an Error-like object for backward compatibility as people may call
+   * PropTypes directly and inspect their output. However, we don't use real
+   * Errors anymore. We don't inspect their stack anyway, and creating them
+   * is prohibitively expensive if they are created too often, such as what
+   * happens in oneOfType() for any type before the one that matched.
+   */
+  function PropTypeError(message) {
+    this.message = message;
+    this.stack = '';
+  }
+  // Make `instanceof Error` still work for returned errors.
+  PropTypeError.prototype = Error.prototype;
+
+  function createChainableTypeChecker(validate) {
+    if (process.env.NODE_ENV !== 'production') {
+      var manualPropTypeCallCache = {};
+      var manualPropTypeWarningCount = 0;
+    }
+    function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
+      componentName = componentName || ANONYMOUS;
+      propFullName = propFullName || propName;
+
+      if (secret !== ReactPropTypesSecret) {
+        if (throwOnDirectAccess) {
+          // New behavior only for users of `prop-types` package
+          invariant(
+            false,
+            'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
+            'Use `PropTypes.checkPropTypes()` to call them. ' +
+            'Read more at http://fb.me/use-check-prop-types'
+          );
+        } else if (process.env.NODE_ENV !== 'production' && typeof console !== 'undefined') {
+          // Old behavior for people using React.PropTypes
+          var cacheKey = componentName + ':' + propName;
+          if (
+            !manualPropTypeCallCache[cacheKey] &&
+            // Avoid spamming the console because they are often not actionable except for lib authors
+            manualPropTypeWarningCount < 3
+          ) {
+            warning(
+              false,
+              'You are manually calling a React.PropTypes validation ' +
+              'function for the `%s` prop on `%s`. This is deprecated ' +
+              'and will throw in the standalone `prop-types` package. ' +
+              'You may be seeing this warning due to a third-party PropTypes ' +
+              'library. See https://fb.me/react-warning-dont-call-proptypes ' + 'for details.',
+              propFullName,
+              componentName
+            );
+            manualPropTypeCallCache[cacheKey] = true;
+            manualPropTypeWarningCount++;
+          }
+        }
+      }
+      if (props[propName] == null) {
+        if (isRequired) {
+          if (props[propName] === null) {
+            return new PropTypeError('The ' + location + ' `' + propFullName + '` is marked as required ' + ('in `' + componentName + '`, but its value is `null`.'));
+          }
+          return new PropTypeError('The ' + location + ' `' + propFullName + '` is marked as required in ' + ('`' + componentName + '`, but its value is `undefined`.'));
+        }
+        return null;
+      } else {
+        return validate(props, propName, componentName, location, propFullName);
+      }
+    }
+
+    var chainedCheckType = checkType.bind(null, false);
+    chainedCheckType.isRequired = checkType.bind(null, true);
+
+    return chainedCheckType;
+  }
+
+  function createPrimitiveTypeChecker(expectedType) {
+    function validate(props, propName, componentName, location, propFullName, secret) {
+      var propValue = props[propName];
+      var propType = getPropType(propValue);
+      if (propType !== expectedType) {
+        // `propValue` being instance of, say, date/regexp, pass the 'object'
+        // check, but we can offer a more precise error message here rather than
+        // 'of type `object`'.
+        var preciseType = getPreciseType(propValue);
+
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + preciseType + '` supplied to `' + componentName + '`, expected ') + ('`' + expectedType + '`.'));
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createAnyTypeChecker() {
+    return createChainableTypeChecker(emptyFunction.thatReturnsNull);
+  }
+
+  function createArrayOfTypeChecker(typeChecker) {
+    function validate(props, propName, componentName, location, propFullName) {
+      if (typeof typeChecker !== 'function') {
+        return new PropTypeError('Property `' + propFullName + '` of component `' + componentName + '` has invalid PropType notation inside arrayOf.');
+      }
+      var propValue = props[propName];
+      if (!Array.isArray(propValue)) {
+        var propType = getPropType(propValue);
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an array.'));
+      }
+      for (var i = 0; i < propValue.length; i++) {
+        var error = typeChecker(propValue, i, componentName, location, propFullName + '[' + i + ']', ReactPropTypesSecret);
+        if (error instanceof Error) {
+          return error;
+        }
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createElementTypeChecker() {
+    function validate(props, propName, componentName, location, propFullName) {
+      var propValue = props[propName];
+      if (!isValidElement(propValue)) {
+        var propType = getPropType(propValue);
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected a single ReactElement.'));
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createInstanceTypeChecker(expectedClass) {
+    function validate(props, propName, componentName, location, propFullName) {
+      if (!(props[propName] instanceof expectedClass)) {
+        var expectedClassName = expectedClass.name || ANONYMOUS;
+        var actualClassName = getClassName(props[propName]);
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + actualClassName + '` supplied to `' + componentName + '`, expected ') + ('instance of `' + expectedClassName + '`.'));
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createEnumTypeChecker(expectedValues) {
+    if (!Array.isArray(expectedValues)) {
+      process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOf, expected an instance of array.') : void 0;
+      return emptyFunction.thatReturnsNull;
+    }
+
+    function validate(props, propName, componentName, location, propFullName) {
+      var propValue = props[propName];
+      for (var i = 0; i < expectedValues.length; i++) {
+        if (is(propValue, expectedValues[i])) {
+          return null;
+        }
+      }
+
+      var valuesString = JSON.stringify(expectedValues);
+      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of value `' + propValue + '` ' + ('supplied to `' + componentName + '`, expected one of ' + valuesString + '.'));
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createObjectOfTypeChecker(typeChecker) {
+    function validate(props, propName, componentName, location, propFullName) {
+      if (typeof typeChecker !== 'function') {
+        return new PropTypeError('Property `' + propFullName + '` of component `' + componentName + '` has invalid PropType notation inside objectOf.');
+      }
+      var propValue = props[propName];
+      var propType = getPropType(propValue);
+      if (propType !== 'object') {
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an object.'));
+      }
+      for (var key in propValue) {
+        if (propValue.hasOwnProperty(key)) {
+          var error = typeChecker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
+          if (error instanceof Error) {
+            return error;
+          }
+        }
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createUnionTypeChecker(arrayOfTypeCheckers) {
+    if (!Array.isArray(arrayOfTypeCheckers)) {
+      process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOfType, expected an instance of array.') : void 0;
+      return emptyFunction.thatReturnsNull;
+    }
+
+    for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
+      var checker = arrayOfTypeCheckers[i];
+      if (typeof checker !== 'function') {
+        warning(
+          false,
+          'Invalid argument supplied to oneOfType. Expected an array of check functions, but ' +
+          'received %s at index %s.',
+          getPostfixForTypeWarning(checker),
+          i
+        );
+        return emptyFunction.thatReturnsNull;
+      }
+    }
+
+    function validate(props, propName, componentName, location, propFullName) {
+      for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
+        var checker = arrayOfTypeCheckers[i];
+        if (checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret) == null) {
+          return null;
+        }
+      }
+
+      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` supplied to ' + ('`' + componentName + '`.'));
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createNodeChecker() {
+    function validate(props, propName, componentName, location, propFullName) {
+      if (!isNode(props[propName])) {
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` supplied to ' + ('`' + componentName + '`, expected a ReactNode.'));
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createShapeTypeChecker(shapeTypes) {
+    function validate(props, propName, componentName, location, propFullName) {
+      var propValue = props[propName];
+      var propType = getPropType(propValue);
+      if (propType !== 'object') {
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type `' + propType + '` ' + ('supplied to `' + componentName + '`, expected `object`.'));
+      }
+      for (var key in shapeTypes) {
+        var checker = shapeTypes[key];
+        if (!checker) {
+          continue;
+        }
+        var error = checker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
+        if (error) {
+          return error;
+        }
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
+  function createStrictShapeTypeChecker(shapeTypes) {
+    function validate(props, propName, componentName, location, propFullName) {
+      var propValue = props[propName];
+      var propType = getPropType(propValue);
+      if (propType !== 'object') {
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type `' + propType + '` ' + ('supplied to `' + componentName + '`, expected `object`.'));
+      }
+      // We need to check all keys in case some are required but missing from
+      // props.
+      var allKeys = assign({}, props[propName], shapeTypes);
+      for (var key in allKeys) {
+        var checker = shapeTypes[key];
+        if (!checker) {
+          return new PropTypeError(
+            'Invalid ' + location + ' `' + propFullName + '` key `' + key + '` supplied to `' + componentName + '`.' +
+            '\nBad object: ' + JSON.stringify(props[propName], null, '  ') +
+            '\nValid keys: ' +  JSON.stringify(Object.keys(shapeTypes), null, '  ')
+          );
+        }
+        var error = checker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
+        if (error) {
+          return error;
+        }
+      }
+      return null;
+    }
+
+    return createChainableTypeChecker(validate);
+  }
+
+  function isNode(propValue) {
+    switch (typeof propValue) {
+      case 'number':
+      case 'string':
+      case 'undefined':
+        return true;
+      case 'boolean':
+        return !propValue;
+      case 'object':
+        if (Array.isArray(propValue)) {
+          return propValue.every(isNode);
+        }
+        if (propValue === null || isValidElement(propValue)) {
+          return true;
+        }
+
+        var iteratorFn = getIteratorFn(propValue);
+        if (iteratorFn) {
+          var iterator = iteratorFn.call(propValue);
+          var step;
+          if (iteratorFn !== propValue.entries) {
+            while (!(step = iterator.next()).done) {
+              if (!isNode(step.value)) {
+                return false;
+              }
+            }
+          } else {
+            // Iterator will provide entry [k,v] tuples rather than values.
+            while (!(step = iterator.next()).done) {
+              var entry = step.value;
+              if (entry) {
+                if (!isNode(entry[1])) {
+                  return false;
+                }
+              }
+            }
+          }
+        } else {
+          return false;
+        }
+
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  function isSymbol(propType, propValue) {
+    // Native Symbol.
+    if (propType === 'symbol') {
+      return true;
+    }
+
+    // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
+    if (propValue['@@toStringTag'] === 'Symbol') {
+      return true;
+    }
+
+    // Fallback for non-spec compliant Symbols which are polyfilled.
+    if (typeof Symbol === 'function' && propValue instanceof Symbol) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // Equivalent of `typeof` but with special handling for array and regexp.
+  function getPropType(propValue) {
+    var propType = typeof propValue;
+    if (Array.isArray(propValue)) {
+      return 'array';
+    }
+    if (propValue instanceof RegExp) {
+      // Old webkits (at least until Android 4.0) return 'function' rather than
+      // 'object' for typeof a RegExp. We'll normalize this here so that /bla/
+      // passes PropTypes.object.
+      return 'object';
+    }
+    if (isSymbol(propType, propValue)) {
+      return 'symbol';
+    }
+    return propType;
+  }
+
+  // This handles more types than `getPropType`. Only used for error messages.
+  // See `createPrimitiveTypeChecker`.
+  function getPreciseType(propValue) {
+    if (typeof propValue === 'undefined' || propValue === null) {
+      return '' + propValue;
+    }
+    var propType = getPropType(propValue);
+    if (propType === 'object') {
+      if (propValue instanceof Date) {
+        return 'date';
+      } else if (propValue instanceof RegExp) {
+        return 'regexp';
+      }
+    }
+    return propType;
+  }
+
+  // Returns a string that is postfixed to a warning about an invalid type.
+  // For example, "undefined" or "of type array"
+  function getPostfixForTypeWarning(value) {
+    var type = getPreciseType(value);
+    switch (type) {
+      case 'array':
+      case 'object':
+        return 'an ' + type;
+      case 'boolean':
+      case 'date':
+      case 'regexp':
+        return 'a ' + type;
+      default:
+        return type;
+    }
+  }
+
+  // Returns class name of the object, if any.
+  function getClassName(propValue) {
+    if (!propValue.constructor || !propValue.constructor.name) {
+      return ANONYMOUS;
+    }
+    return propValue.constructor.name;
+  }
+
+  ReactPropTypes.checkPropTypes = checkPropTypes;
+  ReactPropTypes.PropTypes = ReactPropTypes;
+
+  return ReactPropTypes;
+};
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+
+/* eslint-disable no-unused-vars */
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (err) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+
+
+if (process.env.NODE_ENV !== 'production') {
+  var invariant = __webpack_require__(2);
+  var warning = __webpack_require__(4);
+  var ReactPropTypesSecret = __webpack_require__(3);
+  var loggedTypeFailures = {};
+}
+
+/**
+ * Assert that the values match with the type specs.
+ * Error messages are memorized and will only be shown once.
+ *
+ * @param {object} typeSpecs Map of name to a ReactPropType
+ * @param {object} values Runtime values that need to be type-checked
+ * @param {string} location e.g. "prop", "context", "child context"
+ * @param {string} componentName Name of the component for error messages.
+ * @param {?Function} getStack Returns the component stack.
+ * @private
+ */
+function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
+  if (process.env.NODE_ENV !== 'production') {
+    for (var typeSpecName in typeSpecs) {
+      if (typeSpecs.hasOwnProperty(typeSpecName)) {
+        var error;
+        // Prop type validation may throw. In case they do, we don't want to
+        // fail the render phase where it didn't fail before. So we log it.
+        // After these have been cleaned up, we'll let them throw.
+        try {
+          // This is intentionally an invariant that gets caught. It's the same
+          // behavior as without this statement except with a better message.
+          invariant(typeof typeSpecs[typeSpecName] === 'function', '%s: %s type `%s` is invalid; it must be a function, usually from ' + 'the `prop-types` package, but received `%s`.', componentName || 'React class', location, typeSpecName, typeof typeSpecs[typeSpecName]);
+          error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
+        } catch (ex) {
+          error = ex;
+        }
+        warning(!error || error instanceof Error, '%s: type specification of %s `%s` is invalid; the type checker ' + 'function must return `null` or an `Error` but returned a %s. ' + 'You may have forgotten to pass an argument to the type checker ' + 'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' + 'shape all require an argument).', componentName || 'React class', location, typeSpecName, typeof error);
+        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
+          // Only monitor this failure once because there tends to be a lot of the
+          // same error.
+          loggedTypeFailures[error.message] = true;
+
+          var stack = getStack ? getStack() : '';
+
+          warning(false, 'Failed %s type: %s%s', location, error.message, stack != null ? stack : '');
+        }
+      }
+    }
+  }
+}
+
+module.exports = checkPropTypes;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+
+
+var emptyFunction = __webpack_require__(1);
+var invariant = __webpack_require__(2);
+var ReactPropTypesSecret = __webpack_require__(3);
+
+module.exports = function() {
+  function shim(props, propName, componentName, location, propFullName, secret) {
+    if (secret === ReactPropTypesSecret) {
+      // It is still safe when called from React.
+      return;
+    }
+    invariant(
+      false,
+      'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
+      'Use PropTypes.checkPropTypes() to call them. ' +
+      'Read more at http://fb.me/use-check-prop-types'
+    );
+  };
+  shim.isRequired = shim;
+  function getShim() {
+    return shim;
+  };
+  // Important!
+  // Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
+  var ReactPropTypes = {
+    array: shim,
+    bool: shim,
+    func: shim,
+    number: shim,
+    object: shim,
+    string: shim,
+    symbol: shim,
+
+    any: shim,
+    arrayOf: getShim,
+    element: shim,
+    instanceOf: getShim,
+    node: shim,
+    objectOf: getShim,
+    oneOf: getShim,
+    oneOfType: getShim,
+    shape: getShim,
+    exact: getShim
+  };
+
+  ReactPropTypes.checkPropTypes = emptyFunction;
+  ReactPropTypes.PropTypes = ReactPropTypes;
+
+  return ReactPropTypes;
+};
+
+
+/***/ })
+/******/ ]);
+});
