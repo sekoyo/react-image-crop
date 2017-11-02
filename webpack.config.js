@@ -8,7 +8,7 @@ function getConfig(minified) {
       path: path.resolve('dist'),
       library: 'ReactCrop',
       libraryTarget: 'umd',
-      filename: minified ? 'ReactCrop.js' : 'ReactCrop.min.js',
+      filename: minified ? 'ReactCrop.min.js' : 'ReactCrop.js',
     },
     target: 'web',
     externals: {
