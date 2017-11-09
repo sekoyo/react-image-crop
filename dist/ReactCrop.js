@@ -580,8 +580,8 @@ var ReactCrop = function (_PureComponent) {
 
       var clientPos = getClientPos(e);
 
-      // Focus for detecting keypress.
-      _this.componentRef.focus();
+      // Focus for detecting keypress. FIXME: removed focus since it scrolls our focused element
+      // this.componentRef.focus();
 
       var ord = e.target.dataset.ord;
       var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
@@ -633,8 +633,8 @@ var ReactCrop = function (_PureComponent) {
 
       var clientPos = getClientPos(e);
 
-      // Focus for detecting keypress.
-      _this.componentRef.focus();
+      // Focus for detecting keypress. FIXME: removed focus since it scrolls our focused element
+      // this.componentRef.focus();
 
       var imageOffset = getElementOffset(_this.imageRef);
       var xPc = (clientPos.x - imageOffset.left) / _this.imageRef.width * 100;
@@ -695,10 +695,17 @@ var ReactCrop = function (_PureComponent) {
         clientPos.y = _this.straightenYPath(clientPos.x);
       }
 
-      var xDiffPx = clientPos.x - evData.clientStartX;
+      var _this$props4 = _this.props,
+          rotation = _this$props4.rotation,
+          isFlipped = _this$props4.isFlipped;
+
+      var factor = rotation < 90 || rotation > 270 ? 1 : -1;
+      var flippedFactor = isFlipped ? factor * -1 : factor;
+
+      var xDiffPx = flippedFactor * (clientPos.x - evData.clientStartX);
       evData.xDiffPc = xDiffPx / _this.imageRef.width * 100;
 
-      var yDiffPx = clientPos.y - evData.clientStartY;
+      var yDiffPx = factor * (clientPos.y - evData.clientStartY);
       evData.yDiffPc = yDiffPx / _this.imageRef.height * 100;
 
       var nextCrop = void 0;
@@ -711,11 +718,12 @@ var ReactCrop = function (_PureComponent) {
 
       onChange(nextCrop, _this.getPixelCrop(nextCrop));
     }, _this.onComponentKeyDown = function (e) {
-      var _this$props4 = _this.props,
-          crop = _this$props4.crop,
-          disabled = _this$props4.disabled,
-          onChange = _this$props4.onChange,
-          onComplete = _this$props4.onComplete;
+      var _this$props5 = _this.props,
+          crop = _this$props5.crop,
+          disabled = _this$props5.disabled,
+          onChange = _this$props5.onChange,
+          onComplete = _this$props5.onComplete,
+          isFlipped = _this$props5.isFlipped;
 
 
       if (disabled) {
@@ -732,10 +740,10 @@ var ReactCrop = function (_PureComponent) {
       var nextCrop = _this.makeNewCrop();
 
       if (keyCode === ReactCrop.arrowKey.left) {
-        nextCrop.x -= ReactCrop.nudgeStep;
+        isFlipped ? nextCrop.x += ReactCrop.nudgeStep : nextCrop.x -= ReactCrop.nudgeStep;
         nudged = true;
       } else if (keyCode === ReactCrop.arrowKey.right) {
-        nextCrop.x += ReactCrop.nudgeStep;
+        isFlipped ? nextCrop.x -= ReactCrop.nudgeStep : nextCrop.x += ReactCrop.nudgeStep;
         nudged = true;
       } else if (keyCode === ReactCrop.arrowKey.up) {
         nextCrop.y -= ReactCrop.nudgeStep;
@@ -754,11 +762,11 @@ var ReactCrop = function (_PureComponent) {
         onComplete(nextCrop, _this.getPixelCrop(nextCrop));
       }
     }, _this.onDocMouseTouchEnd = function () {
-      var _this$props5 = _this.props,
-          crop = _this$props5.crop,
-          disabled = _this$props5.disabled,
-          onComplete = _this$props5.onComplete,
-          onDragEnd = _this$props5.onDragEnd;
+      var _this$props6 = _this.props,
+          crop = _this$props6.crop,
+          disabled = _this$props6.disabled,
+          onComplete = _this$props6.onComplete,
+          onDragEnd = _this$props6.onDragEnd;
 
 
       onDragEnd();
@@ -1198,6 +1206,8 @@ ReactCrop.propTypes = {
   onDragEnd: _propTypes2.default.func,
   disabled: _propTypes2.default.bool,
   crossorigin: _propTypes2.default.string,
+  rotation: _propTypes2.default.number,
+  isFlipped: _propTypes2.default.bool,
   children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node])
 };
 
@@ -1211,6 +1221,8 @@ ReactCrop.defaultProps = {
   minWidth: 0,
   minHeight: 0,
   keepSelection: false,
+  rotation: 0,
+  isFlipped: false,
   onComplete: function onComplete() {},
   onImageLoaded: function onImageLoaded() {},
   onDragStart: function onDragStart() {},
