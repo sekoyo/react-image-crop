@@ -31,6 +31,23 @@ import ReactCrop from 'react-image-crop';
 
 Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
+```js
+import 'react-image-crop/dist/ReactCrop.css';
+// or scss:
+import 'react-image-crop/lib/ReactCrop.scss';
+```
+
+## CDN
+
+If you prefer to include ReactCrop globally by marking `react-image-crop` as external in your application, then include `react-image-crop` from one of the following CDNs:
+
+* **cdnjs** *(Coming soon)*
+
+* [**unpkg**](https://unpkg.com/react-image-crop/)
+```html
+<script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
+```
+
 ## Props
 
 #### src (required)
@@ -45,7 +62,7 @@ You can of course pass a blob path or base64 data.
 
 All crop values are in percentages, and are relative to the image. All crop params are optional.
 
-```jsx
+```js
 var crop = {
   x: 20,
   y: 10,
@@ -56,18 +73,15 @@ var crop = {
 <ReactCrop src="path/to/image.jpg" crop={crop} />
 ```
 
-If you want a fixed aspect you only need to specify a width *or* a height:
+If you want a fixed aspect can either omit `width` and `height`:
 
- ```jsx
+ ```js
 var crop = {
-  width: 30,
   aspect: 16/9
 }
 ```
 
-..Or you can omit both and only specify the aspect.
-
-Please note that the values will be adjusted if the cropping area is outside of the image boundaries.
+Or you need to specify both. As ReactCrop is based on percentages you will need to know the ratio of the image. If you don't, see [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for how to set your crop in there.
 
 #### minWidth (optional)
 
@@ -93,29 +107,44 @@ If true is passed then selection can't be disabled if the user clicks outside th
 
 If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-#### onChange(crop, pixelCrop) (optional)
+#### onChange(crop, pixelCrop)
 
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience. This callback is not called on the load even if the crop was adjusted.
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+**Note you _must_ implement this callback** and update your crop state, otherwise nothing will change!
+
+```js
+onChange = (crop) => {
+  this.setState({ crop });
+}
+```
 
 #### onComplete(crop, pixelCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+#### onImageLoaded(image) (optional)
 
-#### onImageLoaded(crop, image, pixelCrop) (optional)
+A callback which happens when the image is loaded. Passes the image DOM element.
 
-A callback which happens when the image is loaded. Passes the current crop state object and the image DOM element, as well as a pixel-converted crop for your convenience. If the crop was adjusted during the load, this callback gives you the adjusted crop.
+*Note* you should set your crop here if you're using `crop.aspect` along with a width _or_ height. Since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio.
 
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+```js
+import ReactCrop, { makeAspectCrop } from 'react-image-crop';
 
-#### onAspectRatioChange(crop, pixelCrop) (optional)
+onImageLoaded = (image) => {
+  this.setState({
+    crop: makeAspectCrop({
+      x: 0,
+      y: 0,
+      aspect: 16 / 9,
+      width: 50,
+    }, image.width / image.height),
+  });
+}
+```
 
-A callback which happens when the new aspect ratio is passed to the component. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
-
-*Note* that when setting state in a callback you must also ensure that you set the new crop state, otherwise your component will re-render with whatever crop state was initially set.
+Of course if you already know the image ratio (or you're just specifying the aspect) you can set the crop earlier.
 
 #### onDragStart() (optional)
 
@@ -127,25 +156,62 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 #### crossorigin (optional)
 
-Allows setting the crossorigin attribute used for the img tags.
+Allows setting the crossorigin attribute on the image.
 
 ## What about showing the crop on the client?
+I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend.
 
-I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend. However here are some tips for client-side crop previews:
+However here's a ready to use function that returns a file blob for the cropped part after providing some parameters you already have when you use this package:
 
-- You can fake a crop in pure CSS, but in order to do this you need to know the maximum width & height of the crop preview and then perform the calc again if the container size changes (since this technique is only possible using pixels). It's advantage is that it's instantaneous:
+```js
+/**
+ * @param {File} image - Image File Object
+ * @param {Object} pixelCrop - pixelCrop Object provided by react-image-crop
+ * @param {String} fileName - Name of the returned file in Promise
+ */
+function getCroppedImg(image, pixelCrop, fileName) {
 
-[Example gist](https://gist.github.com/DominicTobias/6aa43d03bc12232ef723)
+  const canvas = document.createElement('canvas');
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+  const ctx = canvas.getContext('2d');
 
-- The other technique is to map the cropped image to a canvas, and then get the base64 of the canvas via [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) and set this as an image source. The advantage is that the preview behaves like a proper image and is responsive. Now this is important:
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  // As Base64 string
+  // const base64Image = canvas.toDataURL('image/jpeg');
+
+  // As a blob
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(file => {
+      file.name = fileName;
+      resolve(file);
+    }, 'image/jpeg');
+  });
+}
+
+async test() {
+  const croppedImg = await getCroppedImg(image, pixelCrop, returnedFileName);
+}
+```
+
+Some things to note:
 
 1. [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. *Always* use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
 
-2. Keep an eye out for [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob) when this lands on more browsers, as it will be both faster and asynchronous.
+2. [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob) is both faster and asynchronous, but not supported on old browsers (this is quickly becoming irrelevant).
 
-3. Another option to make the conversion faster is to scale the image down before converting it to a base64 (see example in gist).
-
-[Example gist](https://gist.github.com/DominicTobias/b1fb501349893922ec7f)
+3. Another option to make the conversion faster is to scale the image down before converting it.
 
 ## Contributing / Developing
 
@@ -153,4 +219,4 @@ To develop run `npm start`, this will recompile your JS and SCSS on changes.
 
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
 
-When you are happy with your changes you can build to dist with `npm run release`.
+You don't need to run the `npm run release` step, this is only for publishing to NPM.

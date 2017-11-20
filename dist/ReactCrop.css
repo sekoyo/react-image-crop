@@ -3,26 +3,17 @@
   display: inline-block;
   cursor: crosshair;
   overflow: hidden;
-  max-width: 100%; }
-  .ReactCrop--disabled {
-    cursor: inherit; }
+  max-width: 100%;
+  background-color: #000; }
   .ReactCrop:focus {
     outline: none; }
+  .ReactCrop--disabled {
+    cursor: inherit; }
   .ReactCrop__image {
     display: block;
     max-width: 100%; }
-  .ReactCrop__image-copy {
-    position: absolute;
-    top: 0;
-    left: 0;
-    max-width: 100%; }
-  .ReactCrop__crop-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.6); }
+  .ReactCrop--crop-invisible .ReactCrop__image {
+    opacity: 0.5; }
   .ReactCrop__crop-selection {
     position: absolute;
     top: 0;

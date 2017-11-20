@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+/* globals document, FileReader */
+import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
-import ReactCrop from '../lib/ReactCrop';
+import ReactCrop, { makeAspectCrop } from '../lib/ReactCrop';
 
 /**
  * Load the image in the crop editor.
@@ -8,49 +9,61 @@ import ReactCrop from '../lib/ReactCrop';
 const cropEditor = document.querySelector('#crop-editor');
 
 function loadEditView(dataUrl) {
-  class Parent extends Component {
-    constructor() {
-      super();
-      this.state = {
-        crop: {
-          x: 0,
-          y: 0,
-        },
-        maxHeight: 80,
-      };
-      this.onButtonClick = this.onButtonClick.bind(this);
+  class Parent extends PureComponent {
+    state = {
+      crop: {
+        x: 0,
+        y: 0,
+        // aspect: 16 / 9,
+      },
+      maxHeight: 80,
     }
 
-    onButtonClick() {
+    onButtonClick = () => {
+      const { image } = this.state;
       this.setState({
-        crop: {
+        crop: makeAspectCrop({
           x: 20,
           y: 5,
           aspect: 1,
-          width: 30,
           height: 50,
-        },
+        }, image.naturalWidth / image.naturalHeight),
+        disabled: false,
       });
     }
 
-    onImageLoaded(crop) {
-      console.log('Image was loaded. Crop:', crop);
-      // this.setState({
-      //  crop: {
-      //    aspect: 16/9,
-      //    width: 30,
-      //  }
-      // });
+    onButtonClick2 = () => {
+      const { image } = this.state;
+      this.setState({
+        crop: makeAspectCrop({
+          x: 20,
+          y: 5,
+          aspect: 16 / 9,
+          height: 20,
+        }, image.naturalWidth / image.naturalHeight),
+        disabled: true,
+      });
     }
 
-    onCropComplete(crop) {
-      console.log('Crop move complete:', crop);
-      this.setState({ hello: Date.now(), crop });
+    onImageLoaded = (image) => {
+      this.setState({
+        crop: makeAspectCrop({
+          x: 0,
+          y: 0,
+          aspect: 10 / 4,
+          width: 50,
+        }, image.naturalWidth / image.naturalHeight),
+        image,
+      });
     }
 
-    // onCropChange: function(crop) {
-    //  console.log('Crop change');
-    // },
+    onCropComplete = (crop, pixelCrop) => {
+      console.log('onCropComplete, pixelCrop:', pixelCrop);
+    }
+
+    onCropChange = (crop) => {
+      this.setState({ crop });
+    }
 
     render() {
       return (
@@ -58,13 +71,12 @@ function loadEditView(dataUrl) {
           <ReactCrop
             {...this.state}
             src={dataUrl}
-            onImageLoaded={crop => this.onImageLoaded(crop)}
-            onComplete={crop => this.onCropComplete(crop)}
-            // onAspectRatioChange={() => console.log('onAspectRatioChange')}
-            // onChange={this.onCropChange}
+            onImageLoaded={this.onImageLoaded}
+            onComplete={this.onCropComplete}
+            onChange={this.onCropChange}
           />
           <button onClick={this.onButtonClick}>Programatically set crop</button>
-          <button onClick={() => { this.setState({ foo: Date.now() }); }}>Change foo state</button>
+          <button onClick={this.onButtonClick2}>Programatically set crop 2</button>
         </div>
       );
     }
