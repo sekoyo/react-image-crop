@@ -17,6 +17,7 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
   overflow: hidden;
   max-width: 100%;
   background-color: #000;
+  touch-action: none;
 
   &:focus {
     outline: none;
