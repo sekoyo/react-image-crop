@@ -60,7 +60,7 @@ You can of course pass a blob path or base64 data.
 
 #### crop (optional)
 
-All crop values are in percentages, and are relative to the image. All crop params are optional.
+All crop values are in percentages, and are relative to the image. All crop params are optional. However while you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and set here.
 
 ```js
 var crop = {
@@ -82,8 +82,6 @@ var crop = {
 ```
 
 Or you need to specify both. As ReactCrop is based on percentages you will need to know the ratio of the image. If you don't, see [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for how to set your crop in there.
-
-While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and set here.
 
 #### minWidth (optional)
 
