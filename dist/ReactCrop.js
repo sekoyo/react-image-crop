@@ -552,6 +552,56 @@ function makeAspectCrop(crop, imageAspect) {
   return completeCrop;
 }
 
+function containCrop(crop, imageAspect) {
+  var contained = _extends({}, crop);
+
+  // Don't let the crop grow on the opposite side when hitting an x image boundary.
+  var cropXAdjusted = false;
+  if (contained.x + contained.width > 100) {
+    contained.width = crop.width + (100 - (crop.x + crop.width));
+    contained.x = crop.x + (100 - (crop.x + contained.width));
+    cropXAdjusted = true;
+  } else if (contained.x < 0) {
+    contained.width = crop.x + crop.width;
+    contained.x = 0;
+    cropXAdjusted = true;
+  }
+
+  if (cropXAdjusted && crop.aspect) {
+    // Adjust height to the resized width to maintain aspect.
+    contained.height = contained.width / crop.aspect * imageAspect;
+    // If sizing in up direction we need to pin Y at the point it
+    // would be at the boundary.
+    if (contained.y < crop.y) {
+      contained.y = crop.y + (crop.height - contained.height);
+    }
+  }
+
+  // Don't let the crop grow on the opposite side when hitting a y image boundary.
+  var cropYAdjusted = false;
+  if (contained.y + contained.height > 100) {
+    contained.height = crop.height + (100 - (crop.y + crop.height));
+    contained.y = crop.y + (100 - (crop.y + contained.height));
+    cropYAdjusted = true;
+  } else if (contained.y < 0) {
+    contained.height = crop.y + crop.height;
+    contained.y = 0;
+    cropYAdjusted = true;
+  }
+
+  if (cropYAdjusted && crop.aspect) {
+    // Adjust width to the resized height to maintain aspect.
+    contained.width = contained.height * crop.aspect / imageAspect;
+    // If sizing in up direction we need to pin X at the point it
+    // would be at the boundary.
+    if (contained.x < crop.x) {
+      contained.x = crop.x + (crop.width - contained.width);
+    }
+  }
+
+  return contained;
+}
+
 var ReactCrop = function (_PureComponent) {
   _inherits(ReactCrop, _PureComponent);
 
@@ -936,62 +986,26 @@ var ReactCrop = function (_PureComponent) {
         }
       }
 
-      // Don't let the crop grow on the opposite side when hitting an x image boundary.
-      var cropXAdjusted = false;
-      if (newX + newSize.width > 100) {
-        newSize.width = crop.width + (100 - (crop.x + crop.width));
-        newX = crop.x + (100 - (crop.x + newSize.width));
-        cropXAdjusted = true;
-      } else if (newX < 0) {
-        newSize.width = crop.x + crop.width;
-        newX = 0;
-        cropXAdjusted = true;
-      }
-
-      if (cropXAdjusted && crop.aspect) {
-        // Adjust height to the resized width to maintain aspect.
-        newSize.height = newSize.width / crop.aspect * imageAspect;
-        // If sizing in up direction we need to pin Y at the point it
-        // would be at the boundary.
-        if (newY < crop.y) {
-          newY = crop.y + (crop.height - newSize.height);
-        }
-      }
-
-      // Don't let the crop grow on the opposite side when hitting a y image boundary.
-      var cropYAdjusted = false;
-      if (newY + newSize.height > 100) {
-        newSize.height = crop.height + (100 - (crop.y + crop.height));
-        newY = crop.y + (100 - (crop.y + newSize.height));
-        cropYAdjusted = true;
-      } else if (newY < 0) {
-        newSize.height = crop.y + crop.height;
-        newY = 0;
-        cropYAdjusted = true;
-      }
-
-      if (cropYAdjusted && crop.aspect) {
-        // Adjust width to the resized height to maintain aspect.
-        newSize.width = newSize.height * crop.aspect / imageAspect;
-        // If sizing in up direction we need to pin X at the point it
-        // would be at the boundary.
-        if (newX < crop.x) {
-          newX = crop.x + (crop.width - newSize.width);
-        }
-      }
+      var containedCrop = containCrop({
+        x: newX,
+        y: newY,
+        width: newSize.width,
+        height: newSize.height,
+        aspect: nextCrop.aspect
+      }, imageAspect);
 
       // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
       if (nextCrop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
-        nextCrop.x = newX;
-        nextCrop.y = newY;
-        nextCrop.width = newSize.width;
-        nextCrop.height = newSize.height;
+        nextCrop.x = containedCrop.x;
+        nextCrop.y = containedCrop.y;
+        nextCrop.width = containedCrop.width;
+        nextCrop.height = containedCrop.height;
       } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
-        nextCrop.x = newX;
-        nextCrop.width = newSize.width;
+        nextCrop.x = containedCrop.x;
+        nextCrop.width = containedCrop.width;
       } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
-        nextCrop.y = newY;
-        nextCrop.height = newSize.height;
+        nextCrop.y = containedCrop.y;
+        nextCrop.height = containedCrop.height;
       }
 
       evData.lastYCrossover = evData.yCrossOver;
@@ -1092,7 +1106,9 @@ var ReactCrop = function (_PureComponent) {
           crop = _props2.crop,
           disabled = _props2.disabled,
           imageAlt = _props2.imageAlt,
-          src = _props2.src;
+          src = _props2.src,
+          style = _props2.style,
+          imageStyle = _props2.imageStyle;
       var cropIsActive = this.state.cropIsActive;
 
       var cropSelection = void 0;
@@ -1130,6 +1146,7 @@ var ReactCrop = function (_PureComponent) {
             _this3.componentRef = n;
           },
           className: componentClasses.join(' '),
+          style: style,
           onTouchStart: this.onComponentMouseTouchDown,
           onMouseDown: this.onComponentMouseTouchDown,
           tabIndex: '1',
@@ -1141,6 +1158,7 @@ var ReactCrop = function (_PureComponent) {
           },
           crossOrigin: crossorigin,
           className: 'ReactCrop__image',
+          style: imageStyle,
           src: src,
           onLoad: function onLoad(e) {
             return _this3.onImageLoad(e.target);
@@ -1198,7 +1216,9 @@ ReactCrop.propTypes = {
   onDragEnd: _propTypes2.default.func,
   disabled: _propTypes2.default.bool,
   crossorigin: _propTypes2.default.string,
-  children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node])
+  children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node]),
+  style: _propTypes2.default.object,
+  imageStyle: _propTypes2.default.object
 };
 
 ReactCrop.defaultProps = {
@@ -1215,11 +1235,14 @@ ReactCrop.defaultProps = {
   onImageLoaded: function onImageLoaded() {},
   onDragStart: function onDragStart() {},
   onDragEnd: function onDragEnd() {},
-  children: undefined
+  children: undefined,
+  style: undefined,
+  imageStyle: undefined
 };
 
 module.exports = ReactCrop;
 module.exports.makeAspectCrop = makeAspectCrop;
+module.exports.containCrop = containCrop;
 
 /***/ }),
 /* 6 */
