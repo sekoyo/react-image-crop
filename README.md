@@ -115,7 +115,7 @@ Inline styles object to be passed to the image wrapper element.
 
 Inline styles object to be passed to the image element.
 
-#### onChange(crop, pixelCrop)
+#### onChange(crop, pixelCrop) (required)
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
