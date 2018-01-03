@@ -58,26 +58,32 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 
 You can of course pass a blob path or base64 data.
 
-#### crop (optional)
+#### crop (optional*)
 
-All crop values are in percentages, and are relative to the image. All crop params are optional. However while you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and set here.
+All crop values are in percentages, and are relative to the image. All crop params are optional.
+
+*optional: While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and passed here.
 
 ```js
-var crop = {
-  x: 20,
-  y: 10,
-  width: 30,
-  height: 10
+state = {
+  crop: {
+    x: 20,
+    y: 10,
+    width: 30,
+    height: 10
+  }
 }
 
-<ReactCrop src="path/to/image.jpg" crop={crop} />
+<ReactCrop src="path/to/image.jpg" crop={this.state.crop} />
 ```
 
 If you want a fixed aspect can either omit `width` and `height`:
 
  ```js
-var crop = {
-  aspect: 16/9
+state = {
+  crop: {
+    aspect: 16/9
+  }
 }
 ```
 
