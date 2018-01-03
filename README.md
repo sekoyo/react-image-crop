@@ -77,13 +77,11 @@ All crop values are in percentages, and are relative to the image. All crop para
 *optional: While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and passed here.
 
 ```js
-state = {
-  crop: {
-    x: 20,
-    y: 10,
-    width: 30,
-    height: 10
-  }
+crop: {
+  x: 20,
+  y: 10,
+  width: 30,
+  height: 10
 }
 
 <ReactCrop src="path/to/image.jpg" crop={this.state.crop} />
@@ -92,10 +90,8 @@ state = {
 If you want a fixed aspect can either omit `width` and `height`:
 
  ```js
-state = {
-  crop: {
-    aspect: 16/9
-  }
+crop: {
+  aspect: 16/9
 }
 ```
 
