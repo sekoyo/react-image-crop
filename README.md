@@ -58,6 +58,18 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 
 You can of course pass a blob path or base64 data.
 
+#### onChange(crop, pixelCrop) (required)
+
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
+
+**Note you _must_ implement this callback** and update your crop state, otherwise nothing will change!
+
+```js
+onChange = (crop) => {
+  this.setState({ crop });
+}
+```
+
 #### crop (optional*)
 
 All crop values are in percentages, and are relative to the image. All crop params are optional.
@@ -120,18 +132,6 @@ Inline styles object to be passed to the image wrapper element.
 #### imageStyle (optional)
 
 Inline styles object to be passed to the image element.
-
-#### onChange(crop, pixelCrop) (required)
-
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
-
-**Note you _must_ implement this callback** and update your crop state, otherwise nothing will change!
-
-```js
-onChange = (crop) => {
-  this.setState({ crop });
-}
-```
 
 #### onComplete(crop, pixelCrop) (optional)
 
