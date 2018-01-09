@@ -1,14 +1,14 @@
-$drag-handle-width: 9px;
-$drag-handle-height: 9px;
-$drag-handle-background-colour: rgba(0,0,0,0.2);
-$drag-handle-border: 1px solid rgba(255,255,255,0.7);
+$drag-handle-width: 9px !default;
+$drag-handle-height: 9px !default;
+$drag-handle-background-colour: rgba(0,0,0,0.2) !default;
+$drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
 
-$drag-bar-size: 6px;
+$drag-bar-size: 6px !default;
 
-$mobile-max-width: 768px;
-$drag-handle-mobile-width: $drag-handle-width + 8;
-$drag-handle-mobile-height: $drag-handle-height + 8;
-$drag-bar-mobile-size: $drag-bar-size + 8;
+$mobile-max-width: 768px !default;
+$drag-handle-mobile-width: $drag-handle-width + 8 !default;
+$drag-handle-mobile-height: $drag-handle-height + 8 !default;
+$drag-bar-mobile-size: $drag-bar-size + 8 !default;
 
 .ReactCrop {
   position: relative;
