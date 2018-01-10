@@ -93,25 +93,25 @@
       left: 0;
       width: 100%;
       height: 6px;
-      margin-top: -4px; }
+      margin-top: -3px; }
     .ReactCrop__drag-bar.ord-e {
       right: 0;
       top: 0;
       width: 6px;
       height: 100%;
-      margin-right: -4px; }
+      margin-right: -3px; }
     .ReactCrop__drag-bar.ord-s {
       bottom: 0;
       left: 0;
       width: 100%;
       height: 6px;
-      margin-bottom: -4px; }
+      margin-bottom: -3px; }
     .ReactCrop__drag-bar.ord-w {
       top: 0;
       left: 0;
       width: 6px;
       height: 100%;
-      margin-left: -4px; }
+      margin-left: -3px; }
   .ReactCrop--new-crop .ReactCrop__drag-bar,
   .ReactCrop--new-crop .ReactCrop__drag-handle,
   .ReactCrop--fixed-aspect .ReactCrop__drag-bar {
@@ -151,13 +151,13 @@
       margin-left: -9px; }
     .ReactCrop__drag-bar.ord-n {
       height: 14px;
-      margin-top: -12px; }
+      margin-top: -7px; }
     .ReactCrop__drag-bar.ord-e {
       width: 14px;
-      margin-right: -12px; }
+      margin-right: -7px; }
     .ReactCrop__drag-bar.ord-s {
       height: 14px;
-      margin-bottom: -12px; }
+      margin-bottom: -7px; }
     .ReactCrop__drag-bar.ord-w {
       width: 14px;
-      margin-left: -12px; } }
+      margin-left: -7px; } }
