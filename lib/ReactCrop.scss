@@ -1,14 +1,22 @@
+// SASS variables for normal drag handle and bar size.
+// Override in your scss file by setting these variables FIRST, then including this file.
 $drag-handle-width: 9px !default;
 $drag-handle-height: 9px !default;
-$drag-handle-background-colour: rgba(0,0,0,0.2) !default;
-$drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
-
 $drag-bar-size: 6px !default;
 
-$mobile-max-width: 768px !default;
+// Query to kick us into "mobile" mode with larger drag handles/bars.
+//  If you're supporting modern browsers, you can use "pointer: coarse",
+//  see: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
+$mobile-media-query: "max-width: 768px" !default;
+
+// Mobile handle/bar sizes.  Override as above.
 $drag-handle-mobile-width: $drag-handle-width + 8 !default;
 $drag-handle-mobile-height: $drag-handle-height + 8 !default;
 $drag-bar-mobile-size: $drag-bar-size + 8 !default;
+
+// Handle color/border.
+$drag-handle-background-colour: rgba(0,0,0,0.2) !default;
+$drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
 
 .ReactCrop {
   position: relative;
@@ -138,28 +146,28 @@ $drag-bar-mobile-size: $drag-bar-size + 8 !default;
       left: 0;
       width: 100%;
       height: $drag-bar-size;
-      margin-top: -($drag-bar-size - 2);
+      margin-top: -($drag-bar-size / 2);
     }
     &.ord-e {
       right: 0;
       top: 0;
       width: $drag-bar-size;
       height: 100%;
-      margin-right: -($drag-bar-size - 2);
+      margin-right: -($drag-bar-size / 2);
     }
     &.ord-s {
       bottom: 0;
       left: 0;
       width: 100%;
       height: $drag-bar-size;
-      margin-bottom: -($drag-bar-size - 2);
+      margin-bottom: -($drag-bar-size / 2);
     }
     &.ord-w {
       top: 0;
       left: 0;
       width: $drag-bar-size;
       height: 100%;
-      margin-left: -($drag-bar-size - 2);
+      margin-left: -($drag-bar-size / 2);
     }
   }
 
@@ -176,7 +184,7 @@ $drag-bar-mobile-size: $drag-bar-size + 8 !default;
     display: none;
   }
 
-  @media (max-width: $mobile-max-width) {
+  @media ($mobile-media-query) {
     &__drag-handle {
       width: $drag-handle-mobile-width;
       height: $drag-handle-mobile-height;
@@ -217,19 +225,19 @@ $drag-bar-mobile-size: $drag-bar-size + 8 !default;
 
     &__drag-bar.ord-n {
       height: $drag-bar-mobile-size;
-      margin-top: -($drag-bar-mobile-size - 2);
+      margin-top: -($drag-bar-mobile-size / 2);
     }
     &__drag-bar.ord-e {
       width: $drag-bar-mobile-size;
-      margin-right: -($drag-bar-mobile-size - 2);
+      margin-right: -($drag-bar-mobile-size / 2);
     }
     &__drag-bar.ord-s {
       height: $drag-bar-mobile-size;
-      margin-bottom: -($drag-bar-mobile-size - 2);
+      margin-bottom: -($drag-bar-mobile-size / 2);
     }
     &__drag-bar.ord-w {
       width: $drag-bar-mobile-size;
-      margin-left: -($drag-bar-mobile-size - 2);
+      margin-left: -($drag-bar-mobile-size / 2);
     }
   }
 }
