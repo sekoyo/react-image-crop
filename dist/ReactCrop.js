@@ -481,6 +481,18 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+// Feature detection
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
+var passiveSupported = false;
+
+try {
+  window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
+    get: function get() {
+      passiveSupported = true;return true;
+    }
+  }));
+} catch (err) {} // eslint-disable-line no-empty
+
 var EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 function getElementOffset(el) {
@@ -537,7 +549,7 @@ function makeAspectCrop(crop, imageAspect) {
     completeCrop.height = crop.width / crop.aspect * imageAspect;
   }
   if (crop.height) {
-    completeCrop.width = (completeCrop.height || crop.height) * crop.aspect / imageAspect;
+    completeCrop.width = (completeCrop.height || crop.height) * (crop.aspect / imageAspect);
   }
 
   if (crop.y + (completeCrop.height || crop.height) > 100) {
@@ -635,6 +647,7 @@ var ReactCrop = function (_PureComponent) {
       _this.componentRef.focus();
 
       var ord = e.target.dataset.ord;
+
       var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
       var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
 
@@ -739,7 +752,9 @@ var ReactCrop = function (_PureComponent) {
 
       e.preventDefault(); // Stop drag selection.
 
-      var evData = _this.evData;
+      var _this2 = _this,
+          evData = _this2.evData;
+
       var clientPos = getClientPos(e);
 
       if (evData.isResize && crop.aspect && evData.cropOffset) {
@@ -830,12 +845,14 @@ var ReactCrop = function (_PureComponent) {
   _createClass(ReactCrop, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      document.addEventListener('mousemove', this.onDocMouseTouchMove);
-      document.addEventListener('touchmove', this.onDocMouseTouchMove);
+      var options = passiveSupported ? { passive: false } : false;
 
-      document.addEventListener('mouseup', this.onDocMouseTouchEnd);
-      document.addEventListener('touchend', this.onDocMouseTouchEnd);
-      document.addEventListener('touchcancel', this.onDocMouseTouchEnd);
+      document.addEventListener('mousemove', this.onDocMouseTouchMove, options);
+      document.addEventListener('touchmove', this.onDocMouseTouchMove, options);
+
+      document.addEventListener('mouseup', this.onDocMouseTouchEnd, options);
+      document.addEventListener('touchend', this.onDocMouseTouchEnd, options);
+      document.addEventListener('touchcancel', this.onDocMouseTouchEnd, options);
 
       if (this.imageRef.complete || this.imageRef.readyState) {
         if (this.imageRef.naturalWidth === 0) {
@@ -843,6 +860,7 @@ var ReactCrop = function (_PureComponent) {
           // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
           // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
           var src = this.imageRef.src;
+
           this.imageRef.src = EMPTY_GIF;
           this.imageRef.src = src;
         } else {
@@ -898,8 +916,8 @@ var ReactCrop = function (_PureComponent) {
           maxWidth = _props.maxWidth,
           minHeight = _props.minHeight,
           maxHeight = _props.maxHeight;
-
       var evData = this.evData;
+
       var imageAspect = this.imageRef.width / this.imageRef.height;
 
       // New width.
@@ -941,6 +959,7 @@ var ReactCrop = function (_PureComponent) {
     value: function dragCrop() {
       var nextCrop = this.makeNewCrop();
       var evData = this.evData;
+
       nextCrop.x = clamp(evData.cropStartX + evData.xDiffPc, 0, 100 - nextCrop.width);
       nextCrop.y = clamp(evData.cropStartY + evData.yDiffPc, 0, 100 - nextCrop.height);
       return nextCrop;
@@ -948,11 +967,10 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'resizeCrop',
     value: function resizeCrop() {
-      var crop = this.props.crop;
-
       var nextCrop = this.makeNewCrop();
       var evData = this.evData;
       var ord = evData.ord;
+
       var imageAspect = this.imageRef.width / this.imageRef.height;
 
       // On the inverse change the diff so it's the same and
@@ -1019,6 +1037,7 @@ var ReactCrop = function (_PureComponent) {
       var evData = this.evData;
       var ord = evData.ord;
       var cropOffset = evData.cropOffset;
+
       var cropStartWidth = evData.cropStartWidth / 100 * this.imageRef.width;
       var cropStartHeight = evData.cropStartHeight / 100 * this.imageRef.height;
       var k = void 0;
@@ -1037,7 +1056,7 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'createCropSelection',
     value: function createCropSelection() {
-      var _this2 = this;
+      var _this3 = this;
 
       var disabled = this.props.disabled;
 
@@ -1047,7 +1066,7 @@ var ReactCrop = function (_PureComponent) {
         'div',
         {
           ref: function ref(n) {
-            _this2.cropSelectRef = n;
+            _this3.cropSelectRef = n;
           },
           style: style,
           className: 'ReactCrop__crop-selection',
@@ -1082,6 +1101,7 @@ var ReactCrop = function (_PureComponent) {
     value: function crossOverCheck() {
       var evData = this.evData;
 
+
       if (!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc >= 0 || evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiffPc <= 0) {
         evData.xCrossOver = !evData.xCrossOver;
       }
@@ -1099,7 +1119,7 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       var _props2 = this.props,
           children = _props2.children,
@@ -1144,7 +1164,7 @@ var ReactCrop = function (_PureComponent) {
         'div',
         {
           ref: function ref(n) {
-            _this3.componentRef = n;
+            _this4.componentRef = n;
           },
           className: componentClasses.join(' '),
           style: style,
@@ -1155,14 +1175,14 @@ var ReactCrop = function (_PureComponent) {
         },
         _react2.default.createElement('img', {
           ref: function ref(n) {
-            _this3.imageRef = n;
+            _this4.imageRef = n;
           },
           crossOrigin: crossorigin,
           className: 'ReactCrop__image',
           style: imageStyle,
           src: src,
           onLoad: function onLoad(e) {
-            return _this3.onImageLoad(e.target);
+            return _this4.onImageLoad(e.target);
           },
           alt: imageAlt
         }),
@@ -1218,8 +1238,8 @@ ReactCrop.propTypes = {
   disabled: _propTypes2.default.bool,
   crossorigin: _propTypes2.default.string,
   children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node]),
-  style: _propTypes2.default.object,
-  imageStyle: _propTypes2.default.object
+  style: _propTypes2.default.shape({}),
+  imageStyle: _propTypes2.default.shape({})
 };
 
 ReactCrop.defaultProps = {
