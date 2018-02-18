@@ -228,5 +228,3 @@ Some things to note:
 To develop run `npm start`, this will recompile your JS and SCSS on changes.
 
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
-
-You don't need to run the `npm run release` step, this is only for publishing to NPM.
