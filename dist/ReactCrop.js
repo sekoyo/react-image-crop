@@ -565,6 +565,21 @@ function makeAspectCrop(crop, imageAspect) {
   return completeCrop;
 }
 
+function getPixelCrop(image, percentCrop) {
+  var x = Math.round(image.naturalWidth * (percentCrop.x / 100));
+  var y = Math.round(image.naturalHeight * (percentCrop.y / 100));
+  var width = Math.round(image.naturalWidth * (percentCrop.width / 100));
+  var height = Math.round(image.naturalHeight * (percentCrop.height / 100));
+
+  return {
+    x: x,
+    y: y,
+    // Clamp width and height so rounding doesn't cause the crop to exceed bounds.
+    width: clamp(width, 0, image.naturalWidth - x),
+    height: clamp(height, 0, image.naturalHeight - y)
+  };
+}
+
 function containCrop(crop, imageAspect) {
   var contained = _extends({}, crop);
 
@@ -730,7 +745,7 @@ var ReactCrop = function (_PureComponent) {
       };
 
       _this.mouseDownOnCrop = true;
-      onChange(nextCrop, _this.getPixelCrop(nextCrop));
+      onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
       _this.setState({ cropIsActive: true });
     }, _this.onDocMouseTouchMove = function (e) {
       var _this$props3 = _this.props,
@@ -775,7 +790,7 @@ var ReactCrop = function (_PureComponent) {
         nextCrop = _this.dragCrop();
       }
 
-      onChange(nextCrop, _this.getPixelCrop(nextCrop));
+      onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
     }, _this.onComponentKeyDown = function (e) {
       var _this$props4 = _this.props,
           crop = _this$props4.crop,
@@ -816,8 +831,8 @@ var ReactCrop = function (_PureComponent) {
         nextCrop.x = clamp(nextCrop.x, 0, 100 - nextCrop.width);
         nextCrop.y = clamp(nextCrop.y, 0, 100 - nextCrop.height);
 
-        onChange(nextCrop, _this.getPixelCrop(nextCrop));
-        onComplete(nextCrop, _this.getPixelCrop(nextCrop));
+        onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
+        onComplete(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
       }
     }, _this.onDocMouseTouchEnd = function () {
       var _this$props5 = _this.props,
@@ -836,7 +851,7 @@ var ReactCrop = function (_PureComponent) {
       if (_this.mouseDownOnCrop) {
         _this.mouseDownOnCrop = false;
 
-        onComplete(crop, _this.getPixelCrop(crop));
+        onComplete(crop, getPixelCrop(_this.imageRef, crop));
         _this.setState({ cropIsActive: false });
       }
     }, _temp), _possibleConstructorReturn(_this, _ret);
@@ -882,18 +897,6 @@ var ReactCrop = function (_PureComponent) {
     key: 'onImageLoad',
     value: function onImageLoad(image) {
       this.props.onImageLoaded(image);
-    }
-  }, {
-    key: 'getPixelCrop',
-    value: function getPixelCrop(crop) {
-      var imageRef = this.imageRef;
-
-      return {
-        x: Math.round(imageRef.naturalWidth * (crop.x / 100)),
-        y: Math.round(imageRef.naturalHeight * (crop.y / 100)),
-        width: Math.round(imageRef.naturalWidth * (crop.width / 100)),
-        height: Math.round(imageRef.naturalHeight * (crop.height / 100))
-      };
     }
   }, {
     key: 'getCropStyle',
@@ -1262,6 +1265,7 @@ ReactCrop.defaultProps = {
 };
 
 module.exports = ReactCrop;
+module.exports.getPixelCrop = getPixelCrop;
 module.exports.makeAspectCrop = makeAspectCrop;
 module.exports.containCrop = containCrop;
 
