@@ -124,6 +124,9 @@ If true then the user cannot modify or draw a new crop. A class of `ReactCrop--d
 #### style (optional)
 
 Inline styles object to be passed to the image wrapper element.
+#### delta (optional)
+
+If your item is inside a container that is scaled, you can add here the scaled size. Example, if the container has   a css like this: `transform: scale(0.5);` the delta value must be 0.5. *Default value is 1.*
 
 #### imageStyle (optional)
 
