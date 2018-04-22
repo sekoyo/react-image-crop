@@ -1061,7 +1061,9 @@ var ReactCrop = function (_PureComponent) {
     value: function createCropSelection() {
       var _this3 = this;
 
-      var disabled = this.props.disabled;
+      var _props2 = this.props,
+          disabled = _props2.disabled,
+          showCenter = _props2.showCenter;
 
       var style = this.getCropStyle();
 
@@ -1091,7 +1093,8 @@ var ReactCrop = function (_PureComponent) {
           _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-s', 'data-ord': 's' }),
           _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-sw', 'data-ord': 'sw' }),
           _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-w', 'data-ord': 'w' })
-        )
+        ),
+        !disabled && showCenter && _react2.default.createElement('div', { className: 'ReactCrop__center-point' })
       );
     }
   }, {
@@ -1124,15 +1127,15 @@ var ReactCrop = function (_PureComponent) {
     value: function render() {
       var _this4 = this;
 
-      var _props2 = this.props,
-          children = _props2.children,
-          crossorigin = _props2.crossorigin,
-          crop = _props2.crop,
-          disabled = _props2.disabled,
-          imageAlt = _props2.imageAlt,
-          src = _props2.src,
-          style = _props2.style,
-          imageStyle = _props2.imageStyle;
+      var _props3 = this.props,
+          children = _props3.children,
+          crossorigin = _props3.crossorigin,
+          crop = _props3.crop,
+          disabled = _props3.disabled,
+          imageAlt = _props3.imageAlt,
+          src = _props3.src,
+          style = _props3.style,
+          imageStyle = _props3.imageStyle;
       var cropIsActive = this.state.cropIsActive;
 
       var cropSelection = void 0;
@@ -1242,7 +1245,8 @@ ReactCrop.propTypes = {
   crossorigin: _propTypes2.default.string,
   children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node]),
   style: _propTypes2.default.shape({}),
-  imageStyle: _propTypes2.default.shape({})
+  imageStyle: _propTypes2.default.shape({}),
+  showCenter: _propTypes2.default.bool
 };
 
 ReactCrop.defaultProps = {
@@ -1261,7 +1265,8 @@ ReactCrop.defaultProps = {
   onDragEnd: function onDragEnd() {},
   children: undefined,
   style: undefined,
-  imageStyle: undefined
+  imageStyle: undefined,
+  showCenter: false
 };
 
 module.exports = ReactCrop;

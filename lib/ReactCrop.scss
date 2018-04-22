@@ -18,6 +18,10 @@ $drag-bar-mobile-size: $drag-bar-size + 8 !default;
 $drag-handle-background-colour: rgba(0,0,0,0.2) !default;
 $drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
 
+// Center point diameter/border
+$center-point-diameter: 1em !default;
+$center-point-border: .05em dashed white !default;
+
 .ReactCrop {
   position: relative;
   display: inline-block;
@@ -239,6 +243,16 @@ $drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
       width: $drag-bar-mobile-size;
       margin-left: -($drag-bar-mobile-size / 2);
     }
+  }
+
+  &__center-point{
+    position: relative;
+    border: $center-point-border;
+    border-radius: 50%;
+    width: $center-point-diameter;
+    height: $center-point-diameter;
+    top: calc(50% - (#{$center-point-diameter} / 2));
+    left: calc(50% - (#{$center-point-diameter} / 2));
   }
 }
 
