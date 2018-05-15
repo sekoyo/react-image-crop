@@ -162,3 +162,11 @@
     .ReactCrop__drag-bar.ord-w {
       width: 14px;
       margin-left: -7px; } }
+  .ReactCrop__center-point {
+    position: relative;
+    border: 0.05em dashed white;
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    top: calc(50% - (1em / 2));
+    left: calc(50% - (1em / 2)); }
