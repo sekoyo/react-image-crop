@@ -7,7 +7,7 @@ $drag-bar-size: 6px !default;
 // Query to kick us into "mobile" mode with larger drag handles/bars.
 //  If you're supporting modern browsers, you can use "pointer: coarse",
 //  see: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
-$mobile-media-query: "max-width: 768px" !default;
+$mobile-media-query: "(max-width: 768px), (pointer: coarse)" !default;
 
 // Mobile handle/bar sizes.  Override as above.
 $drag-handle-mobile-width: $drag-handle-width + 8 !default;
@@ -37,6 +37,7 @@ $drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
   &__image {
     display: block;
     max-width: 100%;
+    max-height: fill-available;
   }
 
   &--crop-invisible &__image {
@@ -184,7 +185,7 @@ $drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
     display: none;
   }
 
-  @media ($mobile-media-query) {
+  @media #{$mobile-media-query} {
     &__drag-handle {
       width: $drag-handle-mobile-width;
       height: $drag-handle-mobile-height;
