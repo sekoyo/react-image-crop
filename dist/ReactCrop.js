@@ -659,7 +659,7 @@ var ReactCrop = function (_PureComponent) {
       var clientPos = getClientPos(e);
 
       // Focus for detecting keypress.
-      _this.componentRef.focus();
+      _this.componentRef.focus({ preventScroll: true });
 
       var ord = e.target.dataset.ord;
 
@@ -713,7 +713,7 @@ var ReactCrop = function (_PureComponent) {
       var clientPos = getClientPos(e);
 
       // Focus for detecting keypress.
-      _this.componentRef.focus();
+      _this.componentRef.focus({ preventScroll: true });
 
       var imageOffset = getElementOffset(_this.imageRef);
       var xPc = (clientPos.x - imageOffset.left) / _this.imageRef.width * 100;
