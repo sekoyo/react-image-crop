@@ -12,7 +12,9 @@
   .ReactCrop__image {
     display: block;
     max-width: 100%;
-    max-height: fill-available; }
+    max-height: -webkit-fill-available;
+    max-height: -moz-available;
+    max-height: stretch; }
   .ReactCrop--crop-invisible .ReactCrop__image {
     opacity: 0.5; }
   .ReactCrop__crop-selection {
