@@ -75,7 +75,7 @@ onChange = (crop) => {
 
 All crop values are in percentages, and are relative to the image. All crop params are optional.
 
-*: While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and passed here.
+* _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and passed here._
 
 ```js
 crop: {
