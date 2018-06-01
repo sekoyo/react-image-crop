@@ -10,6 +10,7 @@
   .ReactCrop--disabled {
     cursor: inherit; }
   .ReactCrop__image {
+    /* autoprefixer: off */
     display: block;
     max-width: 100%;
     max-height: -webkit-fill-available;
