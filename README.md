@@ -57,8 +57,23 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 <ReactCrop src="path/to/image.jpg" />
 ```
 
-You can of course pass a blob path or base64 data.
+You can of course pass a blob path or base64 data, just transform it to a object url using:
 
+```js 
+URL.createObjectURL()
+```
+Example:
+
+```js
+const blobUrl = URL.createObjectURL(blob);
+```
+
+ ```jsx
+ <ReactCrop src="blobUrl" crop={this.state.crop}/>
+ ```
+ 
+ Note that you should call URL.revokeObjectURL(blobUrl) to free up memory when it's no longer needed.
+ 
 #### onChange(crop, pixelCrop) (required)
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
