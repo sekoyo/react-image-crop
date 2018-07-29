@@ -159,6 +159,10 @@ onImageLoaded = (image) => {
 
 Of course if you already know the image ratio (or you're just specifying the aspect) you can set the crop earlier.
 
+#### onImageError(image) (optional)
+
+This event is called if the image had an error loading.
+
 #### onDragStart() (optional)
 
 A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
