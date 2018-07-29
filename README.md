@@ -90,7 +90,7 @@ crop: {
 <ReactCrop src="path/to/image.jpg" crop={this.state.crop} />
 ```
 
-If you want a fixed aspect can either omit `width` and `height`:
+If you want a fixed aspect you can either omit `width` and `height`:
 
  ```js
 crop: {
