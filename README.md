@@ -4,6 +4,8 @@ A responsive image cropping tool for React.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
+[Sandbox Demo](https://codesandbox.io/s/vmvjl2q023)
+
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
 ## Features
@@ -57,7 +59,7 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 <ReactCrop src="path/to/image.jpg" />
 ```
 
-You can of course pass a blob path or base64 data.
+You can of course pass a blob url or base64 data.
 
 #### onChange(crop, pixelCrop) (required)
 
