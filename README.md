@@ -188,21 +188,26 @@ However here's a ready to use function that returns a file blob for the cropped 
  */
 function getCroppedImg(image, pixelCrop, fileName) {
 
+  // pixelCrop values are percentage values relative to image dimensions
+  // convert to numbers before using
+  
+  const h = image.height;
+  const w = image.width;
   const canvas = document.createElement('canvas');
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  canvas.width = pixelCrop.width * w / 100;
+  canvas.height = pixelCrop.height * h / 100;
   const ctx = canvas.getContext('2d');
 
   ctx.drawImage(
     image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
+    pixelCrop.x * w / 100,
+    pixelCrop.y * h / 100,
+    pixelCrop.width * w / 100,
+    pixelCrop.height * h / 100,
     0,
     0,
-    pixelCrop.width,
-    pixelCrop.height
+    pixelCrop.width * w / 100,
+    pixelCrop.height * h / 100
   );
 
   // As Base64 string
