@@ -124,6 +124,10 @@ If true is passed then selection can't be disabled if the user clicks outside th
 
 If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
+#### className (optional)
+
+A string of classes to add to the main `ReactCrop` element.
+
 #### style (optional)
 
 Inline styles object to be passed to the image wrapper element.
@@ -136,7 +140,7 @@ Inline styles object to be passed to the image element.
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
 
-#### onImageLoaded(image) (optional)
+#### onImageLoaded(image, pixelCrop) (optional)
 
 A callback which happens when the image is loaded. Passes the image DOM element.
 

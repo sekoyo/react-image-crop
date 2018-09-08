@@ -12,8 +12,10 @@ function loadEditView(dataUrl) {
   class Parent extends PureComponent {
     state = {
       crop: {
-        x: 0,
-        y: 0,
+        x: 20,
+        y: 10,
+        width: 40,
+        height: 30,
         // aspect: 16 / 9,
       },
       maxHeight: 80,
@@ -45,7 +47,8 @@ function loadEditView(dataUrl) {
       });
     }
 
-    onImageLoaded = (image) => {
+    onImageLoaded = (image, pixelCrop) => {
+      console.log('onImageLoaded', { image, pixelCrop });
       this.setState({
         crop: makeAspectCrop({
           x: 0,
@@ -58,7 +61,7 @@ function loadEditView(dataUrl) {
     }
 
     onCropComplete = (crop, pixelCrop) => {
-      console.log('onCropComplete, pixelCrop:', pixelCrop);
+      console.log('onCropComplete', { crop, pixelCrop });
     }
 
     onCropChange = (crop) => {
@@ -70,13 +73,14 @@ function loadEditView(dataUrl) {
         <div>
           <ReactCrop
             {...this.state}
+            className="ACustomClassA ACustomClassB"
             src={dataUrl}
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}
           />
-          <button onClick={this.onButtonClick}>Programatically set crop</button>
-          <button onClick={this.onButtonClick2}>Programatically set crop 2</button>
+          <button type="button" onClick={this.onButtonClick}>Programatically set crop</button>
+          <button type="button" onClick={this.onButtonClick2}>Programatically set crop 2</button>
         </div>
       );
     }

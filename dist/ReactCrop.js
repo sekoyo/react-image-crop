@@ -304,6 +304,8 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -730,7 +732,7 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'onImageLoad',
     value: function onImageLoad(image) {
-      this.props.onImageLoaded(image);
+      this.props.onImageLoaded(image, getPixelCrop(image, this.props.crop));
     }
   }, {
     key: 'getCropStyle',
@@ -908,7 +910,8 @@ var ReactCrop = function (_PureComponent) {
           style: style,
           className: 'ReactCrop__crop-selection',
           onMouseDown: this.onCropMouseTouchDown,
-          onTouchStart: this.onCropMouseTouchDown
+          onTouchStart: this.onCropMouseTouchDown,
+          role: 'presentation'
         },
         !disabled && _react2.default.createElement(
           'div',
@@ -960,10 +963,12 @@ var ReactCrop = function (_PureComponent) {
 
       var _props2 = this.props,
           children = _props2.children,
+          className = _props2.className,
           crossorigin = _props2.crossorigin,
           crop = _props2.crop,
           disabled = _props2.disabled,
           imageAlt = _props2.imageAlt,
+          onImageError = _props2.onImageError,
           src = _props2.src,
           style = _props2.style,
           imageStyle = _props2.imageStyle;
@@ -997,6 +1002,10 @@ var ReactCrop = function (_PureComponent) {
         componentClasses.push('ReactCrop--disabled');
       }
 
+      if (className) {
+        componentClasses.push.apply(componentClasses, _toConsumableArray(className.split(' ')));
+      }
+
       return _react2.default.createElement(
         'div',
         {
@@ -1007,6 +1016,7 @@ var ReactCrop = function (_PureComponent) {
           style: style,
           onTouchStart: this.onComponentMouseTouchDown,
           onMouseDown: this.onComponentMouseTouchDown,
+          role: 'presentation',
           tabIndex: '1',
           onKeyDown: this.onComponentKeyDown
         },
@@ -1021,7 +1031,7 @@ var ReactCrop = function (_PureComponent) {
           onLoad: function onLoad(e) {
             return _this4.onImageLoad(e.target);
           },
-          onError: this.props.onImageError,
+          onError: onImageError,
           alt: imageAlt
         }),
         cropSelection,
@@ -1054,7 +1064,9 @@ ReactCrop.defaultCrop = {
 };
 
 ReactCrop.propTypes = {
-  src: _propTypes2.default.string.isRequired,
+  className: _propTypes2.default.string,
+  crossorigin: _propTypes2.default.string,
+  children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node]),
   crop: _propTypes2.default.shape({
     aspect: _propTypes2.default.number,
     x: _propTypes2.default.number,
@@ -1062,26 +1074,26 @@ ReactCrop.propTypes = {
     width: _propTypes2.default.number,
     height: _propTypes2.default.number
   }),
+  disabled: _propTypes2.default.bool,
   imageAlt: _propTypes2.default.string,
+  imageStyle: _propTypes2.default.shape({}),
+  keepSelection: _propTypes2.default.bool,
   minWidth: _propTypes2.default.number,
   minHeight: _propTypes2.default.number,
   maxWidth: _propTypes2.default.number,
   maxHeight: _propTypes2.default.number,
-  keepSelection: _propTypes2.default.bool,
   onChange: _propTypes2.default.func.isRequired,
   onImageError: _propTypes2.default.func,
   onComplete: _propTypes2.default.func,
   onImageLoaded: _propTypes2.default.func,
   onDragStart: _propTypes2.default.func,
   onDragEnd: _propTypes2.default.func,
-  disabled: _propTypes2.default.bool,
-  crossorigin: _propTypes2.default.string,
-  children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node]),
-  style: _propTypes2.default.shape({}),
-  imageStyle: _propTypes2.default.shape({})
+  src: _propTypes2.default.string.isRequired,
+  style: _propTypes2.default.shape({})
 };
 
 ReactCrop.defaultProps = {
+  className: undefined,
   crop: undefined,
   crossorigin: undefined,
   disabled: false,
