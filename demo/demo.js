@@ -21,14 +21,13 @@ function loadEditView(dataUrl) {
     }
 
     onButtonClick = () => {
-      const { image } = this.state;
       this.setState({
-        crop: makeAspectCrop({
+        crop: {
           x: 20,
           y: 5,
           aspect: 1,
           height: 50,
-        }, image.naturalWidth / image.naturalHeight),
+        },
         disabled: true,
       });
     }
