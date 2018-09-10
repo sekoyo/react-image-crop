@@ -402,7 +402,7 @@ function makeAspectCrop(crop, imageAspect) {
 }
 
 function resolveCrop(crop, image) {
-  if (crop && crop.aspect && (!crop.width || !crop.height)) {
+  if (crop && crop.aspect && (!crop.width && crop.height || crop.width && !crop.height)) {
     return makeAspectCrop(crop, image.naturalWidth / image.naturalHeight);
   }
 
