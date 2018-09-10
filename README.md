@@ -98,7 +98,16 @@ crop: {
 }
 ```
 
-Or you need to specify both. As ReactCrop is based on percentages you will need to know the ratio of the image. If you don't, see [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for how to set your crop in there.
+Or specify **ONE** of the dimensions:
+
+```js
+crop: {
+  aspect: 16/9,
+  width: 50,
+}
+```
+
+In this case the other dimension will be calculated and `onChange` and `onComplete` will be fired with the completed crop, so that the crop will be rendered on the next pass.
 
 #### minWidth (optional)
 
@@ -142,26 +151,7 @@ A callback which happens after a resize, drag, or nudge. Passes the current crop
 
 #### onImageLoaded(image, pixelCrop) (optional)
 
-A callback which happens when the image is loaded. Passes the image DOM element.
-
-*Note* you should set your crop here if you're using `crop.aspect` along with a width _or_ height. Since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio.
-
-```js
-import ReactCrop, { makeAspectCrop } from 'react-image-crop';
-
-onImageLoaded = (image) => {
-  this.setState({
-    crop: makeAspectCrop({
-      x: 0,
-      y: 0,
-      aspect: 16 / 9,
-      width: 50,
-    }, image.width / image.height),
-  });
-}
-```
-
-Of course if you already know the image ratio (or you're just specifying the aspect) you can set the crop earlier.
+A callback which happens when the image is loaded. Passes the image DOM element and the pixelCrop if a crop has been specified by this point.
 
 #### onImageError(image) (optional)
 

@@ -15,8 +15,7 @@ function loadEditView(dataUrl) {
         x: 20,
         y: 10,
         width: 40,
-        height: 30,
-        // aspect: 16 / 9,
+        aspect: 16 / 9,
       },
       maxHeight: 80,
     }
@@ -30,41 +29,41 @@ function loadEditView(dataUrl) {
           aspect: 1,
           height: 50,
         }, image.naturalWidth / image.naturalHeight),
-        disabled: false,
+        disabled: true,
       });
     }
 
     onButtonClick2 = () => {
-      const { image } = this.state;
       this.setState({
-        crop: makeAspectCrop({
+        crop: {
           x: 20,
           y: 5,
-          aspect: 16 / 9,
           height: 20,
-        }, image.naturalWidth / image.naturalHeight),
-        disabled: true,
+          width: 30,
+        },
+        disabled: false,
       });
     }
 
     onImageLoaded = (image, pixelCrop) => {
       console.log('onImageLoaded', { image, pixelCrop });
-      this.setState({
-        crop: makeAspectCrop({
-          x: 0,
-          y: 0,
-          aspect: 10 / 4,
-          width: 50,
-        }, image.naturalWidth / image.naturalHeight),
-        image,
-      });
+      // this.setState({
+      //   crop: makeAspectCrop({
+      //     x: 0,
+      //     y: 0,
+      //     aspect: 10 / 4,
+      //     width: 50,
+      //   }, image.naturalWidth / image.naturalHeight),
+      //   image,
+      // });
     }
 
     onCropComplete = (crop, pixelCrop) => {
       console.log('onCropComplete', { crop, pixelCrop });
     }
 
-    onCropChange = (crop) => {
+    onCropChange = (crop, pixelCrop) => {
+      // console.log('onCropChange', { crop, pixelCrop });
       this.setState({ crop });
     }
 

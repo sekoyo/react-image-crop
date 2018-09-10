@@ -375,7 +375,7 @@ function inverseOrd(ord) {
 
 function makeAspectCrop(crop, imageAspect) {
   if (isNaN(crop.aspect) || isNaN(imageAspect)) {
-    console.warn('`crop.aspect` and `imageAspect` need to be numbers in order to make an aspect crop');
+    console.warn('`crop.aspect` and `imageAspect` need to be numbers in order to make an aspect crop', crop);
     return crop;
   }
 
@@ -401,7 +401,19 @@ function makeAspectCrop(crop, imageAspect) {
   return completeCrop;
 }
 
+function resolveCrop(crop, image) {
+  if (crop && crop.aspect && (!crop.width || !crop.height)) {
+    return makeAspectCrop(crop, image.naturalWidth / image.naturalHeight);
+  }
+
+  return crop;
+}
+
 function getPixelCrop(image, percentCrop) {
+  if (!image || !percentCrop) {
+    return null;
+  }
+
   var x = Math.round(image.naturalWidth * (percentCrop.x / 100));
   var y = Math.round(image.naturalHeight * (percentCrop.y / 100));
   var width = Math.round(image.naturalWidth * (percentCrop.width / 100));
@@ -416,7 +428,7 @@ function getPixelCrop(image, percentCrop) {
   };
 }
 
-function containCrop(crop, imageAspect) {
+function containCrop(previousCrop, crop, imageAspect) {
   var contained = _extends({}, crop);
 
   // Don't let the crop grow on the opposite side when hitting an x image boundary.
@@ -436,7 +448,7 @@ function containCrop(crop, imageAspect) {
     contained.height = contained.width / crop.aspect * imageAspect;
     // If sizing in up direction we need to pin Y at the point it
     // would be at the boundary.
-    if (contained.y < crop.y) {
+    if (previousCrop.y > contained.y) {
       contained.y = crop.y + (crop.height - contained.height);
     }
   }
@@ -720,6 +732,13 @@ var ReactCrop = function (_PureComponent) {
       }
     }
   }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps) {
+      if (prevProps.crop !== this.props.crop) {
+        this.resolveCropAndTriggerChange(this.props.crop, this.imageRef);
+      }
+    }
+  }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       document.removeEventListener('mousemove', this.onDocMouseTouchMove);
@@ -732,7 +751,8 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'onImageLoad',
     value: function onImageLoad(image) {
-      this.props.onImageLoaded(image, getPixelCrop(image, this.props.crop));
+      var crop = this.resolveCropAndTriggerChange(this.props.crop, image);
+      this.props.onImageLoaded(image, getPixelCrop(image, crop));
     }
   }, {
     key: 'getCropStyle',
@@ -794,6 +814,16 @@ var ReactCrop = function (_PureComponent) {
       };
     }
   }, {
+    key: 'resolveCropAndTriggerChange',
+    value: function resolveCropAndTriggerChange(crop, image) {
+      var resolvedCrop = resolveCrop(crop, image);
+      if (resolvedCrop !== crop) {
+        this.props.onChange(resolvedCrop, getPixelCrop(image, resolvedCrop));
+        this.props.onComplete(resolvedCrop, getPixelCrop(image, resolvedCrop));
+      }
+      return resolvedCrop;
+    }
+  }, {
     key: 'dragCrop',
     value: function dragCrop() {
       var nextCrop = this.makeNewCrop();
@@ -844,7 +874,7 @@ var ReactCrop = function (_PureComponent) {
         }
       }
 
-      var containedCrop = containCrop({
+      var containedCrop = containCrop(this.props.crop, {
         x: newX,
         y: newY,
         width: newSize.width,
