@@ -32,6 +32,12 @@ var ReactCrop = require('react-image-crop');
 import ReactCrop from 'react-image-crop';
 ```
 
+If you are using TypeScript, install also `@types/react-image-crop` and then import (types will get picked up):
+
+```ts
+import ReactCrop from 'react-image-crop';
+```
+
 Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
 ```js
