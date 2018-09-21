@@ -59,7 +59,7 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 <ReactCrop src="path/to/image.jpg" />
 ```
 
-You can of course pass a blob url or base64 data.
+You can of course pass a blob url (using `URL.createObjectURL()` and `URL.revokeObjectURL()`) or base64 data.
 
 #### onChange(crop, pixelCrop) (required)
 
