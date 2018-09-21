@@ -48,5 +48,8 @@
   "peerDependencies": {
     "prop-types": ">=15.5.8",
     "react": ">=15.2.2"
+  },
+  "dependencies": {
+    "@types/react-image-crop": "^3.0.1"
   }
 }
