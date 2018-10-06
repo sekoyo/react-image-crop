@@ -153,7 +153,7 @@ A callback which happens after a resize, drag, or nudge. Passes the current crop
 
 A callback which happens when the image is loaded. Passes the image DOM element and the pixelCrop if a crop has been specified by this point.
 
-#### onImageError(image) (optional)
+#### onImageError(event) (optional)
 
 This event is called if the image had an error loading.
 
