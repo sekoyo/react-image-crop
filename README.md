@@ -170,6 +170,7 @@ A callback which happens when a user releases the cursor or touch after dragging
 Allows setting the crossorigin attribute on the image.
 
 ## What about showing the crop on the client?
+
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend.
 
 However here's a ready to use function that returns a file blob for the cropped part after providing some parameters you already have when using this package:
@@ -177,7 +178,7 @@ However here's a ready to use function that returns a file blob for the cropped 
 ```js
 /**
  * @param {File} image - Image File Object
- * @param {Object} pixelCrop - pixelCrop Object provided by react-image-crop
+ * @param {Object} pixelCrop - pixelCrop Object from the 2nd argument of onChange or onComplete
  * @param {String} fileName - Name of the returned file in Promise
  */
 function getCroppedImg(image, pixelCrop, fileName) {
