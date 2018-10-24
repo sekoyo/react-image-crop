@@ -3,7 +3,7 @@
   "version": "6.0.1",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
-  "main": "dist/ReactCrop",
+  "main": "dist/ReactCrop.js",
   "style": "dist/ReactCrop.css",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
