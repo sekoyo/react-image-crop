@@ -554,7 +554,7 @@ var ReactCrop = function (_PureComponent) {
 
       // Generation of clientside crops will happen here so for convenience it's best to
       // do it after an image ref has been saved from onImageLoaded.
-      if (resolvedCrop !== this.props.crop) {
+      if (resolvedCrop) {
         this.props.onChange(resolvedCrop, pixelCrop);
         this.props.onComplete(resolvedCrop, pixelCrop);
       }
