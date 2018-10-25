@@ -548,14 +548,15 @@ var ReactCrop = function (_PureComponent) {
     key: 'onImageLoad',
     value: function onImageLoad(image) {
       var resolvedCrop = resolveCrop(this.props.crop, image);
+      var pixelCrop = getPixelCrop(image, resolvedCrop);
 
-      this.props.onImageLoaded(image, getPixelCrop(image, resolvedCrop));
+      this.props.onImageLoaded(image, pixelCrop);
 
       // Generation of clientside crops will happen here so for convenience it's best to
       // do it after an image ref has been saved from onImageLoaded.
       if (resolvedCrop !== this.props.crop) {
-        this.props.onChange(resolvedCrop, getPixelCrop(image, resolvedCrop));
-        this.props.onComplete(resolvedCrop, getPixelCrop(image, resolvedCrop));
+        this.props.onChange(resolvedCrop, pixelCrop);
+        this.props.onComplete(resolvedCrop, pixelCrop);
       }
     }
   }, {
