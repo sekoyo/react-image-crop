@@ -158,7 +158,7 @@ function clamp(num, min, max) {
 }
 
 function isCropValid(crop) {
-  return crop && crop.width && crop.height;
+  return crop && crop.width && crop.height && !isNaN(crop.width) && !isNaN(crop.height);
 }
 
 function inverseOrd(ord) {
@@ -554,7 +554,7 @@ var ReactCrop = function (_PureComponent) {
 
       // Generation of clientside crops will happen here so for convenience it's best to
       // do it after an image ref has been saved from onImageLoaded.
-      if (resolvedCrop) {
+      if (resolvedCrop && isCropValid(resolvedCrop)) {
         this.props.onChange(resolvedCrop, pixelCrop);
         this.props.onComplete(resolvedCrop, pixelCrop);
       }
