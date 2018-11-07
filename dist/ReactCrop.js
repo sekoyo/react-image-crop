@@ -702,7 +702,11 @@ var ReactCrop = function (_PureComponent) {
       }
 
       evData.lastYCrossover = evData.yCrossOver;
-      this.crossOverCheck();
+
+      if (!this.props.disableCrossover || this.props.minWidth <= 0 && this.props.minHeight <= 0) {
+        this.crossOverCheck();
+      }
+
       return nextCrop;
     }
   }, {
@@ -913,6 +917,7 @@ ReactCrop.propTypes = {
   imageAlt: _propTypes2.default.string,
   imageStyle: _propTypes2.default.shape({}),
   keepSelection: _propTypes2.default.bool,
+  disableCrossover: _propTypes2.default.bool,
   minWidth: _propTypes2.default.number,
   minHeight: _propTypes2.default.number,
   maxWidth: _propTypes2.default.number,
@@ -938,6 +943,7 @@ ReactCrop.defaultProps = {
   minWidth: 0,
   minHeight: 0,
   keepSelection: false,
+  disableCrossover: false,
   onComplete: function onComplete() {},
   onImageError: function onImageError() {},
   onImageLoaded: function onImageLoaded() {},

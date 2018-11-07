@@ -129,6 +129,10 @@ A maximum crop height, as a percentage of the image height.
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.
 
+#### disableCrossover (optional)
+
+If true is passed then selection will not invert the crop as long as `minWidth` or `minHeight` is also used.
+
 #### disabled (optional)
 
 If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
