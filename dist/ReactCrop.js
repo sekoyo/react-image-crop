@@ -122,19 +122,6 @@ try {
 
 var EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
-function getElementOffset(el) {
-  var rect = el.getBoundingClientRect();
-  var docEl = document.documentElement;
-
-  var rectTop = rect.top + window.pageYOffset - docEl.clientTop;
-  var rectLeft = rect.left + window.pageXOffset - docEl.clientLeft;
-
-  return {
-    top: rectTop,
-    left: rectLeft
-  };
-}
-
 function getClientPos(e) {
   var pageX = void 0;
   var pageY = void 0;
@@ -288,7 +275,7 @@ var ReactCrop = function (_PureComponent) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call.apply(_ref, [this].concat(args))), _this), _this.state = {}, _this.onCropMouseTouchDown = function (e) {
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call.apply(_ref, [this].concat(args))), _this), _this.window = window, _this.document = document, _this.state = {}, _this.onCropMouseTouchDown = function (e) {
       var _this$props = _this.props,
           crop = _this$props.crop,
           disabled = _this$props.disabled;
@@ -313,7 +300,7 @@ var ReactCrop = function (_PureComponent) {
       var cropOffset = void 0;
 
       if (crop.aspect) {
-        cropOffset = getElementOffset(_this.cropSelectRef);
+        cropOffset = _this.getElementOffset(_this.cropSelectRef);
       }
 
       _this.evData = {
@@ -359,7 +346,7 @@ var ReactCrop = function (_PureComponent) {
       // Focus for detecting keypress.
       _this.componentRef.focus({ preventScroll: true });
 
-      var imageOffset = getElementOffset(_this.imageRef);
+      var imageOffset = _this.getElementOffset(_this.imageRef);
       var xPc = (clientPos.x - imageOffset.left) / _this.imageRef.width * 100;
       var yPc = (clientPos.y - imageOffset.top) / _this.imageRef.height * 100;
 
@@ -506,12 +493,12 @@ var ReactCrop = function (_PureComponent) {
     value: function componentDidMount() {
       var options = passiveSupported ? { passive: false } : false;
 
-      document.addEventListener('mousemove', this.onDocMouseTouchMove, options);
-      document.addEventListener('touchmove', this.onDocMouseTouchMove, options);
+      this.document.addEventListener('mousemove', this.onDocMouseTouchMove, options);
+      this.document.addEventListener('touchmove', this.onDocMouseTouchMove, options);
 
-      document.addEventListener('mouseup', this.onDocMouseTouchEnd, options);
-      document.addEventListener('touchend', this.onDocMouseTouchEnd, options);
-      document.addEventListener('touchcancel', this.onDocMouseTouchEnd, options);
+      this.document.addEventListener('mouseup', this.onDocMouseTouchEnd, options);
+      this.document.addEventListener('touchend', this.onDocMouseTouchEnd, options);
+      this.document.addEventListener('touchcancel', this.onDocMouseTouchEnd, options);
 
       if (this.imageRef.complete || this.imageRef.readyState) {
         if (this.imageRef.naturalWidth === 0) {
@@ -537,12 +524,12 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      document.removeEventListener('mousemove', this.onDocMouseTouchMove);
-      document.removeEventListener('touchmove', this.onDocMouseTouchMove);
+      this.document.removeEventListener('mousemove', this.onDocMouseTouchMove);
+      this.document.removeEventListener('touchmove', this.onDocMouseTouchMove);
 
-      document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
-      document.removeEventListener('touchend', this.onDocMouseTouchEnd);
-      document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
+      this.document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
+      this.document.removeEventListener('touchend', this.onDocMouseTouchEnd);
+      this.document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
     }
   }, {
     key: 'onImageLoad',
@@ -558,6 +545,20 @@ var ReactCrop = function (_PureComponent) {
         this.props.onChange(resolvedCrop, pixelCrop);
         this.props.onComplete(resolvedCrop, pixelCrop);
       }
+    }
+  }, {
+    key: 'getElementOffset',
+    value: function getElementOffset(el) {
+      var rect = el.getBoundingClientRect();
+      var docEl = this.document.documentElement;
+
+      var rectTop = rect.top + this.window.pageYOffset - docEl.clientTop;
+      var rectLeft = rect.left + this.window.pageXOffset - docEl.clientLeft;
+
+      return {
+        top: rectTop,
+        left: rectLeft
+      };
     }
   }, {
     key: 'getCropStyle',
