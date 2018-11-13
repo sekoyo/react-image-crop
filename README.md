@@ -8,7 +8,7 @@ A responsive image cropping tool for React.
 
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
-# Table of Contents
+## Table of Contents
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Usage](#usage)
