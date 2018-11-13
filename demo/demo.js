@@ -34,15 +34,12 @@ function loadEditView(dataUrl) {
     }
 
     onButtonClick2 = () => {
-      this.setState({
+      this.setState(state => ({
         crop: {
-          x: 20,
-          y: 5,
-          height: 20,
-          width: 30,
+          ...state.crop,
+          aspect: 16 / 9,
         },
-        disabled: false,
-      });
+      }));
     }
 
     onImageLoaded = (image, pixelCrop) => {
@@ -83,7 +80,7 @@ function loadEditView(dataUrl) {
             onChange={this.onCropChange}
           />
           <button type="button" onClick={this.onButtonClick}>Programatically set crop</button>
-          <button type="button" onClick={this.onButtonClick2}>Programatically set crop 2</button>
+          <button type="button" onClick={this.onButtonClick2}>Change to 16/9 aspect</button>
         </div>
       );
     }
