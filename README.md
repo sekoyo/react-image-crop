@@ -15,8 +15,8 @@ A responsive image cropping tool for React.
 4. [CDN](#cdn)
 5. [Props](#props)
 6. [FAQ](#faq)
-  1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
-  2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
+    1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
+    2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
 
 ## Features
 
