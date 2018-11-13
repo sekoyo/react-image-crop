@@ -62,6 +62,8 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 <script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
 ```
 
+Note when importing the script globally using a `<script>` tag access the component with `ReactCrop.Component`.
+
 ## Props
 
 #### src (required)
