@@ -26,7 +26,7 @@ function loadEditView(dataUrl) {
         crop: {
           x: 20,
           y: 5,
-          aspect: 1,
+          aspect: 16 / 9,
           height: 50,
         },
         disabled: true,
@@ -37,7 +37,8 @@ function loadEditView(dataUrl) {
       this.setState(state => ({
         crop: {
           ...state.crop,
-          aspect: 16 / 9,
+          height: 50,
+          aspect: 1,
         },
       }));
     }

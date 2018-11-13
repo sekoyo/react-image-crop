@@ -710,6 +710,9 @@ var ReactCrop = function (_PureComponent) {
         nextCrop.height = containedCrop.height;
       }
 
+      evData.lastYCrossover = evData.yCrossOver;
+      this.crossOverCheck();
+
       // Ensure new dimensions aren't less than min dimensions.
       if (minWidth && nextCrop.width < minWidth) {
         return crop;
@@ -719,8 +722,6 @@ var ReactCrop = function (_PureComponent) {
         return crop;
       }
 
-      evData.lastYCrossover = evData.yCrossOver;
-      this.crossOverCheck();
       return nextCrop;
     }
   }, {
