@@ -15,9 +15,10 @@ function loadEditView(dataUrl) {
         x: 20,
         y: 10,
         width: 40,
-        aspect: 16 / 9,
+        height: 40,
+        // aspect: 16 / 9,
       },
-      maxHeight: 80,
+      disabled: false,
     }
 
     onButtonClick = () => {
@@ -70,7 +71,11 @@ function loadEditView(dataUrl) {
       return (
         <div>
           <ReactCrop
-            {...this.state}
+            crop={this.state.crop}
+            disabled={this.state.disabled}
+            maxHeight={80}
+            minHeight={20}
+            minWidth={20}
             className="ACustomClassA ACustomClassB"
             src={dataUrl}
             onImageLoaded={this.onImageLoaded}

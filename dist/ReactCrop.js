@@ -421,7 +421,9 @@ var ReactCrop = function (_PureComponent) {
         nextCrop = _this.dragCrop();
       }
 
-      onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
+      if (nextCrop !== crop) {
+        onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
+      }
     }, _this.onComponentKeyDown = function (e) {
       var _this$props4 = _this.props,
           crop = _this$props4.crop,
@@ -644,6 +646,10 @@ var ReactCrop = function (_PureComponent) {
     value: function resizeCrop() {
       var nextCrop = this.makeNewCrop();
       var evData = this.evData;
+      var _props2 = this.props,
+          crop = _props2.crop,
+          minWidth = _props2.minWidth,
+          minHeight = _props2.minHeight;
       var ord = evData.ord;
 
       var imageAspect = this.imageRef.width / this.imageRef.height;
@@ -700,6 +706,15 @@ var ReactCrop = function (_PureComponent) {
       } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
         nextCrop.y = containedCrop.y;
         nextCrop.height = containedCrop.height;
+      }
+
+      // Ensure new dimensions aren't less than min dimensions.
+      if (minWidth && nextCrop.width < minWidth) {
+        return crop;
+      }
+
+      if (minHeight && nextCrop.height < minHeight) {
+        return crop;
       }
 
       evData.lastYCrossover = evData.yCrossOver;
@@ -797,17 +812,17 @@ var ReactCrop = function (_PureComponent) {
     value: function render() {
       var _this4 = this;
 
-      var _props2 = this.props,
-          children = _props2.children,
-          className = _props2.className,
-          crossorigin = _props2.crossorigin,
-          crop = _props2.crop,
-          disabled = _props2.disabled,
-          imageAlt = _props2.imageAlt,
-          onImageError = _props2.onImageError,
-          src = _props2.src,
-          style = _props2.style,
-          imageStyle = _props2.imageStyle;
+      var _props3 = this.props,
+          children = _props3.children,
+          className = _props3.className,
+          crossorigin = _props3.crossorigin,
+          crop = _props3.crop,
+          disabled = _props3.disabled,
+          imageAlt = _props3.imageAlt,
+          onImageError = _props3.onImageError,
+          src = _props3.src,
+          style = _props3.style,
+          imageStyle = _props3.imageStyle;
       var cropIsActive = this.state.cropIsActive;
 
       var cropSelection = void 0;
