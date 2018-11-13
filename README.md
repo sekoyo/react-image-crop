@@ -17,6 +17,7 @@ A responsive image cropping tool for React.
 6. [FAQ](#faq)
     1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
     2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
+7. [Contributing / Developing](#contributing--developing)
 
 ## Features
 
@@ -229,12 +230,6 @@ async test() {
 }
 ```
 
-### How to handle image EXIF orientation/rotation
-
-You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
-
-You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
-
 Some things to note:
 
 1. [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. *Always* use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
@@ -242,6 +237,12 @@ Some things to note:
 2. [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob) is both faster and asynchronous, but not supported on old browsers (this is quickly becoming irrelevant).
 
 3. Another option to make the conversion faster is to scale the image down before converting it.
+
+### How to handle image EXIF orientation/rotation
+
+You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
+
+You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
 
 ## Contributing / Developing
 
