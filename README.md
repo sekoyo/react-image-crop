@@ -169,7 +169,9 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 Allows setting the crossorigin attribute on the image.
 
-## What about showing the crop on the client?
+## FAQ
+
+### What about showing the crop on the client?
 
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend.
 
@@ -216,6 +218,12 @@ async test() {
   const croppedImg = await getCroppedImg(image, pixelCrop, returnedFileName);
 }
 ```
+
+### How to handle image EXIF orientation/rotation
+
+You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
+
+You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
 
 Some things to note:
 
