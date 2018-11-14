@@ -62,6 +62,8 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 <script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
 ```
 
+Note when importing the script globally using a `<script>` tag access the component with `ReactCrop.Component`.
+
 ## Props
 
 #### src (required)
@@ -218,9 +220,9 @@ function getCroppedImg(image, pixelCrop, fileName) {
 
   // As a blob
   return new Promise((resolve, reject) => {
-    canvas.toBlob(file => {
-      file.name = fileName;
-      resolve(file);
+    canvas.toBlob(blob => {
+      blob.name = fileName;
+      resolve(blob);
     }, 'image/jpeg');
   });
 }
