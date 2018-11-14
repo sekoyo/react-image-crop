@@ -185,9 +185,7 @@ function makeAspectCrop(crop, imageAspect) {
 }
 
 function resolveCrop(crop, image) {
-  if (crop && crop.aspect && (!crop.width && crop.height || crop.width && !crop.height ||
-  // We also check if the aspect is valid, e.g. if the user changed the aspect but not the width/height #133.
-  (image.naturalWidth * (crop.width / 100) / (image.naturalHeight * (crop.height / 100))).toFixed(1) !== crop.aspect.toFixed(1))) {
+  if (crop && crop.aspect && (!crop.width && crop.height || crop.width && !crop.height)) {
     return makeAspectCrop(crop, image.naturalWidth / image.naturalHeight);
   }
 

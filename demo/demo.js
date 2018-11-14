@@ -1,7 +1,8 @@
 /* globals document, FileReader */
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
-import ReactCrop, { makeAspectCrop } from '../lib/ReactCrop';
+import ReactCrop from '../lib/ReactCrop';
+import '../dist/ReactCrop.css';
 
 /**
  * Load the image in the crop editor.
