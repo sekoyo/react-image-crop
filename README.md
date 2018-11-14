@@ -220,9 +220,9 @@ function getCroppedImg(image, pixelCrop, fileName) {
 
   // As a blob
   return new Promise((resolve, reject) => {
-    canvas.toBlob(file => {
-      file.name = fileName;
-      resolve(file);
+    canvas.toBlob(blob => {
+      blob.name = fileName;
+      resolve(blob);
     }, 'image/jpeg');
   });
 }
