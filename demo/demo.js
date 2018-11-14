@@ -38,9 +38,10 @@ function loadEditView(dataUrl) {
       this.setState(state => ({
         crop: {
           ...state.crop,
-          height: 50,
           aspect: 1,
+          height: null,
         },
+        disabled: false,
       }));
     }
 
