@@ -9,107 +9,101 @@ import '../dist/ReactCrop.css';
  */
 const cropEditor = document.querySelector('#crop-editor');
 
-function loadEditView(dataUrl) {
-  class Parent extends PureComponent {
-    state = {
-      crop: {
-        x: 20,
-        y: 10,
-        width: 40,
-        height: 40,
-        // aspect: 16 / 9,
-      },
-      disabled: false,
-    }
+class App extends PureComponent {
+  state = {
+    src: null,
+    crop: {
+      x: 10,
+      y: 10,
+      aspect: 1,
+      width: 50,
+    },
+  };
 
-    onButtonClick = () => {
+  onSelectFile = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        this.setState({ src: reader.result });
+      });
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  onImageLoaded = (image, pixelCrop) => {
+    const { crop } = this.state;
+    if (crop.aspect && crop.height && crop.width) {
       this.setState({
-        crop: {
-          x: 20,
-          y: 5,
-          aspect: 16 / 9,
-          height: 50,
-        },
-        disabled: true,
+        crop: { ...crop, height: null },
       });
     }
+    this.imageRef = image;
+  };
 
-    onButtonClick2 = () => {
-      this.setState(state => ({
-        crop: {
-          ...state.crop,
-          aspect: 1,
-          height: null,
-        },
-        disabled: false,
-      }));
+  onCropComplete = async (crop, pixelCrop) => {
+    if (crop.width && crop.height) {
+      const croppedImageUrl = await this.getCroppedImg(
+        this.imageRef,
+        pixelCrop,
+        'newFile.jpeg',
+      );
+      this.setState({ croppedImageUrl });
     }
+  };
 
-    onImageLoaded = (image, pixelCrop) => {
-      console.log('onImageLoaded', { image, pixelCrop });
-      // this.setState({
-      //   crop: makeAspectCrop({
-      //     x: 0,
-      //     y: 0,
-      //     aspect: 10 / 4,
-      //     width: 50,
-      //   }, image.naturalWidth / image.naturalHeight),
-      //   image,
-      // });
-    }
+  onCropChange = (crop) => {
+    this.setState({ crop });
+  };
 
-    onCropComplete = (crop, pixelCrop) => {
-      console.log('onCropComplete', { crop, pixelCrop });
-    }
+  getCroppedImg(image, pixelCrop, fileName) {
+    const canvas = document.createElement('canvas');
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+    const ctx = canvas.getContext('2d');
 
-    onCropChange = (crop, pixelCrop) => {
-      // console.log('onCropChange', { crop, pixelCrop });
-      this.setState({ crop });
-    }
+    ctx.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      pixelCrop.width,
+      pixelCrop.height,
+    );
 
-    render() {
-      return (
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        blob.name = fileName;
+        window.URL.revokeObjectURL(this.fileUrl);
+        this.fileUrl = window.URL.createObjectURL(blob);
+        resolve(this.fileUrl);
+      }, 'image/jpeg');
+    });
+  }
+
+  render() {
+    const { croppedImageUrl } = this.state;
+
+    return (
+      <div className="App">
         <div>
+          <input type="file" onChange={this.onSelectFile} />
+        </div>
+        {this.state.src && (
           <ReactCrop
+            src={this.state.src}
             crop={this.state.crop}
-            disabled={this.state.disabled}
-            maxHeight={80}
-            minHeight={20}
-            minWidth={20}
-            className="ACustomClassA ACustomClassB"
-            src={dataUrl}
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}
           />
-          <button type="button" onClick={this.onButtonClick}>Programatically set crop</button>
-          <button type="button" onClick={this.onButtonClick2}>Change to 16/9 aspect</button>
-        </div>
-      );
-    }
+        )}
+        {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} />}
+      </div>
+    );
   }
-
-  ReactDOM.render(<Parent />, cropEditor);
 }
 
-/**
- * Select an image file.
- */
-const imageType = /^image\//;
-const fileInput = document.querySelector('#file-picker');
-
-fileInput.addEventListener('change', (e) => {
-  const file = e.target.files.item(0);
-
-  if (!file || !imageType.test(file.type)) {
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = (e2) => {
-    loadEditView(e2.target.result);
-  };
-
-  reader.readAsDataURL(file);
-});
+ReactDOM.render(<App />, cropEditor);
