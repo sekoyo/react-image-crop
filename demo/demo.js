@@ -31,17 +31,22 @@ class App extends PureComponent {
   };
 
   onImageLoaded = (image, pixelCrop) => {
-    const { crop } = this.state;
-    if (crop.aspect && crop.height && crop.width) {
-      this.setState({
-        crop: { ...crop, height: null },
-      });
-    }
     this.imageRef = image;
+    this.makeClientCrop(this.state.crop, pixelCrop);
   };
 
-  onCropComplete = async (crop, pixelCrop) => {
-    if (crop.width && crop.height) {
+  onCropComplete = (crop, pixelCrop) => {
+    console.log('onCropComplete', { crop, pixelCrop });
+    this.makeClientCrop(crop, pixelCrop);
+  };
+
+  onCropChange = (crop) => {
+    console.log('onCropChange', crop);
+    this.setState({ crop });
+  };
+
+  async makeClientCrop(crop, pixelCrop) {
+    if (this.imageRef && crop.width && crop.height) {
       const croppedImageUrl = await this.getCroppedImg(
         this.imageRef,
         pixelCrop,
@@ -49,13 +54,10 @@ class App extends PureComponent {
       );
       this.setState({ croppedImageUrl });
     }
-  };
-
-  onCropChange = (crop) => {
-    this.setState({ crop });
-  };
+  }
 
   getCroppedImg(image, pixelCrop, fileName) {
+    console.log('getCroppedImg', { image, pixelCrop, fileName });
     const canvas = document.createElement('canvas');
     canvas.width = pixelCrop.width;
     canvas.height = pixelCrop.height;
