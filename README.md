@@ -144,7 +144,11 @@ If true is passed then selection can't be disabled if the user clicks outside th
 
 #### disabled (optional)
 
-If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
+If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
+
+#### locked (optional)
+
+Similar to disabled except the user can still drag the crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
 
 #### className (optional)
 
