@@ -18,7 +18,7 @@ class App extends PureComponent {
       aspect: 1,
       width: 50,
     },
-  };
+  }
 
   onSelectFile = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -28,32 +28,21 @@ class App extends PureComponent {
       });
       reader.readAsDataURL(e.target.files[0]);
     }
-  };
+  }
 
   onImageLoaded = (image, pixelCrop) => {
     this.imageRef = image;
     this.makeClientCrop(this.state.crop, pixelCrop);
-  };
+  }
 
   onCropComplete = (crop, pixelCrop) => {
     console.log('onCropComplete', { crop, pixelCrop });
     this.makeClientCrop(crop, pixelCrop);
-  };
+  }
 
   onCropChange = (crop) => {
     console.log('onCropChange', crop);
     this.setState({ crop });
-  };
-
-  async makeClientCrop(crop, pixelCrop) {
-    if (this.imageRef && crop.width && crop.height) {
-      const croppedImageUrl = await this.getCroppedImg(
-        this.imageRef,
-        pixelCrop,
-        'newFile.jpeg',
-      );
-      this.setState({ croppedImageUrl });
-    }
   }
 
   getCroppedImg(image, pixelCrop, fileName) {
@@ -83,6 +72,17 @@ class App extends PureComponent {
         resolve(this.fileUrl);
       }, 'image/jpeg');
     });
+  }
+
+  async makeClientCrop(crop, pixelCrop) {
+    if (this.imageRef && crop.width && crop.height) {
+      const croppedImageUrl = await this.getCroppedImg(
+        this.imageRef,
+        pixelCrop,
+        'newFile.jpeg',
+      );
+      this.setState({ croppedImageUrl });
+    }
   }
 
   render() {
