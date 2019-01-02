@@ -148,7 +148,7 @@ If true then the user cannot resize or draw a new crop. A class of `ReactCrop--d
 
 #### locked (optional)
 
-Similar to disabled except the user can still drag the crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
+If true then the user cannot create or resize a crop, but still drag the existing crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
 
 #### className (optional)
 
