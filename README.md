@@ -4,7 +4,7 @@ A responsive image cropping tool for React.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
-[Sandbox Demo](https://codesandbox.io/s/72py4jlll6)
+[Sandbox Demo](https://codesandbox.io/s/1o9rx6omq4)
 
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
