@@ -7,7 +7,7 @@
   background-color: #000; }
   .ReactCrop:focus {
     outline: none; }
-  .ReactCrop--disabled {
+  .ReactCrop--disabled, .ReactCrop--locked {
     cursor: inherit; }
   .ReactCrop__image {
     /* autoprefixer: off */

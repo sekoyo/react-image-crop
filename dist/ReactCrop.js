@@ -888,8 +888,20 @@ function makeAspectCrop(crop, imageAspect) {
   return completeCrop;
 }
 
+function isAspectInvalid(crop, width, height) {
+  if (!crop.width && crop.height || crop.width && !crop.height) {
+    return true;
+  }
+
+  if (crop.width && crop.height && Math.round(height * (crop.height / 100) * crop.aspect) !== Math.round(width * (crop.width / 100))) {
+    return true;
+  }
+
+  return false;
+}
+
 function resolveCrop(crop, image) {
-  if (crop && crop.aspect && (!crop.width && crop.height || crop.width && !crop.height)) {
+  if (crop && crop.aspect && isAspectInvalid(crop, image.naturalWidth, image.naturalHeight)) {
     return makeAspectCrop(crop, image.naturalWidth / image.naturalHeight);
   }
 
@@ -1031,6 +1043,7 @@ var ReactCrop = function (_PureComponent) {
       var _this$props2 = _this.props,
           crop = _this$props2.crop,
           disabled = _this$props2.disabled,
+          locked = _this$props2.locked,
           keepSelection = _this$props2.keepSelection,
           onChange = _this$props2.onChange;
 
@@ -1039,7 +1052,7 @@ var ReactCrop = function (_PureComponent) {
         return;
       }
 
-      if (disabled || keepSelection && isCropValid(crop)) {
+      if (disabled || locked || keepSelection && isCropValid(crop)) {
         return;
       }
 
@@ -1444,7 +1457,9 @@ var ReactCrop = function (_PureComponent) {
     value: function createCropSelection() {
       var _this3 = this;
 
-      var disabled = this.props.disabled;
+      var _props3 = this.props,
+          disabled = _props3.disabled,
+          locked = _props3.locked;
 
       var style = this.getCropStyle();
 
@@ -1460,7 +1475,7 @@ var ReactCrop = function (_PureComponent) {
           onTouchStart: this.onCropMouseTouchDown,
           role: 'presentation'
         },
-        !disabled && _react2.default.createElement(
+        !disabled && !locked && _react2.default.createElement(
           'div',
           { className: 'ReactCrop__drag-elements' },
           _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-n', 'data-ord': 'n' }),
@@ -1508,17 +1523,18 @@ var ReactCrop = function (_PureComponent) {
     value: function render() {
       var _this4 = this;
 
-      var _props3 = this.props,
-          children = _props3.children,
-          className = _props3.className,
-          crossorigin = _props3.crossorigin,
-          crop = _props3.crop,
-          disabled = _props3.disabled,
-          imageAlt = _props3.imageAlt,
-          onImageError = _props3.onImageError,
-          src = _props3.src,
-          style = _props3.style,
-          imageStyle = _props3.imageStyle;
+      var _props4 = this.props,
+          children = _props4.children,
+          className = _props4.className,
+          crossorigin = _props4.crossorigin,
+          crop = _props4.crop,
+          disabled = _props4.disabled,
+          locked = _props4.locked,
+          imageAlt = _props4.imageAlt,
+          onImageError = _props4.onImageError,
+          src = _props4.src,
+          style = _props4.style,
+          imageStyle = _props4.imageStyle;
       var cropIsActive = this.state.cropIsActive;
 
       var cropSelection = void 0;
@@ -1547,6 +1563,10 @@ var ReactCrop = function (_PureComponent) {
 
       if (disabled) {
         componentClasses.push('ReactCrop--disabled');
+      }
+
+      if (locked) {
+        componentClasses.push('ReactCrop--locked');
       }
 
       if (className) {
@@ -1621,6 +1641,7 @@ ReactCrop.propTypes = {
     height: _propTypes2.default.number
   }),
   disabled: _propTypes2.default.bool,
+  locked: _propTypes2.default.bool,
   imageAlt: _propTypes2.default.string,
   imageStyle: _propTypes2.default.shape({}),
   keepSelection: _propTypes2.default.bool,
@@ -1643,6 +1664,7 @@ ReactCrop.defaultProps = {
   crop: undefined,
   crossorigin: undefined,
   disabled: false,
+  locked: false,
   imageAlt: '',
   maxWidth: 100,
   maxHeight: 100,

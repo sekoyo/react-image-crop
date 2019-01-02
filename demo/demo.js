@@ -41,7 +41,7 @@ class App extends PureComponent {
   }
 
   onCropChange = (crop) => {
-    console.log('onCropChange', crop);
+    // console.log('onCropChange', crop);
     this.setState({ crop });
   }
 
