@@ -111,7 +111,7 @@ crop: {
 }
 ```
 
-Or specify **ONE** of the dimensions:
+Or specify one of the dimensions:
 
 ```js
 crop: {
