@@ -26,7 +26,7 @@ A responsive image cropping tool for React.
 - Free-form or fixed aspect crops
 - Keyboard support for nudging selection
 - Min/max crop size
-- No dependencies/small footprint (~4.63KB gzipped)
+- No dependencies/small footprint (~4.5KB gzip)
 
 ## Installation
 ```
