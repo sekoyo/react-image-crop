@@ -64,7 +64,7 @@ class App extends PureComponent {
       pixelCrop.height,
     );
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         blob.name = fileName;
         window.URL.revokeObjectURL(this.fileUrl);
@@ -74,14 +74,13 @@ class App extends PureComponent {
     });
   }
 
-  async makeClientCrop(crop, pixelCrop) {
+  makeClientCrop(crop, pixelCrop) {
     if (this.imageRef && crop.width && crop.height) {
-      const croppedImageUrl = await this.getCroppedImg(
+      this.getCroppedImg(
         this.imageRef,
         pixelCrop,
         'newFile.jpeg',
-      );
-      this.setState({ croppedImageUrl });
+      ).then(croppedImageUrl => this.setState({ croppedImageUrl }));
     }
   }
 
