@@ -260,7 +260,7 @@ The library exports a convenience function for this - `makeAspectCrop(crop, imag
 When using `makeAspectCrop` specify the aspect, and the width or height as a percentage. The other side will be fille in for you.
 
 ```js
-const newCrop = makeAspectCrop({ aspect: 16/9, width: 50 })
+const newCrop = makeAspectCrop({ aspect: 16/9, width: 50 }, image.naturalWidth / image.naturalHeight)
 ```
 
 ## Contributing / Developing
