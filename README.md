@@ -121,7 +121,7 @@ crop: {
 }
 ```
 
-In this case the other dimension will be calculated and `onChange` and `onComplete` will be fired with the completed crop, so that the crop will be rendered on the next pass.
+In this case the other dimension will be calculated and `onChange` and `onComplete` will be fired with the completed crop, so that the crop will be rendered on the next pass. This will be done for you when an image is loaded, but if you want to set an aspect crop from say a button, then you will need to set a complete crop, see [How to create a fixed aspect crop programmatically](README.md#how-to-create-a-fixed-aspect-crop-programmatically) for more details on that.
 
 #### minWidth (optional)
 
