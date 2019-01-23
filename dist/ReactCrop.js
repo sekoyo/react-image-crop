@@ -530,13 +530,6 @@ var ReactCrop = function (_PureComponent) {
       }
     }
   }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate(prevProps) {
-      if (prevProps.crop !== this.props.crop) {
-        this.resolveCropAndTriggerChange(this.props.crop, this.imageRef);
-      }
-    }
-  }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       this.document.removeEventListener('mousemove', this.onDocMouseTouchMove);
@@ -549,8 +542,14 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'onImageLoad',
     value: function onImageLoad(image) {
-      var crop = this.resolveCropAndTriggerChange(this.props.crop, image);
-      this.props.onImageLoaded(image, getPixelCrop(image, crop));
+      var resolvedCrop = resolveCrop(this.props.crop, image);
+
+      this.props.onImageLoaded(image, getPixelCrop(image, resolvedCrop));
+
+      if (resolvedCrop !== this.props.crop) {
+        this.props.onChange(resolvedCrop, getPixelCrop(image, resolvedCrop));
+        this.props.onComplete(resolvedCrop, getPixelCrop(image, resolvedCrop));
+      }
     }
   }, {
     key: 'getElementOffset',
@@ -624,16 +623,6 @@ var ReactCrop = function (_PureComponent) {
         width: newWidth,
         height: newHeight
       };
-    }
-  }, {
-    key: 'resolveCropAndTriggerChange',
-    value: function resolveCropAndTriggerChange(crop, image) {
-      var resolvedCrop = resolveCrop(crop, image);
-      if (resolvedCrop !== crop) {
-        this.props.onChange(resolvedCrop, getPixelCrop(image, resolvedCrop));
-        this.props.onComplete(resolvedCrop, getPixelCrop(image, resolvedCrop));
-      }
-      return resolvedCrop;
     }
   }, {
     key: 'dragCrop',
