@@ -162,7 +162,10 @@ function makeAspectCrop(crop, imageAspect) {
     return crop;
   }
 
-  var completeCrop = _extends({}, crop);
+  var completeCrop = _extends({
+    x: 0,
+    y: 0
+  }, crop);
 
   if (crop.width) {
     completeCrop.height = crop.width / crop.aspect * imageAspect;
