@@ -17,6 +17,7 @@ A responsive image cropping tool for React.
 6. [FAQ](#faq)
     1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
     2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
+    3. [How to create a fixed aspect crop programmatically](#how-to-create-a-fixed-aspect-crop-programmatically)
 7. [Contributing / Developing](#contributing--developing)
 
 ## Features
@@ -249,6 +250,18 @@ Some things to note:
 You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
 
 You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
+
+### How to create a fixed aspect crop programmatically
+
+As this library uses percentages for crop values, creating an aspect crop yourself requires you to use the dimensions of the image. You might do this for instance if you have some buttons with pre-defined aspect crops.
+
+The library exports a convenience function for this - `makeAspectCrop(partialCrop, imageAspect)` which takes the image reference you can get from the `onImageLoaded(image, crop)` event. Note that you don't need to do this when a new image loads, in that case the library will fix (or complete if you omited width or height) the crop for you.
+
+When using `makeAspectCrop` specify the aspect, optionally the x and y, and the width or height as a percentage. The other side will be filled in for you.
+
+```js
+const newCrop = makeAspectCrop({ aspect: 16/9, width: 50 }, image.naturalWidth / image.naturalHeight)
+```
 
 ## Contributing / Developing
 
