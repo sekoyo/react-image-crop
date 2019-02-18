@@ -187,6 +187,10 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 Allows setting the crossorigin attribute on the image.
 
+#### renderSelectionAddon(state) (optional)
+
+Render a custom element in crop selection.
+
 ## FAQ
 
 ### What about showing the crop on the client?
