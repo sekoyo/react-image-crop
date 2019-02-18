@@ -66,7 +66,7 @@ class App extends PureComponent {
 
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
-        blob.name = fileName;
+        blob.name = fileName; // eslint-disable-line no-param-reassign
         window.URL.revokeObjectURL(this.fileUrl);
         this.fileUrl = window.URL.createObjectURL(blob);
         resolve(this.fileUrl);
