@@ -87,7 +87,9 @@ exports.containCrop = exports.makeAspectCrop = exports.getPixelCrop = exports.Co
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /* globals document, window */
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); /* globals document, window */
 
 
 var _react = __webpack_require__(1);
@@ -127,8 +129,11 @@ function getClientPos(e) {
   var pageY = void 0;
 
   if (e.touches) {
-    pageX = e.touches[0].pageX;
-    pageY = e.touches[0].pageY;
+    var _e$touches = _slicedToArray(e.touches, 1);
+
+    var _e$touches$ = _e$touches[0];
+    pageX = _e$touches$.pageX;
+    pageY = _e$touches$.pageY;
   } else {
     pageX = e.pageX;
     pageY = e.pageY;
@@ -226,8 +231,14 @@ function getPixelCrop(image, percentCrop) {
   };
 }
 
-function containCrop(previousCrop, crop, imageAspect) {
+function containCrop(prevCrop, crop, imageAspect) {
   var contained = _extends({}, crop);
+
+  // Fixes issue where crop can be dragged to the left when resizing with SW ord
+  // even though it's hit the bottom of the image.
+  if (crop.aspect && prevCrop.x > crop.x && crop.height + crop.y >= 100) {
+    contained.x = prevCrop.x;
+  }
 
   // Don't let the crop grow on the opposite side when hitting an x image boundary.
   var cropXAdjusted = false;
@@ -246,7 +257,7 @@ function containCrop(previousCrop, crop, imageAspect) {
     contained.height = contained.width / crop.aspect * imageAspect;
     // If sizing in up direction we need to pin Y at the point it
     // would be at the boundary.
-    if (previousCrop.y > contained.y) {
+    if (prevCrop.y > contained.y) {
       contained.y = crop.y + (crop.height - contained.height);
     }
   }
@@ -331,7 +342,7 @@ var ReactCrop = function (_PureComponent) {
         yCrossOver: yInversed,
         startXCrossOver: xInversed,
         startYCrossOver: yInversed,
-        isResize: e.target !== _this.cropSelectRef,
+        isResize: e.target.dataset.ord,
         ord: ord,
         cropOffset: cropOffset
       };
@@ -747,7 +758,8 @@ var ReactCrop = function (_PureComponent) {
 
       var _props3 = this.props,
           disabled = _props3.disabled,
-          locked = _props3.locked;
+          locked = _props3.locked,
+          renderSelectionAddon = _props3.renderSelectionAddon;
 
       var style = this.getCropStyle();
 
@@ -778,7 +790,8 @@ var ReactCrop = function (_PureComponent) {
           _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-s', 'data-ord': 's' }),
           _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-sw', 'data-ord': 'sw' }),
           _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-w', 'data-ord': 'w' })
-        )
+        ),
+        renderSelectionAddon && renderSelectionAddon(this.state)
       );
     }
   }, {
@@ -872,7 +885,7 @@ var ReactCrop = function (_PureComponent) {
           onTouchStart: this.onComponentMouseTouchDown,
           onMouseDown: this.onComponentMouseTouchDown,
           role: 'presentation',
-          tabIndex: '1',
+          tabIndex: 1,
           onKeyDown: this.onComponentKeyDown
         },
         _react2.default.createElement('img', {
@@ -889,8 +902,8 @@ var ReactCrop = function (_PureComponent) {
           onError: onImageError,
           alt: imageAlt
         }),
-        cropSelection,
-        children
+        children,
+        cropSelection
       );
     }
   }]);
@@ -945,7 +958,8 @@ ReactCrop.propTypes = {
   onDragStart: _propTypes2.default.func,
   onDragEnd: _propTypes2.default.func,
   src: _propTypes2.default.string.isRequired,
-  style: _propTypes2.default.shape({})
+  style: _propTypes2.default.shape({}),
+  renderSelectionAddon: _propTypes2.default.func
 };
 
 ReactCrop.defaultProps = {
@@ -967,7 +981,8 @@ ReactCrop.defaultProps = {
   onDragEnd: function onDragEnd() {},
   children: undefined,
   style: undefined,
-  imageStyle: undefined
+  imageStyle: undefined,
+  renderSelectionAddon: undefined
 };
 
 exports.default = ReactCrop;
