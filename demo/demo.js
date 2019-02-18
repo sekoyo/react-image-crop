@@ -1,4 +1,4 @@
-/* globals document, FileReader */
+/* globals window, document, FileReader */
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
 import ReactCrop from '../lib/ReactCrop';
@@ -66,7 +66,7 @@ class App extends PureComponent {
 
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
-        blob.name = fileName;
+        blob.name = fileName; // eslint-disable-line no-param-reassign
         window.URL.revokeObjectURL(this.fileUrl);
         this.fileUrl = window.URL.createObjectURL(blob);
         resolve(this.fileUrl);
@@ -84,6 +84,20 @@ class App extends PureComponent {
     }
   }
 
+  renderSelectionAddon = () => (
+    <button
+      type="button"
+      style={{
+        position: 'absolute',
+        bottom: -25,
+        right: 0,
+      }}
+      onClick={() => window.alert('You click addon!')}
+    >
+      custom addon
+    </button>
+  );
+
   render() {
     const { croppedImageUrl } = this.state;
 
@@ -99,6 +113,7 @@ class App extends PureComponent {
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}
+            renderSelectionAddon={this.renderSelectionAddon}
           />
         )}
         {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} />}
