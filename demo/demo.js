@@ -45,6 +45,14 @@ class App extends PureComponent {
     this.setState({ crop });
   }
 
+  onDragStart = () => {
+    console.log('onDragStart');
+  }
+
+  onDragEnd = () => {
+    console.log('onDragEnd');
+  }
+
   getCroppedImg(image, pixelCrop, fileName) {
     console.log('getCroppedImg', { image, pixelCrop, fileName });
     const canvas = document.createElement('canvas');
@@ -113,6 +121,8 @@ class App extends PureComponent {
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}
+            onDragStart={this.onDragStart}
+            onDragEnd={this.onDragEnd}
             renderSelectionAddon={this.renderSelectionAddon}
           />
         )}

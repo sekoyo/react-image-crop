@@ -413,8 +413,6 @@ var ReactCrop = function (_PureComponent) {
           onDragStart = _this$props3.onDragStart;
 
 
-      onDragStart();
-
       if (disabled) {
         return;
       }
@@ -424,6 +422,10 @@ var ReactCrop = function (_PureComponent) {
       }
 
       e.preventDefault(); // Stop drag selection.
+      if (!_this.dragStarted) {
+        _this.dragStarted = true;
+        onDragStart();
+      }
 
       var _this2 = _this,
           evData = _this2.evData;
@@ -502,15 +504,14 @@ var ReactCrop = function (_PureComponent) {
           onDragEnd = _this$props5.onDragEnd;
 
 
-      onDragEnd();
-
       if (disabled) {
         return;
       }
 
       if (_this.mouseDownOnCrop) {
         _this.mouseDownOnCrop = false;
-
+        _this.dragStarted = false;
+        onDragEnd();
         onComplete(crop, getPixelCrop(_this.imageRef, crop));
         _this.setState({ cropIsActive: false });
       }
