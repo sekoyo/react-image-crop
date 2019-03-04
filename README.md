@@ -163,6 +163,10 @@ Inline styles object to be passed to the image wrapper element.
 
 Inline styles object to be passed to the image element.
 
+#### useNaturalImageDimensions (optional)
+
+If true then the pixel crop is calculated using natural dimensions instead of the rendered dimensions (defaults to true).
+
 #### onComplete(crop, pixelCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
