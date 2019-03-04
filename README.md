@@ -165,7 +165,7 @@ Inline styles object to be passed to the image element.
 
 #### useNaturalImageDimensions (optional)
 
-If true then the pixel crop is calcaulted using natural dimensions instead of the default ones
+If true then the pixel crop is calculated using natural dimensions instead of the rendered dimensions (defaults to true).
 
 #### onComplete(crop, pixelCrop) (optional)
 
