@@ -213,21 +213,26 @@ function resolveCrop(crop, image) {
 }
 
 function getPixelCrop(image, percentCrop) {
+  var useNaturalImageDimensions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
   if (!image || !percentCrop) {
     return null;
   }
 
-  var x = Math.round(image.naturalWidth * (percentCrop.x / 100));
-  var y = Math.round(image.naturalHeight * (percentCrop.y / 100));
-  var width = Math.round(image.naturalWidth * (percentCrop.width / 100));
-  var height = Math.round(image.naturalHeight * (percentCrop.height / 100));
+  var imageWidth = useNaturalImageDimensions ? image.naturalWidth : image.width;
+  var imageHeight = useNaturalImageDimensions ? image.naturalHeight : image.height;
+
+  var x = Math.round(imageWidth * (percentCrop.x / 100));
+  var y = Math.round(imageHeight * (percentCrop.y / 100));
+  var width = Math.round(imageWidth * (percentCrop.width / 100));
+  var height = Math.round(imageHeight * (percentCrop.height / 100));
 
   return {
     x: x,
     y: y,
     // Clamp width and height so rounding doesn't cause the crop to exceed bounds.
-    width: clamp(width, 0, image.naturalWidth - x),
-    height: clamp(height, 0, image.naturalHeight - y)
+    width: clamp(width, 0, imageWidth - x),
+    height: clamp(height, 0, imageHeight - y)
   };
 }
 
@@ -355,7 +360,8 @@ var ReactCrop = function (_PureComponent) {
           disabled = _this$props2.disabled,
           locked = _this$props2.locked,
           keepSelection = _this$props2.keepSelection,
-          onChange = _this$props2.onChange;
+          onChange = _this$props2.onChange,
+          useNaturalImageDimensions = _this$props2.useNaturalImageDimensions;
 
 
       if (e.target !== _this.imageRef) {
@@ -403,7 +409,7 @@ var ReactCrop = function (_PureComponent) {
       };
 
       _this.mouseDownOnCrop = true;
-      onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
+      onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop, useNaturalImageDimensions));
       _this.setState({ cropIsActive: true });
     }, _this.onDocMouseTouchMove = function (e) {
       var _this$props3 = _this.props,
@@ -458,7 +464,8 @@ var ReactCrop = function (_PureComponent) {
           crop = _this$props4.crop,
           disabled = _this$props4.disabled,
           onChange = _this$props4.onChange,
-          onComplete = _this$props4.onComplete;
+          onComplete = _this$props4.onComplete,
+          useNaturalImageDimensions = _this$props4.useNaturalImageDimensions;
 
 
       if (disabled) {
@@ -493,15 +500,16 @@ var ReactCrop = function (_PureComponent) {
         nextCrop.x = clamp(nextCrop.x, 0, 100 - nextCrop.width);
         nextCrop.y = clamp(nextCrop.y, 0, 100 - nextCrop.height);
 
-        onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
-        onComplete(nextCrop, getPixelCrop(_this.imageRef, nextCrop));
+        onChange(nextCrop, getPixelCrop(_this.imageRef, nextCrop, useNaturalImageDimensions));
+        onComplete(nextCrop, getPixelCrop(_this.imageRef, nextCrop, useNaturalImageDimensions));
       }
     }, _this.onDocMouseTouchEnd = function () {
       var _this$props5 = _this.props,
           crop = _this$props5.crop,
           disabled = _this$props5.disabled,
           onComplete = _this$props5.onComplete,
-          onDragEnd = _this$props5.onDragEnd;
+          onDragEnd = _this$props5.onDragEnd,
+          useNaturalImageDimensions = _this$props5.useNaturalImageDimensions;
 
 
       if (disabled) {
@@ -512,7 +520,7 @@ var ReactCrop = function (_PureComponent) {
         _this.mouseDownOnCrop = false;
         _this.dragStarted = false;
         onDragEnd();
-        onComplete(crop, getPixelCrop(_this.imageRef, crop));
+        onComplete(crop, getPixelCrop(_this.imageRef, crop, useNaturalImageDimensions));
         _this.setState({ cropIsActive: false });
       }
     }, _temp), _possibleConstructorReturn(_this, _ret);
@@ -557,13 +565,21 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'onImageLoad',
     value: function onImageLoad(image) {
-      var resolvedCrop = resolveCrop(this.props.crop, image);
+      var _props = this.props,
+          crop = _props.crop,
+          onComplete = _props.onComplete,
+          onChange = _props.onChange,
+          onImageLoaded = _props.onImageLoaded,
+          useNaturalImageDimensions = _props.useNaturalImageDimensions;
 
-      this.props.onImageLoaded(image, getPixelCrop(image, resolvedCrop));
 
-      if (resolvedCrop !== this.props.crop) {
-        this.props.onChange(resolvedCrop, getPixelCrop(image, resolvedCrop));
-        this.props.onComplete(resolvedCrop, getPixelCrop(image, resolvedCrop));
+      var resolvedCrop = resolveCrop(crop, image);
+
+      onImageLoaded(image, getPixelCrop(image, resolvedCrop, useNaturalImageDimensions));
+
+      if (resolvedCrop !== crop) {
+        onChange(resolvedCrop, getPixelCrop(image, resolvedCrop, useNaturalImageDimensions));
+        onComplete(resolvedCrop, getPixelCrop(image, resolvedCrop, useNaturalImageDimensions));
       }
     }
   }, {
@@ -595,12 +611,12 @@ var ReactCrop = function (_PureComponent) {
   }, {
     key: 'getNewSize',
     value: function getNewSize() {
-      var _props = this.props,
-          crop = _props.crop,
-          minWidth = _props.minWidth,
-          maxWidth = _props.maxWidth,
-          minHeight = _props.minHeight,
-          maxHeight = _props.maxHeight;
+      var _props2 = this.props,
+          crop = _props2.crop,
+          minWidth = _props2.minWidth,
+          maxWidth = _props2.maxWidth,
+          minHeight = _props2.minHeight,
+          maxHeight = _props2.maxHeight;
       var evData = this.evData;
 
       var imageAspect = this.imageRef.width / this.imageRef.height;
@@ -654,10 +670,10 @@ var ReactCrop = function (_PureComponent) {
     value: function resizeCrop() {
       var nextCrop = this.makeNewCrop();
       var evData = this.evData;
-      var _props2 = this.props,
-          crop = _props2.crop,
-          minWidth = _props2.minWidth,
-          minHeight = _props2.minHeight;
+      var _props3 = this.props,
+          crop = _props3.crop,
+          minWidth = _props3.minWidth,
+          minHeight = _props3.minHeight;
       var ord = evData.ord;
 
       var imageAspect = this.imageRef.width / this.imageRef.height;
@@ -757,10 +773,10 @@ var ReactCrop = function (_PureComponent) {
     value: function createCropSelection() {
       var _this3 = this;
 
-      var _props3 = this.props,
-          disabled = _props3.disabled,
-          locked = _props3.locked,
-          renderSelectionAddon = _props3.renderSelectionAddon;
+      var _props4 = this.props,
+          disabled = _props4.disabled,
+          locked = _props4.locked,
+          renderSelectionAddon = _props4.renderSelectionAddon;
 
       var style = this.getCropStyle();
 
@@ -825,18 +841,18 @@ var ReactCrop = function (_PureComponent) {
     value: function render() {
       var _this4 = this;
 
-      var _props4 = this.props,
-          children = _props4.children,
-          className = _props4.className,
-          crossorigin = _props4.crossorigin,
-          crop = _props4.crop,
-          disabled = _props4.disabled,
-          locked = _props4.locked,
-          imageAlt = _props4.imageAlt,
-          onImageError = _props4.onImageError,
-          src = _props4.src,
-          style = _props4.style,
-          imageStyle = _props4.imageStyle;
+      var _props5 = this.props,
+          children = _props5.children,
+          className = _props5.className,
+          crossorigin = _props5.crossorigin,
+          crop = _props5.crop,
+          disabled = _props5.disabled,
+          locked = _props5.locked,
+          imageAlt = _props5.imageAlt,
+          onImageError = _props5.onImageError,
+          src = _props5.src,
+          style = _props5.style,
+          imageStyle = _props5.imageStyle;
       var cropIsActive = this.state.cropIsActive;
 
       var cropSelection = void 0;
@@ -983,7 +999,8 @@ ReactCrop.defaultProps = {
   children: undefined,
   style: undefined,
   imageStyle: undefined,
-  renderSelectionAddon: undefined
+  renderSelectionAddon: undefined,
+  useNaturalImageDimensions: true
 };
 
 exports.default = ReactCrop;
