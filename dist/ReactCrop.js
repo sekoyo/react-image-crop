@@ -575,9 +575,11 @@ var ReactCrop = function (_PureComponent) {
 
       var resolvedCrop = resolveCrop(crop, image);
 
-      onImageLoaded(image, getPixelCrop(image, resolvedCrop, useNaturalImageDimensions));
+      // Return false from onImageLoaded if you set the crop with setState in there as otherwise the subsequent
+      // onChange + onComplete will not have your updated crop.
+      var res = onImageLoaded(image, getPixelCrop(image, resolvedCrop, useNaturalImageDimensions));
 
-      if (resolvedCrop !== crop) {
+      if (res !== false && resolvedCrop !== crop) {
         onChange(resolvedCrop, getPixelCrop(image, resolvedCrop, useNaturalImageDimensions));
         onComplete(resolvedCrop, getPixelCrop(image, resolvedCrop, useNaturalImageDimensions));
       }
