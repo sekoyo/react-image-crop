@@ -15,7 +15,7 @@ class App extends PureComponent {
     crop: {
       x: 10,
       y: 10,
-      aspect: 1,
+      // aspect: 1,
       width: 50,
     },
   }
@@ -30,14 +30,14 @@ class App extends PureComponent {
     }
   }
 
-  onImageLoaded = (image, pixelCrop) => {
+  onImageLoaded = (image) => {
     this.imageRef = image;
-    this.makeClientCrop(this.state.crop, pixelCrop);
+    this.makeClientCrop(this.state.crop);
   }
 
-  onCropComplete = (crop, pixelCrop) => {
-    console.log('onCropComplete', { crop, pixelCrop });
-    this.makeClientCrop(crop, pixelCrop);
+  onCropComplete = (crop) => {
+    console.log('onCropComplete', crop);
+    this.makeClientCrop(crop);
   }
 
   onCropChange = (crop) => {
@@ -53,23 +53,24 @@ class App extends PureComponent {
     console.log('onDragEnd');
   }
 
-  getCroppedImg(image, pixelCrop, fileName) {
-    console.log('getCroppedImg', { image, pixelCrop, fileName });
+  getCroppedImg(image, crop, fileName) {
     const canvas = document.createElement('canvas');
-    canvas.width = pixelCrop.width;
-    canvas.height = pixelCrop.height;
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = crop.width;
+    canvas.height = crop.height;
     const ctx = canvas.getContext('2d');
 
     ctx.drawImage(
       image,
-      pixelCrop.x,
-      pixelCrop.y,
-      pixelCrop.width,
-      pixelCrop.height,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
       0,
       0,
-      pixelCrop.width,
-      pixelCrop.height,
+      crop.width,
+      crop.height,
     );
 
     return new Promise((resolve) => {
@@ -82,11 +83,11 @@ class App extends PureComponent {
     });
   }
 
-  makeClientCrop(crop, pixelCrop) {
+  makeClientCrop(crop) {
     if (this.imageRef && crop.width && crop.height) {
       this.getCroppedImg(
         this.imageRef,
-        pixelCrop,
+        crop,
         'newFile.jpeg',
       ).then(croppedImageUrl => this.setState({ croppedImageUrl }));
     }
@@ -100,7 +101,7 @@ class App extends PureComponent {
         bottom: -25,
         right: 0,
       }}
-      onClick={() => window.alert('You click addon!')}
+      onClick={() => window.alert('You clicked the addon!')}
     >
       custom addon
     </button>
