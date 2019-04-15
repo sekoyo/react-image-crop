@@ -1,6 +1,6 @@
 {
   "name": "react-image-crop",
-  "version": "6.0.18",
+  "version": "7.0.0",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "dist/ReactCrop.js",
@@ -9,9 +9,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --progress --colors --watch --config demo/webpack.config.js & npm run sass-watch",
     "sass-watch": "node-sass lib/ReactCrop.scss dist/ReactCrop.css --watch",
-    "release-js": "cross-env NODE_ENV=production webpack",
-    "release-css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
-    "release": "npm run release-js && npm run release-css"
+    "build:js": "cross-env NODE_ENV=production webpack",
+    "build:css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
+    "build": "npm run build:js && npm run build:css"
   },
   "author": "Dominic Tobias <dominic.tobias@gmail.com>",
   "keywords": [
@@ -49,7 +49,6 @@
     "react": ">=15.2.2"
   },
   "dependencies": {
-    "@types/react-image-crop": "^6.0.1",
     "prop-types": ">=15.5.8"
   }
 }
