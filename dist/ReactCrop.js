@@ -611,7 +611,7 @@ var ReactCrop = function (_PureComponent) {
 
       if (!_this.dragStarted) {
         _this.dragStarted = true;
-        onDragStart();
+        onDragStart(e);
       }
 
       var _this2 = _this,
@@ -680,7 +680,7 @@ var ReactCrop = function (_PureComponent) {
         onChange(nextCrop);
         onComplete(nextCrop);
       }
-    }, _this.onDocMouseTouchEnd = function () {
+    }, _this.onDocMouseTouchEnd = function (e) {
       var _this$props5 = _this.props,
           crop = _this$props5.crop,
           disabled = _this$props5.disabled,
@@ -695,7 +695,7 @@ var ReactCrop = function (_PureComponent) {
       if (_this.mouseDownOnCrop) {
         _this.mouseDownOnCrop = false;
         _this.dragStarted = false;
-        onDragEnd();
+        onDragEnd(e);
         onComplete(crop);
         _this.setState({ cropIsActive: false });
       }
@@ -779,7 +779,8 @@ var ReactCrop = function (_PureComponent) {
       var crop = this.props.crop;
 
       return {
-        transform: 'translate(' + crop.x + 'px, ' + crop.y + 'px)',
+        top: crop.y + 'px',
+        left: crop.x + 'px',
         width: crop.width + 'px',
         height: crop.height + 'px'
       };
