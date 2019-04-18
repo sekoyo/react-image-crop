@@ -171,11 +171,11 @@ A callback which happens when the image is loaded. Passes the image DOM element.
 
 This event is called if the image had an error loading.
 
-#### onDragStart() (optional)
+#### onDragStart(event) (optional)
 
 A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
 
-#### onDragEnd() (optional)
+#### onDragEnd(event) (optional)
 
 A callback which happens when a user releases the cursor or touch after dragging or resizing.
 
