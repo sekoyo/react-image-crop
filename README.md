@@ -93,6 +93,7 @@ All crop values are in pixels. All crop params are optional.
 
 ```js
 crop: {
+  unit: 'px',
   x: 130,
   y: 50,
   width: 200,
@@ -120,6 +121,16 @@ crop: {
 ```
 
 If you specify just one of the dimensions, the other will be calculated for you.
+
+```js
+crop: {
+  unit: 'pc',
+  width: 50,
+  height: 50,
+}
+```
+
+`unit` is optional and defaults to pixels `px`. It can also be percent `pc`. In the above example we make a crop that is 50% of the renderer image size.
 
 #### minWidth (optional)
 
@@ -165,7 +176,7 @@ Inline styles object to be passed to the image element.
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
 
-`percentCrop` is the crop as a percentage. A typical use case for it would be to save it, so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image was smaller).
+`percentCrop` is the crop as a percentage. A typical use case for it would be to save it so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image is smaller).
 
 #### onImageLoaded(image) (optional)
 
