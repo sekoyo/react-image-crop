@@ -71,7 +71,7 @@ Note when importing the script globally using a `<script>` tag access the compon
 
 You can of course pass a blob url (using `URL.createObjectURL()` and `URL.revokeObjectURL()`) or base64 data.
 
-#### onChange(crop) (required)
+#### onChange(crop, percentCrop) (required)
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
 
@@ -82,6 +82,8 @@ onChange = (crop) => {
   this.setState({ crop });
 }
 ```
+
+`percentCrop` is the crop as a percentage, it is passed for your convenience and you can use it if you choose to. A more likely use would be in [onComplete](#onComplete), though.
 
 #### crop (required*)
 
@@ -159,9 +161,11 @@ Inline styles object to be passed to the image wrapper element.
 
 Inline styles object to be passed to the image element.
 
-#### onComplete(crop) (optional)
+#### onComplete(crop, percentCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
+
+`percentCrop` is the crop as a percentage. A typical use case for it would be to save it, so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image was smaller).
 
 #### onImageLoaded(image) (optional)
 

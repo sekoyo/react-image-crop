@@ -5,14 +5,13 @@ $drag-handle-height: 9px !default;
 $drag-bar-size: 6px !default;
 
 // Query to kick us into "mobile" mode with larger drag handles/bars.
-//  If you're supporting modern browsers, you can use "pointer: coarse",
-//  see: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
-$mobile-media-query: "(max-width: 768px), (pointer: coarse)" !default;
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
+$mobile-media-query: "(pointer: coarse)" !default;
 
 // Mobile handle/bar sizes.  Override as above.
-$drag-handle-mobile-width: $drag-handle-width + 8 !default;
-$drag-handle-mobile-height: $drag-handle-height + 8 !default;
-$drag-bar-mobile-size: $drag-bar-size + 8 !default;
+$drag-handle-mobile-width: $drag-handle-width + 10 !default;
+$drag-handle-mobile-height: $drag-handle-height + 10 !default;
+$drag-bar-mobile-size: $drag-bar-size + 10 !default;
 
 // Handle color/border.
 $drag-handle-background-colour: rgba(0,0,0,0.2) !default;
