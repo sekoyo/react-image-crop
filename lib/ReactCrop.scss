@@ -1,7 +1,7 @@
 // SASS variables for normal drag handle and bar size.
 // Override in your scss file by setting these variables FIRST, then including this file.
-$drag-handle-width: 9px !default;
-$drag-handle-height: 9px !default;
+$drag-handle-width: 10px !default;
+$drag-handle-height: 10px !default;
 $drag-bar-size: 6px !default;
 
 // Query to kick us into "mobile" mode with larger drag handles/bars.
@@ -41,6 +41,7 @@ $drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
     max-height: -webkit-fill-available;
     max-height: -moz-available;
     max-height: fill-available;
+    touch-action: manipulation;
   }
 
   &--crop-invisible &__image {
@@ -55,6 +56,7 @@ $drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
     box-sizing: border-box;
     cursor: move;
     box-shadow: 0 0 0 9999em rgba(0,0,0,.5);
+    touch-action: manipulation;
 
     .ReactCrop--disabled & {
       cursor: inherit;

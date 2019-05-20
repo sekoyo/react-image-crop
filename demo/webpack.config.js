@@ -1,18 +1,18 @@
 module.exports = {
-  devtool: '#cheap-eval-source-map',
+  mode: 'development',
   entry: `${__dirname}/demo`,
   output: {
     path: __dirname,
     filename: 'bundle.js',
   },
   module: {
-    loaders: [{
-      test: /\.(js|jsx)$/,
+    rules: [{
+      test: /\.js$/,
       exclude: /node_modules/,
-      loader: 'babel-loader',
+      use: 'babel-loader',
     }, {
       test: /\.css$/,
-      loader: ['style-loader', 'css-loader'],
+      use: ['style-loader', 'css-loader'],
     }],
   },
 };
