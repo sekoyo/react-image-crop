@@ -13,12 +13,12 @@ class App extends PureComponent {
   state = {
     src: null,
     crop: {
+      unit: 'pc',
       x: 10,
       y: 10,
-      // aspect: 1,
+      aspect: 1,
       width: 50,
       height: 50,
-      unit: 'pc',
     },
   }
 
