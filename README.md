@@ -84,7 +84,7 @@ onChange = (crop) => {
 }
 ```
 
-`percentCrop` is the crop as a percentage, it is passed for your convenience and you can use it if you choose to. A more likely use would be in [onComplete](#onComplete), though.
+`percentCrop` is the crop as a percentage, it is passed for your convenience and you can use it if you choose to. A more likely use would be in [onComplete](#oncompletecrop-percentcrop-optional), though.
 
 #### crop (required*)
 
