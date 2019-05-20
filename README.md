@@ -24,8 +24,9 @@ An image cropping tool for React with no dependencies.
 - Touch enabled
 - Free-form or fixed aspect crops
 - Keyboard support for nudging selection
-- Min/max crop size
+- Crops can be expressed in pixels or percentages
 - No dependencies/small footprint (5KB gzip)
+- Min/max crop size
 
 ## Installation
 ```
@@ -87,7 +88,7 @@ onChange = (crop) => {
 
 #### crop (required*)
 
-All crop values are in pixels. All crop params are optional.
+All crop params are initially optional.
 
 &#42; _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and passed here._
 
@@ -130,7 +131,7 @@ crop: {
 }
 ```
 
-`unit` is optional and defaults to pixels `px`. It can also be percent `pc`. In the above example we make a crop that is 50% of the renderer image size.
+`unit` is optional and defaults to pixels `px`. It can also be percent `pc`. In the above example we make a crop that is 50% of the rendered image size. Since the values are a percentage of the image, it will only be a square if the image is also a square.
 
 #### minWidth (optional)
 
