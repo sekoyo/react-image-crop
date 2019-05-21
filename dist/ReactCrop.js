@@ -420,12 +420,6 @@ function resolveCrop(crop, image) {
 function containCrop(prevCrop, crop, image) {
   var contained = _extends({}, crop);
 
-  // Fixes issue where crop can be dragged to the left when resizing with SW ord
-  // even though it's hit the bottom of the image.
-  if (crop.aspect && prevCrop.x > crop.x && crop.height + crop.y >= image.height) {
-    contained.x = prevCrop.x;
-  }
-
   // Don't let the crop grow on the opposite side when hitting an x image boundary.
   var cropXAdjusted = false;
   if (contained.x + contained.width > image.width) {
@@ -446,6 +440,12 @@ function containCrop(prevCrop, crop, image) {
     if (prevCrop.y > contained.y) {
       contained.y = crop.y + (crop.height - contained.height);
     }
+  }
+
+  // Fixes issue where crop can be dragged to the left when resizing with SW ord
+  // even though it's hit the bottom of the image.
+  if (crop.aspect && prevCrop.x > crop.x && crop.height + crop.y >= image.height) {
+    contained.x = prevCrop.x;
   }
 
   // Don't let the crop grow on the opposite side when hitting a y image boundary.
