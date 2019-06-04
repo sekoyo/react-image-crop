@@ -14,11 +14,7 @@ class App extends PureComponent {
     src: null,
     crop: {
       unit: 'pc',
-      x: 10,
-      y: 10,
-      aspect: 1,
-      width: 50,
-      height: 50,
+      aspect: 16 / 9,
     },
   }
 
@@ -44,8 +40,8 @@ class App extends PureComponent {
 
   onCropChange = (crop, percentCrop) => {
     // console.log('onCropChange', crop, percentCrop);
-    // this.setState({ crop: percentCrop });
-    this.setState({ crop });
+    this.setState({ crop: percentCrop });
+    // this.setState({ crop });
   }
 
   onDragStart = () => {
@@ -127,7 +123,9 @@ class App extends PureComponent {
             onChange={this.onCropChange}
             onDragStart={this.onDragStart}
             onDragEnd={this.onDragEnd}
-            renderSelectionAddon={this.renderSelectionAddon}
+            // renderSelectionAddon={this.renderSelectionAddon}
+            // minWidth={160}
+            // minHeight={90}
           />
         )}
         {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} />}
