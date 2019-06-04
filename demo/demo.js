@@ -15,8 +15,7 @@ class App extends PureComponent {
     crop: {
       x: 10,
       y: 10,
-      aspect: 1,
-      width: 50,
+      aspect: 16 / 9,
     },
   }
 
@@ -124,7 +123,9 @@ class App extends PureComponent {
             onChange={this.onCropChange}
             onDragStart={this.onDragStart}
             onDragEnd={this.onDragEnd}
-            renderSelectionAddon={this.renderSelectionAddon}
+            // renderSelectionAddon={this.renderSelectionAddon}
+            // minWidth={160}
+            // minHeight={90}
           />
         )}
         {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} />}
