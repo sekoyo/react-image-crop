@@ -52,16 +52,15 @@ import 'react-image-crop/lib/ReactCrop.scss';
 
 ## Example
 
-```
+```js
 function CropDemo({ src }) {
   const [crop, setCrop] = useState({ aspect: 16 / 9 });
-  const onCropChange = crop => setCrop(crop);
 
   return (
     <ReactCrop
       src={src}
       crop={crop}
-      onChange={onCropChange}
+      onChange={crop => setCrop(crop)}
     />
   );
 }
@@ -110,11 +109,11 @@ You can use either `crop` or `percentCrop`, the library can handle either interc
 
 All crop params are initially optional.
 
-&#42; _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and passed here._
+&#42; _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` and passed into the component._
 
 ```js
 crop: {
-  unit: 'px', // default
+  unit: 'px', // default, can be 'px' or '%'
   x: 130,
   y: 50,
   width: 200,
@@ -145,13 +144,13 @@ If you specify just one of the dimensions, the other will be calculated for you.
 
 ```js
 crop: {
-  unit: 'pc',
+  unit: '%',
   width: 50,
   height: 50,
 }
 ```
 
-`unit` is optional and defaults to pixels `px`. It can also be percent `pc`. In the above example we make a crop that is 50% of the rendered image size. Since the values are a percentage of the image, it will only be a square if the image is also a square.
+`unit` is optional and defaults to pixels `px`. It can also be percent `%`. In the above example we make a crop that is 50% of the rendered image size. Since the values are a percentage of the image, it will only be a square if the image is also a square.
 
 #### minWidth (optional)
 
