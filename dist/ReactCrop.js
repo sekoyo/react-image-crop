@@ -116,7 +116,904 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+<<<<<<< HEAD
 eval("/*\nobject-assign\n(c) Sindre Sorhus\n@license MIT\n*/\n\n\n/* eslint-disable no-unused-vars */\nvar getOwnPropertySymbols = Object.getOwnPropertySymbols;\nvar hasOwnProperty = Object.prototype.hasOwnProperty;\nvar propIsEnumerable = Object.prototype.propertyIsEnumerable;\n\nfunction toObject(val) {\n\tif (val === null || val === undefined) {\n\t\tthrow new TypeError('Object.assign cannot be called with null or undefined');\n\t}\n\n\treturn Object(val);\n}\n\nfunction shouldUseNative() {\n\ttry {\n\t\tif (!Object.assign) {\n\t\t\treturn false;\n\t\t}\n\n\t\t// Detect buggy property enumeration order in older V8 versions.\n\n\t\t// https://bugs.chromium.org/p/v8/issues/detail?id=4118\n\t\tvar test1 = new String('abc');  // eslint-disable-line no-new-wrappers\n\t\ttest1[5] = 'de';\n\t\tif (Object.getOwnPropertyNames(test1)[0] === '5') {\n\t\t\treturn false;\n\t\t}\n\n\t\t// https://bugs.chromium.org/p/v8/issues/detail?id=3056\n\t\tvar test2 = {};\n\t\tfor (var i = 0; i < 10; i++) {\n\t\t\ttest2['_' + String.fromCharCode(i)] = i;\n\t\t}\n\t\tvar order2 = Object.getOwnPropertyNames(test2).map(function (n) {\n\t\t\treturn test2[n];\n\t\t});\n\t\tif (order2.join('') !== '0123456789') {\n\t\t\treturn false;\n\t\t}\n\n\t\t// https://bugs.chromium.org/p/v8/issues/detail?id=3056\n\t\tvar test3 = {};\n\t\t'abcdefghijklmnopqrst'.split('').forEach(function (letter) {\n\t\t\ttest3[letter] = letter;\n\t\t});\n\t\tif (Object.keys(Object.assign({}, test3)).join('') !==\n\t\t\t\t'abcdefghijklmnopqrst') {\n\t\t\treturn false;\n\t\t}\n\n\t\treturn true;\n\t} catch (err) {\n\t\t// We don't expect any of the above to throw, but better to be safe.\n\t\treturn false;\n\t}\n}\n\nmodule.exports = shouldUseNative() ? Object.assign : function (target, source) {\n\tvar from;\n\tvar to = toObject(target);\n\tvar symbols;\n\n\tfor (var s = 1; s < arguments.length; s++) {\n\t\tfrom = Object(arguments[s]);\n\n\t\tfor (var key in from) {\n\t\t\tif (hasOwnProperty.call(from, key)) {\n\t\t\t\tto[key] = from[key];\n\t\t\t}\n\t\t}\n\n\t\tif (getOwnPropertySymbols) {\n\t\t\tsymbols = getOwnPropertySymbols(from);\n\t\t\tfor (var i = 0; i < symbols.length; i++) {\n\t\t\t\tif (propIsEnumerable.call(from, symbols[i])) {\n\t\t\t\t\tto[symbols[i]] = from[symbols[i]];\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\treturn to;\n};\n\n\n//# sourceURL=webpack://ReactCrop/./node_modules/object-assign/index.js?");
+=======
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.containCrop = exports.makeAspectCrop = exports.Component = exports.default = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); /* globals document, window */
+
+
+var _react = __webpack_require__(3);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(4);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// Feature detection
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
+var passiveSupported = false;
+
+try {
+  window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
+    get: function get() {
+      passiveSupported = true;return true;
+    }
+  }));
+} catch (err) {} // eslint-disable-line no-empty
+
+var EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+
+function getClientPos(e) {
+  var pageX = void 0;
+  var pageY = void 0;
+
+  if (e.touches) {
+    var _e$touches = _slicedToArray(e.touches, 1);
+
+    var _e$touches$ = _e$touches[0];
+    pageX = _e$touches$.pageX;
+    pageY = _e$touches$.pageY;
+  } else {
+    pageX = e.pageX;
+    pageY = e.pageY;
+  }
+
+  return {
+    x: pageX,
+    y: pageY
+  };
+}
+
+function clamp(num, min, max) {
+  return Math.min(Math.max(num, min), max);
+}
+
+function isCropValid(crop) {
+  return crop && crop.width && crop.height && !isNaN(crop.width) && !isNaN(crop.height);
+}
+
+function inverseOrd(ord) {
+  var inversedOrd = void 0;
+
+  if (ord === 'n') inversedOrd = 's';else if (ord === 'ne') inversedOrd = 'sw';else if (ord === 'e') inversedOrd = 'w';else if (ord === 'se') inversedOrd = 'nw';else if (ord === 's') inversedOrd = 'n';else if (ord === 'sw') inversedOrd = 'ne';else if (ord === 'w') inversedOrd = 'e';else if (ord === 'nw') inversedOrd = 'se';
+
+  return inversedOrd;
+}
+
+function makeAspectCrop(crop, image) {
+  if (isNaN(crop.aspect)) {
+    console.warn('`crop.aspect` should be a number in order to make an aspect crop', crop);
+    return crop;
+  }
+
+  var completeCrop = _extends({
+    x: 0,
+    y: 0
+  }, crop);
+
+  if (crop.width) {
+    completeCrop.height = completeCrop.width / crop.aspect;
+  }
+  if (crop.height) {
+    completeCrop.width = completeCrop.height * crop.aspect;
+  }
+
+  if (completeCrop.y + completeCrop.height > image.height) {
+    completeCrop.height = image.height - completeCrop.y;
+    completeCrop.width = completeCrop.height * crop.aspect;
+  }
+
+  if (completeCrop.x + completeCrop.width > image.width) {
+    completeCrop.width = image.width - completeCrop.x;
+    completeCrop.height = completeCrop.width / crop.aspect;
+  }
+
+  return completeCrop;
+}
+
+function isAspectInvalid(crop, image) {
+  if (!crop.width && crop.height || crop.width && !crop.height) {
+    return true;
+  }
+
+  return crop.width / crop.aspect !== crop.height || crop.height * crop.aspect !== crop.width || crop.y + crop.height > image.height || crop.x + crop.width > image.width;
+}
+
+function resolveCrop(crop, image) {
+  if (crop && crop.aspect && isAspectInvalid(crop, image)) {
+    return makeAspectCrop(crop, image);
+  }
+
+  return crop;
+}
+
+function containCrop(prevCrop, crop, image) {
+  var contained = _extends({}, crop);
+
+  // Non-aspects are simple
+  if (!crop.aspect) {
+    if (crop.x < 0) {
+      contained.x = 0;
+      contained.width += crop.x;
+    } else if (crop.x + crop.width > image.width) {
+      contained.width = image.width - crop.x;
+    }
+
+    if (crop.y + crop.height > image.height) {
+      contained.height = image.height - crop.y;
+    }
+
+    return contained;
+  }
+
+  var widthAdjusted = false;
+
+  if (crop.x < 0) {
+    contained.x = 0;
+    contained.width += crop.x;
+    contained.height = contained.width / crop.aspect;
+    widthAdjusted = true;
+  } else if (crop.x + crop.width > image.width) {
+    contained.width = image.width - crop.x;
+    contained.height = contained.width / crop.aspect;
+    widthAdjusted = true;
+  }
+
+  // If sizing in up direction we need to pin Y at the point it
+  // would be at the boundary.
+  if (widthAdjusted && prevCrop.y > contained.y) {
+    contained.y = crop.y + (crop.height - contained.height);
+  }
+
+  var heightAdjusted = false;
+
+  if (contained.y + contained.height > image.height) {
+    contained.height = image.height - contained.y;
+    contained.width = contained.height * contained.aspect;
+    heightAdjusted = true;
+  }
+
+  // If sizing in left direction we need to pin X at the point it
+  // would be at the boundary.
+  if (heightAdjusted && prevCrop.x > contained.x) {
+    contained.x = crop.x + (crop.width - contained.width);
+  }
+
+  return contained;
+}
+
+var ReactCrop = function (_PureComponent) {
+  _inherits(ReactCrop, _PureComponent);
+
+  function ReactCrop() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
+    _classCallCheck(this, ReactCrop);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = ReactCrop.__proto__ || Object.getPrototypeOf(ReactCrop)).call.apply(_ref, [this].concat(args))), _this), _this.window = window, _this.document = document, _this.state = {}, _this.onCropMouseTouchDown = function (e) {
+      var _this$props = _this.props,
+          crop = _this$props.crop,
+          disabled = _this$props.disabled;
+
+
+      if (disabled) {
+        return;
+      }
+
+      e.preventDefault(); // Stop drag selection.
+
+      var clientPos = getClientPos(e);
+
+      // Focus for detecting keypress.
+      _this.componentRef.focus({ preventScroll: true });
+
+      var ord = e.target.dataset.ord;
+
+      var xInversed = ord === 'nw' || ord === 'w' || ord === 'sw';
+      var yInversed = ord === 'nw' || ord === 'n' || ord === 'ne';
+
+      var cropOffset = void 0;
+
+      if (crop.aspect) {
+        cropOffset = _this.getElementOffset(_this.cropSelectRef);
+      }
+
+      _this.evData = {
+        clientStartX: clientPos.x,
+        clientStartY: clientPos.y,
+        cropStartWidth: crop.width,
+        cropStartHeight: crop.height,
+        cropStartX: xInversed ? crop.x + crop.width : crop.x,
+        cropStartY: yInversed ? crop.y + crop.height : crop.y,
+        xInversed: xInversed,
+        yInversed: yInversed,
+        xCrossOver: xInversed,
+        yCrossOver: yInversed,
+        startXCrossOver: xInversed,
+        startYCrossOver: yInversed,
+        isResize: e.target.dataset.ord,
+        ord: ord,
+        cropOffset: cropOffset
+      };
+
+      _this.mouseDownOnCrop = true;
+      _this.setState({ cropIsActive: true });
+    }, _this.onComponentMouseTouchDown = function (e) {
+      var _this$props2 = _this.props,
+          crop = _this$props2.crop,
+          disabled = _this$props2.disabled,
+          locked = _this$props2.locked,
+          keepSelection = _this$props2.keepSelection,
+          onChange = _this$props2.onChange;
+
+
+      if (e.target !== _this.imageRef) {
+        return;
+      }
+
+      if (disabled || locked || keepSelection && isCropValid(crop)) {
+        return;
+      }
+
+      e.preventDefault(); // Stop drag selection.
+
+      var clientPos = getClientPos(e);
+
+      // Focus for detecting keypress.
+      _this.componentRef.focus({ preventScroll: true });
+
+      var imageOffset = _this.getElementOffset(_this.imageRef);
+      var x = clientPos.x - imageOffset.left;
+      var y = clientPos.y - imageOffset.top;
+
+      var nextCrop = {
+        aspect: crop ? crop.aspect : undefined,
+        x: x,
+        y: y,
+        width: 0,
+        height: 0
+      };
+
+      _this.evData = {
+        clientStartX: clientPos.x,
+        clientStartY: clientPos.y,
+        cropStartWidth: nextCrop.width,
+        cropStartHeight: nextCrop.height,
+        cropStartX: nextCrop.x,
+        cropStartY: nextCrop.y,
+        xInversed: false,
+        yInversed: false,
+        xCrossOver: false,
+        yCrossOver: false,
+        startXCrossOver: false,
+        startYCrossOver: false,
+        isResize: true,
+        ord: 'nw'
+      };
+
+      _this.mouseDownOnCrop = true;
+      onChange(nextCrop);
+      _this.setState({ cropIsActive: true });
+    }, _this.onDocMouseTouchMove = function (e) {
+      var _this$props3 = _this.props,
+          crop = _this$props3.crop,
+          disabled = _this$props3.disabled,
+          onChange = _this$props3.onChange,
+          onDragStart = _this$props3.onDragStart;
+
+
+      if (disabled) {
+        return;
+      }
+
+      if (!_this.mouseDownOnCrop) {
+        return;
+      }
+
+      e.preventDefault(); // Stop drag selection.
+
+      if (!_this.dragStarted) {
+        _this.dragStarted = true;
+        onDragStart(e);
+      }
+
+      var _this2 = _this,
+          evData = _this2.evData;
+
+      var clientPos = getClientPos(e);
+
+      if (evData.isResize && crop.aspect && evData.cropOffset) {
+        clientPos.y = _this.straightenYPath(clientPos.x);
+      }
+
+      evData.xDiff = clientPos.x - evData.clientStartX;
+      evData.yDiff = clientPos.y - evData.clientStartY;
+
+      var nextCrop = void 0;
+
+      if (evData.isResize) {
+        nextCrop = _this.resizeCrop();
+      } else {
+        nextCrop = _this.dragCrop();
+      }
+
+      if (nextCrop !== crop) {
+        onChange(nextCrop);
+      }
+    }, _this.onComponentKeyDown = function (e) {
+      var _this$props4 = _this.props,
+          crop = _this$props4.crop,
+          disabled = _this$props4.disabled,
+          onChange = _this$props4.onChange,
+          onComplete = _this$props4.onComplete;
+
+
+      if (disabled) {
+        return;
+      }
+
+      var keyCode = e.which;
+      var nudged = false;
+
+      if (!isCropValid(crop)) {
+        return;
+      }
+
+      var nextCrop = _this.makeNewCrop();
+
+      if (keyCode === ReactCrop.arrowKey.left) {
+        nextCrop.x -= ReactCrop.nudgeStep;
+        nudged = true;
+      } else if (keyCode === ReactCrop.arrowKey.right) {
+        nextCrop.x += ReactCrop.nudgeStep;
+        nudged = true;
+      } else if (keyCode === ReactCrop.arrowKey.up) {
+        nextCrop.y -= ReactCrop.nudgeStep;
+        nudged = true;
+      } else if (keyCode === ReactCrop.arrowKey.down) {
+        nextCrop.y += ReactCrop.nudgeStep;
+        nudged = true;
+      }
+
+      if (nudged) {
+        e.preventDefault(); // Stop drag selection.
+        nextCrop.x = clamp(nextCrop.x, 0, _this.imageRef.width - nextCrop.width);
+        nextCrop.y = clamp(nextCrop.y, 0, _this.imageRef.height - nextCrop.height);
+
+        onChange(nextCrop);
+        onComplete(nextCrop);
+      }
+    }, _this.onDocMouseTouchEnd = function (e) {
+      var _this$props5 = _this.props,
+          crop = _this$props5.crop,
+          disabled = _this$props5.disabled,
+          onComplete = _this$props5.onComplete,
+          onDragEnd = _this$props5.onDragEnd;
+
+
+      if (disabled) {
+        return;
+      }
+
+      if (_this.mouseDownOnCrop) {
+        _this.mouseDownOnCrop = false;
+        _this.dragStarted = false;
+        onDragEnd(e);
+        onComplete(crop);
+        _this.setState({ cropIsActive: false });
+      }
+    }, _temp), _possibleConstructorReturn(_this, _ret);
+  }
+
+  _createClass(ReactCrop, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var options = passiveSupported ? { passive: false } : false;
+
+      this.document.addEventListener('mousemove', this.onDocMouseTouchMove, options);
+      this.document.addEventListener('touchmove', this.onDocMouseTouchMove, options);
+
+      this.document.addEventListener('mouseup', this.onDocMouseTouchEnd, options);
+      this.document.addEventListener('touchend', this.onDocMouseTouchEnd, options);
+      this.document.addEventListener('touchcancel', this.onDocMouseTouchEnd, options);
+
+      if (this.imageRef.complete || this.imageRef.readyState) {
+        if (this.imageRef.naturalWidth === 0) {
+          // Broken load on iOS, PR #51
+          // https://css-tricks.com/snippets/jquery/fixing-load-in-ie-for-cached-images/
+          // http://stackoverflow.com/questions/821516/browser-independent-way-to-detect-when-image-has-been-loaded
+          var src = this.imageRef.src;
+
+          this.imageRef.src = EMPTY_GIF;
+          this.imageRef.src = src;
+        } else {
+          this.onImageLoad(this.imageRef);
+        }
+      }
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.document.removeEventListener('mousemove', this.onDocMouseTouchMove);
+      this.document.removeEventListener('touchmove', this.onDocMouseTouchMove);
+
+      this.document.removeEventListener('mouseup', this.onDocMouseTouchEnd);
+      this.document.removeEventListener('touchend', this.onDocMouseTouchEnd);
+      this.document.removeEventListener('touchcancel', this.onDocMouseTouchEnd);
+    }
+  }, {
+    key: 'onImageLoad',
+    value: function onImageLoad(image) {
+      var _props = this.props,
+          crop = _props.crop,
+          onComplete = _props.onComplete,
+          onChange = _props.onChange,
+          onImageLoaded = _props.onImageLoaded;
+
+
+      var resolvedCrop = resolveCrop(crop, image);
+
+      // Return false from onImageLoaded if you set the crop with setState in there as otherwise the subsequent
+      // onChange + onComplete will not have your updated crop.
+      var res = onImageLoaded(image);
+
+      if (res !== false && resolvedCrop !== crop) {
+        onChange(resolvedCrop);
+        onComplete(resolvedCrop);
+      }
+    }
+  }, {
+    key: 'getElementOffset',
+    value: function getElementOffset(el) {
+      var rect = el.getBoundingClientRect();
+      var docEl = this.document.documentElement;
+
+      var rectTop = rect.top + this.window.pageYOffset - docEl.clientTop;
+      var rectLeft = rect.left + this.window.pageXOffset - docEl.clientLeft;
+
+      return {
+        top: rectTop,
+        left: rectLeft
+      };
+    }
+  }, {
+    key: 'getCropStyle',
+    value: function getCropStyle() {
+      var crop = this.props.crop;
+
+      return {
+        top: crop.y + 'px',
+        left: crop.x + 'px',
+        width: crop.width + 'px',
+        height: crop.height + 'px'
+      };
+    }
+  }, {
+    key: 'getNewSize',
+    value: function getNewSize() {
+      var _props2 = this.props,
+          crop = _props2.crop,
+          minWidth = _props2.minWidth,
+          maxWidth = _props2.maxWidth,
+          minHeight = _props2.minHeight,
+          maxHeight = _props2.maxHeight;
+      var evData = this.evData,
+          imageRef = this.imageRef;
+
+      // New width.
+
+      var newWidth = evData.cropStartWidth + evData.xDiff;
+
+      if (evData.xCrossOver) {
+        newWidth = Math.abs(newWidth);
+      }
+
+      newWidth = clamp(newWidth, minWidth, maxWidth || imageRef.width);
+
+      // New height.
+      var newHeight = void 0;
+
+      if (crop.aspect) {
+        newHeight = newWidth / crop.aspect;
+      } else {
+        newHeight = evData.cropStartHeight + evData.yDiff;
+      }
+
+      if (evData.yCrossOver) {
+        // Cap if polarity is inversed and the height fills the y space.
+        newHeight = Math.min(Math.abs(newHeight), evData.cropStartY);
+      }
+
+      newHeight = clamp(newHeight, minHeight, maxHeight || imageRef.height);
+
+      if (crop.aspect) {
+        newWidth = clamp(newHeight * crop.aspect, 0, this.imageRef.width);
+      }
+
+      return {
+        width: newWidth,
+        height: newHeight
+      };
+    }
+  }, {
+    key: 'dragCrop',
+    value: function dragCrop() {
+      var nextCrop = this.makeNewCrop();
+      var evData = this.evData;
+
+      nextCrop.x = clamp(evData.cropStartX + evData.xDiff, 0, this.imageRef.width - nextCrop.width);
+      nextCrop.y = clamp(evData.cropStartY + evData.yDiff, 0, this.imageRef.height - nextCrop.height);
+      return nextCrop;
+    }
+  }, {
+    key: 'resizeCrop',
+    value: function resizeCrop() {
+      var nextCrop = this.makeNewCrop();
+      var evData = this.evData;
+      var _props3 = this.props,
+          crop = _props3.crop,
+          minWidth = _props3.minWidth,
+          minHeight = _props3.minHeight;
+      var ord = evData.ord;
+
+      // On the inverse change the diff so it's the same and
+      // the same algo applies.
+
+      if (evData.xInversed) {
+        evData.xDiff -= evData.cropStartWidth * 2;
+      }
+      if (evData.yInversed) {
+        evData.yDiff -= evData.cropStartHeight * 2;
+      }
+
+      // New size.
+      var newSize = this.getNewSize();
+
+      // Adjust x/y to give illusion of 'staticness' as width/height is increased
+      // when polarity is inversed.
+      var newX = evData.cropStartX;
+      var newY = evData.cropStartY;
+
+      if (evData.xCrossOver) {
+        newX = nextCrop.x + (nextCrop.width - newSize.width);
+      }
+
+      if (evData.yCrossOver) {
+        // This not only removes the little "shake" when inverting at a diagonal, but for some
+        // reason y was way off at fast speeds moving sw->ne with fixed aspect only, I couldn't
+        // figure out why.
+        if (evData.lastYCrossover === false) {
+          newY = nextCrop.y - newSize.height;
+        } else {
+          newY = nextCrop.y + (nextCrop.height - newSize.height);
+        }
+      }
+
+      var containedCrop = containCrop(this.props.crop, {
+        x: newX,
+        y: newY,
+        width: newSize.width,
+        height: newSize.height,
+        aspect: nextCrop.aspect
+      }, this.imageRef);
+
+      // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
+      if (nextCrop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
+        nextCrop.x = containedCrop.x;
+        nextCrop.y = containedCrop.y;
+        nextCrop.width = containedCrop.width;
+        nextCrop.height = containedCrop.height;
+      } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
+        nextCrop.x = containedCrop.x;
+        nextCrop.width = containedCrop.width;
+      } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
+        nextCrop.y = containedCrop.y;
+        nextCrop.height = containedCrop.height;
+      }
+
+      evData.lastYCrossover = evData.yCrossOver;
+      this.crossOverCheck();
+
+      // Ensure new dimensions aren't less than min dimensions.
+      if (minWidth && nextCrop.width < minWidth) {
+        return crop;
+      }
+
+      if (minHeight && nextCrop.height < minHeight) {
+        return crop;
+      }
+
+      return nextCrop;
+    }
+  }, {
+    key: 'straightenYPath',
+    value: function straightenYPath(clientX) {
+      var evData = this.evData;
+      var ord = evData.ord;
+      var cropOffset = evData.cropOffset,
+          cropStartWidth = evData.cropStartWidth,
+          cropStartHeight = evData.cropStartHeight;
+
+      var k = void 0;
+      var d = void 0;
+
+      if (ord === 'nw' || ord === 'se') {
+        k = cropStartHeight / cropStartWidth;
+        d = cropOffset.top - cropOffset.left * k;
+      } else {
+        k = -cropStartHeight / cropStartWidth;
+        d = cropOffset.top + (cropStartHeight - cropOffset.left * k);
+      }
+
+      return k * clientX + d;
+    }
+  }, {
+    key: 'createCropSelection',
+    value: function createCropSelection() {
+      var _this3 = this;
+
+      var _props4 = this.props,
+          disabled = _props4.disabled,
+          locked = _props4.locked,
+          renderSelectionAddon = _props4.renderSelectionAddon;
+
+      var style = this.getCropStyle();
+
+      return _react2.default.createElement(
+        'div',
+        {
+          ref: function ref(n) {
+            _this3.cropSelectRef = n;
+          },
+          style: style,
+          className: 'ReactCrop__crop-selection',
+          onMouseDown: this.onCropMouseTouchDown,
+          onTouchStart: this.onCropMouseTouchDown,
+          role: 'presentation'
+        },
+        !disabled && !locked && _react2.default.createElement(
+          'div',
+          { className: 'ReactCrop__drag-elements' },
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-n', 'data-ord': 'n' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-e', 'data-ord': 'e' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-s', 'data-ord': 's' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-bar ord-w', 'data-ord': 'w' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-nw', 'data-ord': 'nw' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-n', 'data-ord': 'n' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-ne', 'data-ord': 'ne' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-e', 'data-ord': 'e' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-se', 'data-ord': 'se' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-s', 'data-ord': 's' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-sw', 'data-ord': 'sw' }),
+          _react2.default.createElement('div', { className: 'ReactCrop__drag-handle ord-w', 'data-ord': 'w' })
+        ),
+        renderSelectionAddon && renderSelectionAddon(this.state)
+      );
+    }
+  }, {
+    key: 'makeNewCrop',
+    value: function makeNewCrop() {
+      return _extends({}, ReactCrop.defaultCrop, this.props.crop);
+    }
+  }, {
+    key: 'crossOverCheck',
+    value: function crossOverCheck() {
+      var evData = this.evData;
+
+
+      if (!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiff >= 0 || evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiff <= 0) {
+        evData.xCrossOver = !evData.xCrossOver;
+      }
+
+      if (!evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiff >= 0 || evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiff <= 0) {
+        evData.yCrossOver = !evData.yCrossOver;
+      }
+
+      var swapXOrd = evData.xCrossOver !== evData.startXCrossOver;
+      var swapYOrd = evData.yCrossOver !== evData.startYCrossOver;
+
+      evData.inversedXOrd = swapXOrd ? inverseOrd(evData.ord) : false;
+      evData.inversedYOrd = swapYOrd ? inverseOrd(evData.ord) : false;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this4 = this;
+
+      var _props5 = this.props,
+          children = _props5.children,
+          className = _props5.className,
+          crossorigin = _props5.crossorigin,
+          crop = _props5.crop,
+          disabled = _props5.disabled,
+          locked = _props5.locked,
+          imageAlt = _props5.imageAlt,
+          onImageError = _props5.onImageError,
+          src = _props5.src,
+          style = _props5.style,
+          imageStyle = _props5.imageStyle;
+      var cropIsActive = this.state.cropIsActive;
+
+      var cropSelection = void 0;
+
+      if (isCropValid(crop)) {
+        cropSelection = this.createCropSelection();
+      }
+
+      var componentClasses = ['ReactCrop'];
+
+      if (cropIsActive) {
+        componentClasses.push('ReactCrop--active');
+      }
+
+      if (crop) {
+        if (crop.aspect) {
+          componentClasses.push('ReactCrop--fixed-aspect');
+        }
+
+        // In this case we have to shadow the image, since the box-shadow
+        // on the crop won't work.
+        if (cropIsActive && (!crop.width || !crop.height)) {
+          componentClasses.push('ReactCrop--crop-invisible');
+        }
+      }
+
+      if (disabled) {
+        componentClasses.push('ReactCrop--disabled');
+      }
+
+      if (locked) {
+        componentClasses.push('ReactCrop--locked');
+      }
+
+      if (className) {
+        componentClasses.push.apply(componentClasses, _toConsumableArray(className.split(' ')));
+      }
+
+      return _react2.default.createElement(
+        'div',
+        {
+          ref: function ref(n) {
+            _this4.componentRef = n;
+          },
+          className: componentClasses.join(' '),
+          style: style,
+          onTouchStart: this.onComponentMouseTouchDown,
+          onMouseDown: this.onComponentMouseTouchDown,
+          role: 'presentation',
+          tabIndex: 1,
+          onKeyDown: this.onComponentKeyDown
+        },
+        _react2.default.createElement('img', {
+          ref: function ref(n) {
+            _this4.imageRef = n;
+          },
+          crossOrigin: crossorigin,
+          className: 'ReactCrop__image',
+          style: imageStyle,
+          src: src,
+          onLoad: function onLoad(e) {
+            return _this4.onImageLoad(e.target);
+          },
+          onError: onImageError,
+          alt: imageAlt
+        }),
+        children,
+        cropSelection
+      );
+    }
+  }]);
+
+  return ReactCrop;
+}(_react.PureComponent);
+
+ReactCrop.xOrds = ['e', 'w'];
+ReactCrop.yOrds = ['n', 's'];
+ReactCrop.xyOrds = ['nw', 'ne', 'se', 'sw'];
+
+ReactCrop.arrowKey = {
+  left: 37,
+  up: 38,
+  right: 39,
+  down: 40
+};
+
+ReactCrop.nudgeStep = 0.2;
+
+ReactCrop.defaultCrop = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0
+};
+
+ReactCrop.propTypes = {
+  className: _propTypes2.default.string,
+  crossorigin: _propTypes2.default.string,
+  children: _propTypes2.default.oneOfType([_propTypes2.default.arrayOf(_propTypes2.default.node), _propTypes2.default.node]),
+  crop: _propTypes2.default.shape({
+    aspect: _propTypes2.default.number,
+    x: _propTypes2.default.number,
+    y: _propTypes2.default.number,
+    width: _propTypes2.default.number,
+    height: _propTypes2.default.number
+  }),
+  disabled: _propTypes2.default.bool,
+  locked: _propTypes2.default.bool,
+  imageAlt: _propTypes2.default.string,
+  imageStyle: _propTypes2.default.shape({}),
+  keepSelection: _propTypes2.default.bool,
+  minWidth: _propTypes2.default.number,
+  minHeight: _propTypes2.default.number,
+  maxWidth: _propTypes2.default.number,
+  maxHeight: _propTypes2.default.number,
+  onChange: _propTypes2.default.func.isRequired,
+  onImageError: _propTypes2.default.func,
+  onComplete: _propTypes2.default.func,
+  onImageLoaded: _propTypes2.default.func,
+  onDragStart: _propTypes2.default.func,
+  onDragEnd: _propTypes2.default.func,
+  src: _propTypes2.default.string.isRequired,
+  style: _propTypes2.default.shape({}),
+  renderSelectionAddon: _propTypes2.default.func
+};
+
+ReactCrop.defaultProps = {
+  className: undefined,
+  crop: undefined,
+  crossorigin: undefined,
+  disabled: false,
+  locked: false,
+  imageAlt: '',
+  maxWidth: undefined,
+  maxHeight: undefined,
+  minWidth: 0,
+  minHeight: 0,
+  keepSelection: false,
+  onComplete: function onComplete() {},
+  onImageError: function onImageError() {},
+  onImageLoaded: function onImageLoaded() {},
+  onDragStart: function onDragStart() {},
+  onDragEnd: function onDragEnd() {},
+  children: undefined,
+  style: undefined,
+  imageStyle: undefined,
+  renderSelectionAddon: undefined
+};
+
+exports.default = ReactCrop;
+exports.Component = ReactCrop;
+exports.makeAspectCrop = makeAspectCrop;
+exports.containCrop = containCrop;
+>>>>>>> master
 
 /***/ }),
 

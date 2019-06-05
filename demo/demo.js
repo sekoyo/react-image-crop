@@ -13,8 +13,8 @@ class App extends PureComponent {
   state = {
     src: null,
     crop: {
-      unit: 'pc',
-      aspect: 16 / 9,
+      // unit: 'px',
+      // aspect: 16 / 9,
     },
   }
 
@@ -40,8 +40,8 @@ class App extends PureComponent {
 
   onCropChange = (crop, percentCrop) => {
     // console.log('onCropChange', crop, percentCrop);
-    this.setState({ crop: percentCrop });
-    // this.setState({ crop });
+    // this.setState({ crop: percentCrop });
+    this.setState({ crop });
   }
 
   onDragStart = () => {

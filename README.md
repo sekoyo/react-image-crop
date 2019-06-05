@@ -12,6 +12,7 @@ An image cropping tool for React with no dependencies.
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Usage](#usage)
+3. [Example](#example)
 4. [CDN](#cdn)
 5. [Props](#props)
 6. [FAQ](#faq)
@@ -21,12 +22,13 @@ An image cropping tool for React with no dependencies.
 
 ## Features
 
-- Touch enabled
-- Free-form or fixed aspect crops
-- Keyboard support for nudging selection
-- Crops can be expressed in pixels or percentages
-- No dependencies/small footprint (5KB gzip)
-- Min/max crop size
+- Responsive (you can use pixels or percentages).
+- Touch enabled.
+- Free-form or fixed aspect crops.
+- Keyboard support for nudging selection.
+- Crops can be expressed in pixels or percentages.
+- No dependencies/small footprint (5KB gzip).
+- Min/max crop size.
 
 ## Installation
 ```
@@ -48,6 +50,25 @@ import 'react-image-crop/dist/ReactCrop.css';
 // or scss:
 import 'react-image-crop/lib/ReactCrop.scss';
 ```
+
+## Example
+
+```
+function CropDemo({ src }) {
+  const [crop, setCrop] = useState({ aspect: 16 / 9 });
+  const onCropChange = crop => setCrop(crop);
+
+  return (
+    <ReactCrop
+      src={src}
+      crop={crop}
+      onChange={onCropChange}
+    />
+  );
+}
+```
+
+See the [sandbox demo](https://codesandbox.io/s/72py4jlll6) for a more complete example.
 
 ## CDN
 
@@ -84,7 +105,7 @@ onChange = (crop) => {
 }
 ```
 
-`percentCrop` is the crop as a percentage, it is passed for your convenience and you can use it if you choose to. A more likely use would be in [onComplete](#oncompletecrop-percentcrop-optional), though.
+You can use either `crop` or `percentCrop`, the library can handle either interchangeably. Percent crops will be drawn using percentages, not converted to pixels.
 
 #### crop (required*)
 
@@ -94,7 +115,7 @@ All crop params are initially optional.
 
 ```js
 crop: {
-  unit: 'px',
+  unit: 'px', // default
   x: 130,
   y: 50,
   width: 200,
