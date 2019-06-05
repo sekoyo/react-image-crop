@@ -13,8 +13,7 @@ class App extends PureComponent {
   state = {
     src: null,
     crop: {
-      // unit: 'px',
-      // aspect: 16 / 9,
+      aspect: 16 / 9,
     },
   }
 
@@ -30,7 +29,6 @@ class App extends PureComponent {
 
   onImageLoaded = (image) => {
     this.imageRef = image;
-    this.makeClientCrop(this.state.crop);
   }
 
   onCropComplete = (crop, percentCrop) => {
