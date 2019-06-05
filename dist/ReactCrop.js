@@ -436,36 +436,36 @@ function containCrop(prevCrop, crop, image) {
     return contained;
   }
 
-  var heightAdjusted = false;
+  var widthAdjusted = false;
 
   if (crop.x < 0) {
     contained.x = 0;
     contained.width += crop.x;
     contained.height = contained.width / crop.aspect;
-    heightAdjusted = true;
+    widthAdjusted = true;
   } else if (crop.x + crop.width > image.width) {
     contained.width = image.width - crop.x;
     contained.height = contained.width / crop.aspect;
-    heightAdjusted = true;
+    widthAdjusted = true;
   }
 
   // If sizing in up direction we need to pin Y at the point it
   // would be at the boundary.
-  if (heightAdjusted && prevCrop.y > contained.y) {
+  if (widthAdjusted && prevCrop.y > contained.y) {
     contained.y = crop.y + (crop.height - contained.height);
   }
 
-  var widthAdjusted = false;
+  var heightAdjusted = false;
 
-  if (crop.y + crop.height > image.height) {
-    contained.height = image.height - crop.y;
-    contained.width = contained.height * crop.aspect;
-    widthAdjusted = true;
+  if (contained.y + contained.height > image.height) {
+    contained.height = image.height - contained.y;
+    contained.width = contained.height * contained.aspect;
+    heightAdjusted = true;
   }
 
   // If sizing in left direction we need to pin X at the point it
   // would be at the boundary.
-  if (widthAdjusted && prevCrop.x > contained.x) {
+  if (heightAdjusted && prevCrop.x > contained.x) {
     contained.x = crop.x + (crop.width - contained.width);
   }
 
