@@ -13,9 +13,8 @@ class App extends PureComponent {
   state = {
     src: null,
     crop: {
-      x: 10,
-      y: 10,
-      aspect: 16 / 9,
+      // unit: 'px',
+      // aspect: 16 / 9,
     },
   }
 
@@ -34,13 +33,14 @@ class App extends PureComponent {
     this.makeClientCrop(this.state.crop);
   }
 
-  onCropComplete = (crop) => {
-    console.log('onCropComplete', crop);
+  onCropComplete = (crop, percentCrop) => {
+    console.log('onCropComplete', crop, percentCrop);
     this.makeClientCrop(crop);
   }
 
-  onCropChange = (crop) => {
-    // console.log('onCropChange', crop);
+  onCropChange = (crop, percentCrop) => {
+    // console.log('onCropChange', crop, percentCrop);
+    // this.setState({ crop: percentCrop });
     this.setState({ crop });
   }
 

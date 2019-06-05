@@ -12,6 +12,7 @@ An image cropping tool for React with no dependencies.
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Usage](#usage)
+3. [Example](#example)
 4. [CDN](#cdn)
 5. [Props](#props)
 6. [FAQ](#faq)
@@ -21,11 +22,13 @@ An image cropping tool for React with no dependencies.
 
 ## Features
 
-- Touch enabled
-- Free-form or fixed aspect crops
-- Keyboard support for nudging selection
-- Min/max crop size
-- No dependencies/small footprint (5KB gzip)
+- Responsive (you can use pixels or percentages).
+- Touch enabled.
+- Free-form or fixed aspect crops.
+- Keyboard support for nudging selection.
+- Crops can be expressed in pixels or percentages.
+- No dependencies/small footprint (5KB gzip).
+- Min/max crop size.
 
 ## Installation
 ```
@@ -47,6 +50,25 @@ import 'react-image-crop/dist/ReactCrop.css';
 // or scss:
 import 'react-image-crop/lib/ReactCrop.scss';
 ```
+
+## Example
+
+```
+function CropDemo({ src }) {
+  const [crop, setCrop] = useState({ aspect: 16 / 9 });
+  const onCropChange = crop => setCrop(crop);
+
+  return (
+    <ReactCrop
+      src={src}
+      crop={crop}
+      onChange={onCropChange}
+    />
+  );
+}
+```
+
+See the [sandbox demo](https://codesandbox.io/s/72py4jlll6) for a more complete example.
 
 ## CDN
 
@@ -71,7 +93,7 @@ Note when importing the script globally using a `<script>` tag access the compon
 
 You can of course pass a blob url (using `URL.createObjectURL()` and `URL.revokeObjectURL()`) or base64 data.
 
-#### onChange(crop) (required)
+#### onChange(crop, percentCrop) (required)
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
 
@@ -83,14 +105,17 @@ onChange = (crop) => {
 }
 ```
 
+You can use either `crop` or `percentCrop`, the library can handle either interchangeably. Percent crops will be drawn using percentages, not converted to pixels.
+
 #### crop (required*)
 
-All crop values are in pixels. All crop params are optional.
+All crop params are initially optional.
 
 &#42; _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` callback and passed here._
 
 ```js
 crop: {
+  unit: 'px', // default
   x: 130,
   y: 50,
   width: 200,
@@ -118,6 +143,16 @@ crop: {
 ```
 
 If you specify just one of the dimensions, the other will be calculated for you.
+
+```js
+crop: {
+  unit: 'pc',
+  width: 50,
+  height: 50,
+}
+```
+
+`unit` is optional and defaults to pixels `px`. It can also be percent `pc`. In the above example we make a crop that is 50% of the rendered image size. Since the values are a percentage of the image, it will only be a square if the image is also a square.
 
 #### minWidth (optional)
 
@@ -159,9 +194,11 @@ Inline styles object to be passed to the image wrapper element.
 
 Inline styles object to be passed to the image element.
 
-#### onComplete(crop) (optional)
+#### onComplete(crop, percentCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
+
+`percentCrop` is the crop as a percentage. A typical use case for it would be to save it so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image is smaller).
 
 #### onImageLoaded(image) (optional)
 
