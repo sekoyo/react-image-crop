@@ -206,7 +206,7 @@ Useful if you want to set a crop based on the image dimensions when using pixels
 
 ```js
 onImageLoaded = image => {
-  this.setState({ crop: { width: image.with, height: image.height } });
+  this.setState({ crop: { width: image.width, height: image.height } });
   return false;
 }
 ```
