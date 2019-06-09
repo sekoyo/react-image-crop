@@ -202,6 +202,17 @@ A callback which happens after a resize, drag, or nudge. Passes the current crop
 
 A callback which happens when the image is loaded. Passes the image DOM element.
 
+Useful if you want to set a crop based on the image dimensions when using pixels:
+
+```js
+onImageLoaded = image => {
+  this.setState({ crop: { width: image.with, height: image.height } });
+  return false;
+}
+```
+
+Note that you must **return false** in this callback if you are changing the crop object.
+
 #### onImageError(event) (optional)
 
 This event is called if the image had an error loading.
