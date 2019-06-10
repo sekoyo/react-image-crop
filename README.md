@@ -140,7 +140,7 @@ crop: {
 }
 ```
 
-If you specify just one of the dimensions, the other will be calculated for you.
+If you specify just one of the dimensions, the other will be calculated for you. If you do this you must do it BEFORE the image has loaded.
 
 ```js
 crop: {
