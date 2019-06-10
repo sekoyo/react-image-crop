@@ -7,7 +7,7 @@
 		exports["ReactCrop"] = factory(require("react"));
 	else
 		root["ReactCrop"] = factory(root["React"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE_react__) {
+})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_react__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
