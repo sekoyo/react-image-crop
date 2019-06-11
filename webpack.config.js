@@ -1,47 +1,43 @@
 const path = require('path');
 const webpack = require('webpack');
 
-function getConfig(minified) {
+function getConfig(env) {
   const config = {
+    mode: env,
     entry: './lib/ReactCrop',
     output: {
       path: path.resolve('dist'),
       library: 'ReactCrop',
       libraryTarget: 'umd',
-      filename: minified ? 'ReactCrop.min.js' : 'ReactCrop.js',
+      filename: env === 'production' ? 'ReactCrop.min.js' : 'ReactCrop.js',
     },
     target: 'web',
     externals: {
       react: {
         root: 'React',
-        commonjs2: 'react',
         commonjs: 'react',
+        commonjs2: 'react',
         amd: 'react',
       },
     },
     module: {
-      loaders: [{
-        test: /\.(js|jsx)$/,
+      rules: [{
+        test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        use: 'babel-loader',
       }],
     },
-  };
-
-  if (minified) {
-    config.plugins = [
-      new webpack.optimize.ModuleConcatenationPlugin(),
-      new webpack.optimize.UglifyJsPlugin(),
+    plugins: [
       new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        'process.env.NODE_ENV': JSON.stringify(env),
       }),
-    ];
-  }
+    ],
+  };
 
   return config;
 }
 
 module.exports = [
-  getConfig(),
-  getConfig(true),
+  getConfig('development'),
+  getConfig('production'),
 ];

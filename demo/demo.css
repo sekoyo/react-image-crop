@@ -3,6 +3,6 @@ body {
   margin: 0;
 }
 
-#crop-editor {
-	margin: 50px;
+.App {
+  margin: 20%;
 }

@@ -1,18 +1,33 @@
 # React Image Crop
 
-A responsive image cropping tool for React.
+An image cropping tool for React with no dependencies.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
+[Sandbox Demo](https://codesandbox.io/s/72py4jlll6)
+
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
+
+## Table of Contents
+1. [Features](#features)
+2. [Installation](#installation)
+3. [Usage](#usage)
+3. [Example](#example)
+4. [CDN](#cdn)
+5. [Props](#props)
+6. [FAQ](#faq)
+    1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
+    2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
+7. [Contributing / Developing](#contributing--developing)
 
 ## Features
 
-- Responsive
-- Touch enabled
-- Free-form or fixed aspect crops
-- Keyboard support for nudging selection
-- Min/max crop size
+- Responsive (you can use pixels or percentages).
+- Touch enabled.
+- Free-form or fixed aspect crops.
+- Keyboard support for nudging selection.
+- No dependencies/small footprint (5KB gzip).
+- Min/max crop size.
 
 ## Installation
 ```
@@ -21,11 +36,9 @@ npm i react-image-crop --save
 
 ## Usage
 
-Include the main js module, e.g.:
+Include the main js module:
 
 ```js
-var ReactCrop = require('react-image-crop');
-// or es6:
 import ReactCrop from 'react-image-crop';
 ```
 
@@ -36,6 +49,24 @@ import 'react-image-crop/dist/ReactCrop.css';
 // or scss:
 import 'react-image-crop/lib/ReactCrop.scss';
 ```
+
+## Example
+
+```js
+function CropDemo({ src }) {
+  const [crop, setCrop] = useState({ aspect: 16 / 9 });
+
+  return (
+    <ReactCrop
+      src={src}
+      crop={crop}
+      onChange={crop => setCrop(crop)}
+    />
+  );
+}
+```
+
+See the [sandbox demo](https://codesandbox.io/s/72py4jlll6) for a more complete example.
 
 ## CDN
 
@@ -48,6 +79,8 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 <script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
 ```
 
+Note when importing the script globally using a `<script>` tag access the component with `ReactCrop.Component`.
+
 ## Props
 
 #### src (required)
@@ -56,62 +89,13 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 <ReactCrop src="path/to/image.jpg" />
 ```
 
-You can of course pass a blob path or base64 data.
+You can of course pass a blob url (using `URL.createObjectURL()` and `URL.revokeObjectURL()`) or base64 data.
 
-#### crop (optional)
+#### onChange(crop, percentCrop) (required)
 
-All crop values are in percentages, and are relative to the image. All crop params are optional.
+A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
 
-```js
-var crop = {
-  x: 20,
-  y: 10,
-  width: 30,
-  height: 10
-}
-
-<ReactCrop src="path/to/image.jpg" crop={crop} />
-```
-
-If you want a fixed aspect can either omit `width` and `height`:
-
- ```js
-var crop = {
-  aspect: 16/9
-}
-```
-
-Or you need to specify both. As ReactCrop is based on percentages you will need to know the ratio of the image. If you don't, see [onImageLoaded](https://github.com/DominicTobias/react-image-crop#onimageloadedimage-optional) for how to set your crop in there.
-
-#### minWidth (optional)
-
-A minimum crop width, as a percentage of the image width.
-
-#### minHeight (optional)
-
-A minimum crop height, as a percentage of the image height.
-
-#### maxWidth (optional)
-
-A maximum crop width, as a percentage of the image width.
-
-#### maxHeight (optional)
-
-A maximum crop height, as a percentage of the image height.
-
-#### keepSelection (optional)
-
-If true is passed then selection can't be disabled if the user clicks outside the selection area.
-
-#### disabled (optional)
-
-If true then the user cannot modify or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
-
-#### onChange(crop, pixelCrop)
-
-A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object, as well as a pixel-converted crop for your convenience.
-
-**Note you _must_ implement this callback** and update your crop state, otherwise nothing will change!
+Note you _must_ implement this callback and update your crop state, otherwise nothing will change!
 
 ```js
 onChange = (crop) => {
@@ -119,38 +103,125 @@ onChange = (crop) => {
 }
 ```
 
-#### onComplete(crop, pixelCrop) (optional)
+You can use either `crop` or `percentCrop`, the library can handle either interchangeably. Percent crops will be drawn using percentages, not converted to pixels.
 
-A callback which happens after a resize, drag, or nudge. Passes the current crop state object, as well as a pixel-converted crop for your convenience.
+#### crop (required*)
+
+All crop params are initially optional.
+
+&#42; _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` and passed into the component._
+
+```js
+crop: {
+  unit: 'px', // default, can be 'px' or '%'
+  x: 130,
+  y: 50,
+  width: 200,
+  height: 200
+}
+
+<ReactCrop src="path/to/image.jpg" crop={this.state.crop} />
+```
+
+If you want a fixed aspect you can either omit `width` and `height`:
+
+ ```js
+crop: {
+  aspect: 16/9
+}
+```
+
+Or specify one or both of the dimensions:
+
+```js
+crop: {
+  aspect: 16/9,
+  width: 50,
+}
+```
+
+If you specify just one of the dimensions, the other will be calculated for you.
+
+```js
+crop: {
+  unit: '%',
+  width: 50,
+  height: 50,
+}
+```
+
+`unit` is optional and defaults to pixels `px`. It can also be percent `%`. In the above example we make a crop that is 50% of the rendered image size. Since the values are a percentage of the image, it will only be a square if the image is also a square.
+
+#### minWidth (optional)
+
+A minimum crop width, in pixels.
+
+#### minHeight (optional)
+
+A minimum crop height, in pixels.
+
+#### maxWidth (optional)
+
+A maximum crop width, in pixels.
+
+#### maxHeight (optional)
+
+A maximum crop height, in pixels.
+
+#### keepSelection (optional)
+
+If true is passed then selection can't be disabled if the user clicks outside the selection area.
+
+#### disabled (optional)
+
+If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
+
+#### locked (optional)
+
+If true then the user cannot create or resize a crop, but can still drag the existing crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
+
+#### className (optional)
+
+A string of classes to add to the main `ReactCrop` element.
+
+#### style (optional)
+
+Inline styles object to be passed to the image wrapper element.
+
+#### imageStyle (optional)
+
+Inline styles object to be passed to the image element.
+
+#### onComplete(crop, percentCrop) (optional)
+
+A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
+
+`percentCrop` is the crop as a percentage. A typical use case for it would be to save it so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image is smaller).
 
 #### onImageLoaded(image) (optional)
 
 A callback which happens when the image is loaded. Passes the image DOM element.
 
-*Note* you should set your crop here if you're using `crop.aspect` along with a width _or_ height. Since ReactCrop uses percentages we can only infer the correct width and height once we know the image ratio.
+Useful if you want to set a crop based on the image dimensions when using pixels:
 
 ```js
-import ReactCrop, { makeAspectCrop } from 'react-image-crop';
-
-onImageLoaded = (image) => {
-  this.setState({
-    crop: makeAspectCrop({
-      x: 0,
-      y: 0,
-      aspect: 16 / 9,
-      width: 50,
-    }, image.width / image.height),
-  });
+onImageLoaded = image => {
+  this.setState({ crop: { width: image.width, height: image.height } });
+  return false;
 }
 ```
 
-Of course if you already know the image ratio (or you're just specifying the aspect) you can set the crop earlier.
+Note that you must **return false** in this callback if you are changing the crop object.
 
-#### onDragStart() (optional)
+#### onImageError(event) (optional)
+
+This event is called if the image had an error loading.
+
+#### onDragStart(event) (optional)
 
 A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
 
-#### onDragEnd() (optional)
+#### onDragEnd(event) (optional)
 
 A callback which happens when a user releases the cursor or touch after dragging or resizing.
 
@@ -158,34 +229,42 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 Allows setting the crossorigin attribute on the image.
 
-## What about showing the crop on the client?
+#### renderSelectionAddon(state) (optional)
+
+Render a custom element in crop selection.
+
+## FAQ
+
+### What about showing the crop on the client?
+
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend.
 
-However here's a ready to use function that returns a file blob for the cropped part after providing some parameters you already have when you use this package:
+However here's a ready to use function that returns a file blob for the cropped part after providing some parameters you already have when using this package:
 
 ```js
 /**
  * @param {File} image - Image File Object
- * @param {Object} pixelCrop - pixelCrop Object provided by react-image-crop
+ * @param {Object} crop - crop Object
  * @param {String} fileName - Name of the returned file in Promise
  */
-function getCroppedImg(image, pixelCrop, fileName) {
-
+function getCroppedImg(image, crop, fileName) {
   const canvas = document.createElement('canvas');
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+  canvas.width = crop.width;
+  canvas.height = crop.height;
   const ctx = canvas.getContext('2d');
 
   ctx.drawImage(
     image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
+    crop.x * scaleX,
+    crop.y * scaleY,
+    crop.width * scaleX,
+    crop.height * scaleY,
     0,
     0,
-    pixelCrop.width,
-    pixelCrop.height
+    crop.width,
+    crop.height,
   );
 
   // As Base64 string
@@ -193,15 +272,15 @@ function getCroppedImg(image, pixelCrop, fileName) {
 
   // As a blob
   return new Promise((resolve, reject) => {
-    canvas.toBlob(file => {
-      file.name = fileName;
-      resolve(file);
+    canvas.toBlob(blob => {
+      blob.name = fileName;
+      resolve(blob);
     }, 'image/jpeg');
   });
 }
 
 async test() {
-  const croppedImg = await getCroppedImg(image, pixelCrop, returnedFileName);
+  const croppedImg = await getCroppedImg(image, crop, fileName);
 }
 ```
 
@@ -213,10 +292,14 @@ Some things to note:
 
 3. Another option to make the conversion faster is to scale the image down before converting it.
 
+### How to handle image EXIF orientation/rotation
+
+You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
+
+You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
+
 ## Contributing / Developing
 
 To develop run `npm start`, this will recompile your JS and SCSS on changes.
 
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
-
-You don't need to run the `npm run release` step, this is only for publishing to NPM.

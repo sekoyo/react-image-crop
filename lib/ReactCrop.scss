@@ -1,14 +1,21 @@
-$drag-handle-width: 9px;
-$drag-handle-height: 9px;
-$drag-handle-background-colour: rgba(0,0,0,0.2);
-$drag-handle-border: 1px solid rgba(255,255,255,0.7);
+// SASS variables for normal drag handle and bar size.
+// Override in your scss file by setting these variables FIRST, then including this file.
+$drag-handle-width: 10px !default;
+$drag-handle-height: 10px !default;
+$drag-bar-size: 6px !default;
 
-$drag-bar-size: 6px;
+// Query to kick us into "mobile" mode with larger drag handles/bars.
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
+$mobile-media-query: "(pointer: coarse)" !default;
 
-$mobile-max-width: 768px;
-$drag-handle-mobile-width: $drag-handle-width + 8;
-$drag-handle-mobile-height: $drag-handle-height + 8;
-$drag-bar-mobile-size: $drag-bar-size + 8;
+// Mobile handle/bar sizes.  Override as above.
+$drag-handle-mobile-width: $drag-handle-width + 10 !default;
+$drag-handle-mobile-height: $drag-handle-height + 10 !default;
+$drag-bar-mobile-size: $drag-bar-size + 10 !default;
+
+// Handle color/border.
+$drag-handle-background-colour: rgba(0,0,0,0.2) !default;
+$drag-handle-border: 1px solid rgba(255,255,255,0.7) !default;
 
 .ReactCrop {
   position: relative;
@@ -22,13 +29,19 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
     outline: none;
   }
 
-  &--disabled {
+  &--disabled,
+  &--locked {
     cursor: inherit;
   }
 
   &__image {
+    /* autoprefixer: off */
     display: block;
     max-width: 100%;
+    max-height: -webkit-fill-available;
+    max-height: -moz-available;
+    max-height: fill-available;
+    touch-action: manipulation;
   }
 
   &--crop-invisible &__image {
@@ -43,6 +56,7 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
     box-sizing: border-box;
     cursor: move;
     box-shadow: 0 0 0 9999em rgba(0,0,0,.5);
+    touch-action: manipulation;
 
     .ReactCrop--disabled & {
       cursor: inherit;
@@ -138,28 +152,28 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
       left: 0;
       width: 100%;
       height: $drag-bar-size;
-      margin-top: -($drag-bar-size - 2);
+      margin-top: -($drag-bar-size / 2);
     }
     &.ord-e {
       right: 0;
       top: 0;
       width: $drag-bar-size;
       height: 100%;
-      margin-right: -($drag-bar-size - 2);
+      margin-right: -($drag-bar-size / 2);
     }
     &.ord-s {
       bottom: 0;
       left: 0;
       width: 100%;
       height: $drag-bar-size;
-      margin-bottom: -($drag-bar-size - 2);
+      margin-bottom: -($drag-bar-size / 2);
     }
     &.ord-w {
       top: 0;
       left: 0;
       width: $drag-bar-size;
       height: 100%;
-      margin-left: -($drag-bar-size - 2);
+      margin-left: -($drag-bar-size / 2);
     }
   }
 
@@ -176,7 +190,7 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
     display: none;
   }
 
-  @media (max-width: $mobile-max-width) {
+  @media #{$mobile-media-query} {
     &__drag-handle {
       width: $drag-handle-mobile-width;
       height: $drag-handle-mobile-height;
@@ -217,19 +231,19 @@ $drag-bar-mobile-size: $drag-bar-size + 8;
 
     &__drag-bar.ord-n {
       height: $drag-bar-mobile-size;
-      margin-top: -($drag-bar-mobile-size - 2);
+      margin-top: -($drag-bar-mobile-size / 2);
     }
     &__drag-bar.ord-e {
       width: $drag-bar-mobile-size;
-      margin-right: -($drag-bar-mobile-size - 2);
+      margin-right: -($drag-bar-mobile-size / 2);
     }
     &__drag-bar.ord-s {
       height: $drag-bar-mobile-size;
-      margin-bottom: -($drag-bar-mobile-size - 2);
+      margin-bottom: -($drag-bar-mobile-size / 2);
     }
     &__drag-bar.ord-w {
       width: $drag-bar-mobile-size;
-      margin-left: -($drag-bar-mobile-size - 2);
+      margin-left: -($drag-bar-mobile-size / 2);
     }
   }
 }
