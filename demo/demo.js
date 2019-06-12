@@ -12,9 +12,10 @@ const cropEditor = document.querySelector('#crop-editor');
 class App extends PureComponent {
   state = {
     src: null,
-    // crop: {
-    //   aspect: 16 / 9,
-    // },
+    crop: {
+      width: 200,
+      aspect: 16 / 9,
+    },
   }
 
   onSelectFile = (e) => {
@@ -29,8 +30,8 @@ class App extends PureComponent {
 
   onImageLoaded = (image) => {
     this.imageRef = image;
-    this.setState({ crop: { width: 50, height: 50 } });
-    return false;
+    // this.setState({ crop: { width: 50, height: 50 } });
+    // return false;
   }
 
   onCropComplete = (crop, percentCrop) => {
