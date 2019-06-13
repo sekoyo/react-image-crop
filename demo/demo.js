@@ -13,7 +13,10 @@ class App extends PureComponent {
   state = {
     src: null,
     crop: {
-      width: 200,
+      // x: 200,
+      // y: 200,
+      unit: '%',
+      width: 50,
       aspect: 16 / 9,
     },
   }
