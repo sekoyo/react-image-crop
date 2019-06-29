@@ -1,8 +1,11 @@
 /* globals window, document, FileReader */
+/* eslint-disable jsx-a11y/media-has-caption, class-methods-use-this */
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
 import ReactCrop from '../lib/ReactCrop';
 import '../dist/ReactCrop.css';
+
+const mp4Url = 'http://techslides.com/demos/sample-videos/small.mp4';
 
 /**
  * Load the image in the crop editor.
@@ -96,6 +99,12 @@ class App extends PureComponent {
     }
   }
 
+  renderVideo = () => (
+    <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
+      <source src={mp4Url} type="video/mp4" />
+    </video>
+  )
+
   renderSelectionAddon = () => (
     <button
       type="button"
@@ -120,6 +129,7 @@ class App extends PureComponent {
         </div>
         {this.state.src && (
           <ReactCrop
+            // renderComponent={this.renderVideo()}
             src={this.state.src}
             crop={this.state.crop}
             onImageLoaded={this.onImageLoaded}
