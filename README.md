@@ -60,7 +60,7 @@ function CropDemo({ src }) {
     <ReactCrop
       src={src}
       crop={crop}
-      onChange={crop => setCrop(crop)}
+      onChange={setCrop}
     />
   );
 }
