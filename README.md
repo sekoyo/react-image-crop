@@ -233,6 +233,23 @@ Allows setting the crossorigin attribute on the image.
 
 Render a custom element in crop selection.
 
+#### renderComponent (optional)
+
+ Render a custom HTML element in place of an image. Useful if you want to support videos:
+
+ ```js
+  const videoComponent = (
+    <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
+      <source src="sample.mp4" type="video/mp4" />
+    </video>
+  );
+
+  <ReactCrop
+    onChange={this.onCropChange}
+    renderComponent={videoComponent}
+  />
+```
+
 ## FAQ
 
 ### What about showing the crop on the client?
