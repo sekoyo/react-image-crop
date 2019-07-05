@@ -3,7 +3,7 @@
   "version": "8.1.0",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
-  "main": "dist/ReactCrop.js",
+  "main": "dist/ReactCrop.min.js",
   "style": "dist/ReactCrop.css",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
