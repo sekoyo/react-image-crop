@@ -260,7 +260,7 @@ However here's a ready to use function that returns a file blob for the cropped 
 
 ```js
 /**
- * @param {File} image - Image File Object
+ * @param {HTMLImageElement} image - Image File Object
  * @param {Object} crop - crop Object
  * @param {String} fileName - Name of the returned file in Promise
  */
