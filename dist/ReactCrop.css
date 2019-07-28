@@ -34,6 +34,31 @@
     border-image-repeat: repeat; }
     .ReactCrop--disabled .ReactCrop__crop-selection {
       cursor: inherit; }
+    .ReactCrop--circular-crop .ReactCrop__crop-selection {
+      border-radius: 50%; }
+  .ReactCrop__rule-of-thirds-vt::before, .ReactCrop__rule-of-thirds-vt::after, .ReactCrop__rule-of-thirds-hz::before, .ReactCrop__rule-of-thirds-hz::after {
+    content: '';
+    display: block;
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.9); }
+  .ReactCrop__rule-of-thirds-vt::before, .ReactCrop__rule-of-thirds-vt::after {
+    width: 1px;
+    height: 100%; }
+  .ReactCrop__rule-of-thirds-vt::before {
+    left: 33.3333%;
+    left: calc(100% / 3); }
+  .ReactCrop__rule-of-thirds-vt::after {
+    left: 66.6666%;
+    left: calc(100% / 3 * 2); }
+  .ReactCrop__rule-of-thirds-hz::before, .ReactCrop__rule-of-thirds-hz::after {
+    width: 100%;
+    height: 1px; }
+  .ReactCrop__rule-of-thirds-hz::before {
+    top: 33.3333%;
+    top: calc(100% / 3); }
+  .ReactCrop__rule-of-thirds-hz::after {
+    top: 66.6666%;
+    top: calc(100% / 3 * 2); }
   .ReactCrop__drag-handle {
     position: absolute;
     width: 10px;

@@ -22,9 +22,9 @@ class App extends PureComponent {
       width: 50,
       aspect: 16 / 9,
     },
-  }
+  };
 
-  onSelectFile = (e) => {
+  onSelectFile = e => {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
       reader.addEventListener('load', () => {
@@ -32,32 +32,32 @@ class App extends PureComponent {
       });
       reader.readAsDataURL(e.target.files[0]);
     }
-  }
+  };
 
-  onImageLoaded = (image) => {
+  onImageLoaded = image => {
     this.imageRef = image;
     // this.setState({ crop: { width: 50, height: 50 } });
     // return false;
-  }
+  };
 
   onCropComplete = (crop, percentCrop) => {
     console.log('onCropComplete', crop, percentCrop);
     this.makeClientCrop(crop);
-  }
+  };
 
   onCropChange = (crop, percentCrop) => {
     // console.log('onCropChange', crop, percentCrop);
     this.setState({ crop: percentCrop });
     // this.setState({ crop });
-  }
+  };
 
   onDragStart = () => {
     console.log('onDragStart');
-  }
+  };
 
   onDragEnd = () => {
     console.log('onDragEnd');
-  }
+  };
 
   getCroppedImg(image, crop, fileName) {
     const canvas = document.createElement('canvas');
@@ -76,11 +76,11 @@ class App extends PureComponent {
       0,
       0,
       crop.width,
-      crop.height,
+      crop.height
     );
 
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
+    return new Promise(resolve => {
+      canvas.toBlob(blob => {
         blob.name = fileName; // eslint-disable-line no-param-reassign
         window.URL.revokeObjectURL(this.fileUrl);
         this.fileUrl = window.URL.createObjectURL(blob);
@@ -91,11 +91,9 @@ class App extends PureComponent {
 
   makeClientCrop(crop) {
     if (this.imageRef && crop.width && crop.height) {
-      this.getCroppedImg(
-        this.imageRef,
-        crop,
-        'newFile.jpeg',
-      ).then(croppedImageUrl => this.setState({ croppedImageUrl }));
+      this.getCroppedImg(this.imageRef, crop, 'newFile.jpeg').then(croppedImageUrl =>
+        this.setState({ croppedImageUrl })
+      );
     }
   }
 
@@ -103,7 +101,7 @@ class App extends PureComponent {
     <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
       <source src={mp4Url} type="video/mp4" />
     </video>
-  )
+  );
 
   renderSelectionAddon = () => (
     <button
@@ -132,6 +130,8 @@ class App extends PureComponent {
             // renderComponent={this.renderVideo()}
             src={this.state.src}
             crop={this.state.crop}
+            // ruleOfThirds
+            // circularCrop
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}

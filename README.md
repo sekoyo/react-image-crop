@@ -41,15 +41,15 @@ npm i react-image-crop --save
 Include the main js module:
 
 ```js
-import ReactCrop from "react-image-crop";
+import ReactCrop from 'react-image-crop';
 ```
 
 Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
 ```js
-import "react-image-crop/dist/ReactCrop.css";
+import 'react-image-crop/dist/ReactCrop.css';
 // or scss:
-import "react-image-crop/lib/ReactCrop.scss";
+import 'react-image-crop/lib/ReactCrop.scss';
 ```
 
 ## Example
@@ -236,7 +236,7 @@ Render a custom HTML element in place of an image. Useful if you want to support
 
 ```js
 const videoComponent = (
-  <video autoPlay loop style={{ display: "block", maxWidth: "100%" }}>
+  <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
     <source src="sample.mp4" type="video/mp4" />
   </video>
 );
@@ -247,6 +247,10 @@ const videoComponent = (
 #### ruleOfThirds (optional)
 
 Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the cropped area. Defaults to `false`.
+
+#### circularCrop (optional)
+
+Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
 ## FAQ
 
