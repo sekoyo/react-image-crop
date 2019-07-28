@@ -9,16 +9,17 @@ An image cropping tool for React with no dependencies.
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
 ## Table of Contents
+
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Usage](#usage)
-3. [Example](#example)
-4. [CDN](#cdn)
-5. [Props](#props)
-6. [FAQ](#faq)
-    1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
-    2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
-7. [Contributing / Developing](#contributing--developing)
+4. [Example](#example)
+5. [CDN](#cdn)
+6. [Props](#props)
+7. [FAQ](#faq)
+   1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
+   2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
+8. [Contributing / Developing](#contributing--developing)
 
 ## Features
 
@@ -30,6 +31,7 @@ An image cropping tool for React with no dependencies.
 - Min/max crop size.
 
 ## Installation
+
 ```
 npm i react-image-crop --save
 ```
@@ -39,15 +41,15 @@ npm i react-image-crop --save
 Include the main js module:
 
 ```js
-import ReactCrop from 'react-image-crop';
+import ReactCrop from "react-image-crop";
 ```
 
 Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
 ```js
-import 'react-image-crop/dist/ReactCrop.css';
+import "react-image-crop/dist/ReactCrop.css";
 // or scss:
-import 'react-image-crop/lib/ReactCrop.scss';
+import "react-image-crop/lib/ReactCrop.scss";
 ```
 
 ## Example
@@ -56,13 +58,7 @@ import 'react-image-crop/lib/ReactCrop.scss';
 function CropDemo({ src }) {
   const [crop, setCrop] = useState({ aspect: 16 / 9 });
 
-  return (
-    <ReactCrop
-      src={src}
-      crop={crop}
-      onChange={setCrop}
-    />
-  );
+  return <ReactCrop src={src} crop={crop} onChange={setCrop} />;
 }
 ```
 
@@ -72,9 +68,10 @@ See the [sandbox demo](https://codesandbox.io/s/72py4jlll6) for a more complete 
 
 If you prefer to include ReactCrop globally by marking `react-image-crop` as external in your application, then include `react-image-crop` from one of the following CDNs:
 
-* **cdnjs** *(Coming soon)*
+- **cdnjs** _(Coming soon)_
 
-* [**unpkg**](https://unpkg.com/react-image-crop/)
+- [**unpkg**](https://unpkg.com/react-image-crop/)
+
 ```html
 <script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
 ```
@@ -98,18 +95,18 @@ A callback which happens for every change of the crop (i.e. many times as you ar
 Note you _must_ implement this callback and update your crop state, otherwise nothing will change!
 
 ```js
-onChange = (crop) => {
+onChange = crop => {
   this.setState({ crop });
-}
+};
 ```
 
 You can use either `crop` or `percentCrop`, the library can handle either interchangeably. Percent crops will be drawn using percentages, not converted to pixels.
 
-#### crop (required*)
+#### crop (required\*)
 
 All crop params are initially optional.
 
-&#42; _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` and passed into the component._
+\* _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` and passed into the component._
 
 ```js
 crop: {
@@ -125,9 +122,9 @@ crop: {
 
 If you want a fixed aspect you can either omit `width` and `height`:
 
- ```js
+```js
 crop: {
-  aspect: 16/9
+  aspect: 16 / 9;
 }
 ```
 
@@ -208,7 +205,7 @@ Useful if you want to set a crop based on the image dimensions when using pixels
 onImageLoaded = image => {
   this.setState({ crop: { width: image.width, height: image.height } });
   return false;
-}
+};
 ```
 
 Note that you must **return false** in this callback if you are changing the crop object.
@@ -235,20 +232,21 @@ Render a custom element in crop selection.
 
 #### renderComponent (optional)
 
- Render a custom HTML element in place of an image. Useful if you want to support videos:
+Render a custom HTML element in place of an image. Useful if you want to support videos:
 
- ```js
-  const videoComponent = (
-    <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
-      <source src="sample.mp4" type="video/mp4" />
-    </video>
-  );
+```js
+const videoComponent = (
+  <video autoPlay loop style={{ display: "block", maxWidth: "100%" }}>
+    <source src="sample.mp4" type="video/mp4" />
+  </video>
+);
 
-  <ReactCrop
-    onChange={this.onCropChange}
-    renderComponent={videoComponent}
-  />
+<ReactCrop onChange={this.onCropChange} renderComponent={videoComponent} />;
 ```
+
+#### ruleOfThirds (optional)
+
+Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the cropped area. Defaults to `false`.
 
 ## FAQ
 
@@ -303,7 +301,7 @@ async test() {
 
 Some things to note:
 
-1. [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. *Always* use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
+1. [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. _Always_ use `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
 
 2. [toBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob) is both faster and asynchronous, but not supported on old browsers (this is quickly becoming irrelevant).
 
