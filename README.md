@@ -57,7 +57,7 @@ import 'react-image-crop/lib/ReactCrop.scss';
 ```js
 function CropDemo({ src }) {
   const [crop, setCrop] = useState({ aspect: 16 / 9 });
-  return <ReactCrop src={src} crop={crop} onChange={setCrop} />;
+  return <ReactCrop src={src} crop={crop} onChange={newCrop => setCrop(newCrop)} />;
 }
 ```
 
