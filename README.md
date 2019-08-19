@@ -293,7 +293,7 @@ function getCroppedImg(image, crop, fileName) {
     canvas.toBlob(blob => {
       blob.name = fileName;
       resolve(blob);
-    }, 'image/jpeg');
+    }, 'image/jpeg', 1);
   });
 }
 
