@@ -1,3 +1,4 @@
+/* eslint-env node */
 const path = require('path');
 const webpack = require('webpack');
 
@@ -10,7 +11,7 @@ function getConfig(env) {
       library: 'ReactCrop',
       libraryTarget: 'umd',
       filename: env === 'production' ? 'ReactCrop.min.js' : 'ReactCrop.js',
-      globalObject: 'this'
+      globalObject: 'this',
     },
     target: 'web',
     externals: {
@@ -22,11 +23,13 @@ function getConfig(env) {
       },
     },
     module: {
-      rules: [{
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: 'babel-loader',
-      }],
+      rules: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: 'babel-loader',
+        },
+      ],
     },
     plugins: [
       new webpack.DefinePlugin({
@@ -38,7 +41,4 @@ function getConfig(env) {
   return config;
 }
 
-module.exports = [
-  getConfig('development'),
-  getConfig('production'),
-];
+module.exports = [getConfig('development'), getConfig('production')];
