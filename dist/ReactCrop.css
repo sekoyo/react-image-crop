@@ -10,12 +10,8 @@
   .ReactCrop--disabled, .ReactCrop--locked {
     cursor: inherit; }
   .ReactCrop__image {
-    /* autoprefixer: off */
     display: block;
     max-width: 100%;
-    max-height: -webkit-fill-available;
-    max-height: -moz-available;
-    max-height: fill-available;
     touch-action: manipulation; }
   .ReactCrop--crop-invisible .ReactCrop__image {
     opacity: 0.5; }
