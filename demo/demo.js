@@ -1,4 +1,3 @@
-/* globals window, document, FileReader */
 /* eslint-disable jsx-a11y/media-has-caption, class-methods-use-this */
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
@@ -18,9 +17,10 @@ class App extends PureComponent {
     crop: {
       // x: 200,
       // y: 200,
-      // unit: '%',
-      // width: 50,
-      // aspect: 16 / 9,
+      unit: 'px',
+      width: 300,
+      height: 300,
+      aspect: 1,
     },
   };
 
@@ -35,9 +35,9 @@ class App extends PureComponent {
   };
 
   onImageLoaded = image => {
-    this.imageRef = image;
-    this.setState({ crop: { width: 50, height: 50 } });
-    return false;
+    // this.imageRef = image;
+    // this.setState({ crop: { unit: 'px', width: 50, height: 50 } });
+    // return false;
   };
 
   onCropComplete = (crop, percentCrop) => {
@@ -47,8 +47,8 @@ class App extends PureComponent {
 
   onCropChange = (crop, percentCrop) => {
     // console.log('onCropChange', crop, percentCrop);
-    this.setState({ crop: percentCrop });
-    // this.setState({ crop });
+    // this.setState({ crop: percentCrop });
+    this.setState({ crop });
   };
 
   onDragStart = () => {
@@ -138,8 +138,8 @@ class App extends PureComponent {
             onDragStart={this.onDragStart}
             onDragEnd={this.onDragEnd}
             // renderSelectionAddon={this.renderSelectionAddon}
-            // minWidth={160}
-            // minHeight={90}
+            // minWidth={100}
+            minHeight={100}
           />
         )}
         {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} />}

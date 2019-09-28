@@ -1,6 +1,9 @@
 module.exports = {
   extends: ['eslint:recommended', 'plugin:react/recommended'],
   parser: 'babel-eslint',
+  env: {
+    browser: true,
+  },
   plugins: ['react', 'jsx-a11y', 'import'],
   rules: {
     'operator-linebreak': 0,
