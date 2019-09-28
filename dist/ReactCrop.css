@@ -31,7 +31,8 @@
     .ReactCrop--disabled .ReactCrop__crop-selection {
       cursor: inherit; }
     .ReactCrop--circular-crop .ReactCrop__crop-selection {
-      border-radius: 50%; }
+      border-radius: 50%;
+      box-shadow: 0px 0px 1px 1px white, 0 0 0 9999em rgba(0, 0, 0, 0.5); }
   .ReactCrop__rule-of-thirds-vt::before, .ReactCrop__rule-of-thirds-vt::after, .ReactCrop__rule-of-thirds-hz::before, .ReactCrop__rule-of-thirds-hz::after {
     content: '';
     display: block;

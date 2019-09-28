@@ -131,7 +131,7 @@ class App extends PureComponent {
             src={this.state.src}
             crop={this.state.crop}
             // ruleOfThirds
-            // circularCrop
+            circularCrop
             onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}
