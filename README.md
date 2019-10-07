@@ -337,7 +337,32 @@ Also remember to set your crop using the percentCrop on changes or the crop will
 onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop })
 ```
 
-If you need more control over the crop you can set it in [onImageLoaded](#onimageloadedimage-optional).
+If you need more control over the crop you can set it in [onImageLoaded](#onimageloadedimage-optional). For example:
+
+```js
+onImageLoaded = image => {
+  this.imageRef = image;
+
+  // Center a square percent crop.
+  const width = image.width > image.height ? (image.height / image.width) * 100 : 100;
+  const height = image.height > image.width ? (image.width / image.height) * 100 : 100;
+  const x = width === 100 ? 0 : (100 - width) / 2;
+  const y = height === 100 ? 0 : (100 - height) / 2;
+
+  this.setState({
+    crop: {
+      unit: '%',
+      aspect: 1,
+      width,
+      height,
+      x,
+      y,
+    },
+  });
+
+  return false; // Return false if you set crop state in here.
+};
+```
 
 ## Contributing / Developing
 
