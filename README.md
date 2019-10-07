@@ -19,6 +19,7 @@ An image cropping tool for React with no dependencies.
 7. [FAQ](#faq)
    1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
    2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
+   3. [How can I center the crop?](#how-can-i-center-the-crop)
 8. [Contributing / Developing](#contributing--developing)
 
 ## Features
@@ -203,7 +204,7 @@ Useful if you want to set a crop based on the image dimensions when using pixels
 ```js
 onImageLoaded = image => {
   this.setState({ crop: { width: image.width, height: image.height } });
-  return false;
+  return false; // Important when settings crop state in here.
 };
 ```
 
@@ -315,6 +316,28 @@ Some things to note:
 You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
 
 You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
+
+### How can I center the crop?
+
+The easiest way is to use the percentage unit:
+
+```js
+crop: {
+  unit: '%',
+  width: 50,
+  height: 50,
+  x: 25,
+  y: 25
+}
+```
+
+Also remember to set your crop using the percentCrop on changes or the crop will go off-center if the container size changes (e.g. browser resize):
+
+```js
+onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop })
+```
+
+If you need more control over the crop you can set it in [onImageLoaded](#onimageloadedimage-optional).
 
 ## Contributing / Developing
 
