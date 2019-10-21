@@ -66,9 +66,7 @@ See the [sandbox demo](https://codesandbox.io/s/72py4jlll6) for a more complete 
 
 ## CDN
 
-If you prefer to include ReactCrop globally by marking `react-image-crop` as external in your application, then include `react-image-crop` from one of the following CDNs:
-
-- **cdnjs** _(Coming soon)_
+If you prefer to include ReactCrop globally by marking `react-image-crop` as external in your application, then include `react-image-crop` from the following CDN:
 
 - [**unpkg**](https://unpkg.com/react-image-crop/)
 
@@ -334,7 +332,7 @@ crop: {
 Also remember to set your crop using the percentCrop on changes or the crop will go off-center if the container size changes (e.g. browser resize):
 
 ```js
-onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop })
+onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop });
 ```
 
 If you need more control over the crop you can set it in [onImageLoaded](#onimageloadedimage-optional). For example:

@@ -9,9 +9,8 @@ $drag-bar-size: 6px !default;
 $mobile-media-query: '(pointer: coarse)' !default;
 
 // Mobile handle/bar sizes.  Override as above.
-$drag-handle-mobile-width: $drag-handle-width + 10 !default;
-$drag-handle-mobile-height: $drag-handle-height + 10 !default;
-$drag-bar-mobile-size: $drag-bar-size + 10 !default;
+$drag-handle-mobile-width: 34px !default;
+$drag-handle-mobile-height: 34px !default;
 
 // Handle color/border.
 $drag-handle-background-colour: rgba(0, 0, 0, 0.2) !default;
@@ -76,7 +75,7 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
     content: '';
     display: block;
     position: absolute;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.4);
   }
 
   &__rule-of-thirds-vt {
@@ -243,54 +242,23 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
       height: $drag-handle-mobile-height;
     }
 
-    .ord-nw {
-      margin-top: -(ceil($drag-handle-mobile-height / 2));
-      margin-left: -(ceil($drag-handle-mobile-width / 2));
-    }
-    .ord-n {
-      margin-top: -(ceil($drag-handle-mobile-height / 2));
-      margin-left: -(ceil($drag-handle-mobile-width / 2));
-    }
-    .ord-ne {
-      margin-top: -(ceil($drag-handle-mobile-height / 2));
-      margin-right: -(ceil($drag-handle-mobile-width / 2));
-    }
-    .ord-e {
-      margin-top: -(ceil($drag-handle-mobile-height / 2));
-      margin-right: -(ceil($drag-handle-mobile-width / 2));
-    }
-    .ord-se {
-      margin-bottom: -(ceil($drag-handle-mobile-height / 2));
-      margin-right: -(ceil($drag-handle-mobile-width / 2));
-    }
-    .ord-s {
-      margin-bottom: -(ceil($drag-handle-mobile-height / 2));
-      margin-left: -(ceil($drag-handle-mobile-width / 2));
-    }
-    .ord-sw {
-      margin-bottom: -(ceil($drag-handle-mobile-height / 2));
-      margin-left: -(ceil($drag-handle-mobile-width / 2));
-    }
-    .ord-w {
-      margin-top: -(ceil($drag-handle-mobile-height / 2));
-      margin-left: -(ceil($drag-handle-mobile-width / 2));
+    &__drag-bar {
+      display: none;
     }
 
-    &__drag-bar.ord-n {
-      height: $drag-bar-mobile-size;
-      margin-top: -($drag-bar-mobile-size / 2);
+    .ord-nw,
+    .ord-n,
+    .ord-ne,
+    .ord-e,
+    .ord-s,
+    .ord-sw,
+    .ord-w {
+      display: none;
     }
-    &__drag-bar.ord-e {
-      width: $drag-bar-mobile-size;
-      margin-right: -($drag-bar-mobile-size / 2);
-    }
-    &__drag-bar.ord-s {
-      height: $drag-bar-mobile-size;
-      margin-bottom: -($drag-bar-mobile-size / 2);
-    }
-    &__drag-bar.ord-w {
-      width: $drag-bar-mobile-size;
-      margin-left: -($drag-bar-mobile-size / 2);
+
+    .ord-se {
+      margin-bottom: -1px;
+      margin-right: -1px;
     }
   }
 }

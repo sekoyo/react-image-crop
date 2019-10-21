@@ -1,6 +1,6 @@
 {
   "name": "react-image-crop",
-  "version": "8.3.1",
+  "version": "8.4.0",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "dist/ReactCrop.min.js",
@@ -24,23 +24,23 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.6.2",
+    "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.6.2",
-    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-class-properties": "^6.23.0",
     "css-loader": "^3.1.4",
-    "eslint": "^6.4.0",
+    "eslint": "^6.5.1",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react": "^7.16.0",
     "node-sass": "^4.12.0",
-    "react": "^16.10.0",
-    "react-dom": "^16.10.0",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
     "style-loader": "^1.0.0",
-    "webpack": "^4.41.0",
+    "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
   },
   "peerDependencies": {
@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "clsx": "^1.0.4",
-    "core-js": "^3.2.1",
+    "core-js": "^3.3.3",
     "prop-types": "^15.7.2"
   }
 }

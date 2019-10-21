@@ -37,7 +37,7 @@
     content: '';
     display: block;
     position: absolute;
-    background-color: rgba(255, 255, 255, 0.9); }
+    background-color: rgba(255, 255, 255, 0.4); }
   .ReactCrop__rule-of-thirds-vt::before, .ReactCrop__rule-of-thirds-vt::after {
     width: 1px;
     height: 100%; }
@@ -151,41 +151,18 @@
     display: none; }
   @media (pointer: coarse) {
     .ReactCrop__drag-handle {
-      width: 20px;
-      height: 20px; }
-    .ReactCrop .ord-nw {
-      margin-top: -10px;
-      margin-left: -10px; }
-    .ReactCrop .ord-n {
-      margin-top: -10px;
-      margin-left: -10px; }
-    .ReactCrop .ord-ne {
-      margin-top: -10px;
-      margin-right: -10px; }
-    .ReactCrop .ord-e {
-      margin-top: -10px;
-      margin-right: -10px; }
-    .ReactCrop .ord-se {
-      margin-bottom: -10px;
-      margin-right: -10px; }
-    .ReactCrop .ord-s {
-      margin-bottom: -10px;
-      margin-left: -10px; }
-    .ReactCrop .ord-sw {
-      margin-bottom: -10px;
-      margin-left: -10px; }
+      width: 34px;
+      height: 34px; }
+    .ReactCrop__drag-bar {
+      display: none; }
+    .ReactCrop .ord-nw,
+    .ReactCrop .ord-n,
+    .ReactCrop .ord-ne,
+    .ReactCrop .ord-e,
+    .ReactCrop .ord-s,
+    .ReactCrop .ord-sw,
     .ReactCrop .ord-w {
-      margin-top: -10px;
-      margin-left: -10px; }
-    .ReactCrop__drag-bar.ord-n {
-      height: 16px;
-      margin-top: -8px; }
-    .ReactCrop__drag-bar.ord-e {
-      width: 16px;
-      margin-right: -8px; }
-    .ReactCrop__drag-bar.ord-s {
-      height: 16px;
-      margin-bottom: -8px; }
-    .ReactCrop__drag-bar.ord-w {
-      width: 16px;
-      margin-left: -8px; } }
+      display: none; }
+    .ReactCrop .ord-se {
+      margin-bottom: -1px;
+      margin-right: -1px; } }
