@@ -135,7 +135,7 @@ crop: {
 }
 ```
 
-If you specify just one of the dimensions, the other will be calculated for you. If you do this you must do it BEFORE the image has loaded.
+If you specify just one of the dimensions, the other will be calculated for you.
 
 ```js
 crop: {
@@ -202,7 +202,7 @@ Useful if you want to set a crop based on the image dimensions when using pixels
 ```js
 onImageLoaded = image => {
   this.setState({ crop: { width: image.width, height: image.height } });
-  return false; // Important when settings crop state in here.
+  return false; // Return false when setting crop state in here.
 };
 ```
 
