@@ -18,9 +18,9 @@ class App extends PureComponent {
       // x: 200,
       // y: 200,
       unit: 'px',
-      width: 300,
-      height: 300,
-      aspect: 1,
+      width: 380,
+      height: 380,
+      // aspect: 1,
     },
   };
 
@@ -46,7 +46,7 @@ class App extends PureComponent {
   };
 
   onCropChange = (crop, percentCrop) => {
-    // console.log('onCropChange', crop, percentCrop);
+    console.log('onCropChange', crop);
     // this.setState({ crop: percentCrop });
     this.setState({ crop });
   };
@@ -57,6 +57,17 @@ class App extends PureComponent {
 
   onDragEnd = () => {
     console.log('onDragEnd');
+  };
+
+  onChangeToIncompleteCropClick = () => {
+    console.log('onChangeToIncompleteCropClick');
+    this.setState({
+      crop: {
+        aspect: 16 / 9,
+        unit: '%',
+        width: 100,
+      },
+    });
   };
 
   getCroppedImg(image, crop, fileName) {
@@ -126,21 +137,24 @@ class App extends PureComponent {
           <input type="file" onChange={this.onSelectFile} />
         </div>
         {this.state.src && (
-          <ReactCrop
-            // renderComponent={this.renderVideo()}
-            src={this.state.src}
-            crop={this.state.crop}
-            // ruleOfThirds
-            circularCrop
-            onImageLoaded={this.onImageLoaded}
-            onComplete={this.onCropComplete}
-            onChange={this.onCropChange}
-            onDragStart={this.onDragStart}
-            onDragEnd={this.onDragEnd}
-            // renderSelectionAddon={this.renderSelectionAddon}
-            // minWidth={100}
-            minHeight={100}
-          />
+          <>
+            <ReactCrop
+              // renderComponent={this.renderVideo()}
+              src={this.state.src}
+              crop={this.state.crop}
+              ruleOfThirds
+              // circularCrop
+              onImageLoaded={this.onImageLoaded}
+              onComplete={this.onCropComplete}
+              onChange={this.onCropChange}
+              onDragStart={this.onDragStart}
+              onDragEnd={this.onDragEnd}
+              // renderSelectionAddon={this.renderSelectionAddon}
+              // minWidth={100}
+              minHeight={100}
+            />
+            <button onClick={this.onChangeToIncompleteCropClick}>Change to incomplete aspect crop</button>
+          </>
         )}
         {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} />}
       </div>
