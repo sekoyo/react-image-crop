@@ -46,7 +46,7 @@ class App extends PureComponent {
   };
 
   onCropChange = (crop, percentCrop) => {
-    console.log('onCropChange', crop);
+    // console.log('onCropChange', crop, percentCrop);
     // this.setState({ crop: percentCrop });
     this.setState({ crop });
   };
@@ -60,7 +60,6 @@ class App extends PureComponent {
   };
 
   onChangeToIncompleteCropClick = () => {
-    console.log('onChangeToIncompleteCropClick');
     this.setState({
       crop: {
         aspect: 16 / 9,
