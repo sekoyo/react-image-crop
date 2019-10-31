@@ -6,13 +6,17 @@
   "main": "dist/ReactCrop.min.js",
   "style": "dist/ReactCrop.css",
   "browserslist": "> 0.25%, not dead",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --progress --colors --watch --config demo/webpack.config.js & npm run sass-watch",
     "sass-watch": "node-sass lib/ReactCrop.scss dist/ReactCrop.css --watch",
     "build:js": "webpack",
     "build:css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
-    "build": "npm run build:js && npm run build:css"
+    "build": "npm run build:js && npm run build:css",
+    "prepare": "npm run build"
   },
   "author": "Dominic Tobias <dominic.tobias@gmail.com>",
   "keywords": [
