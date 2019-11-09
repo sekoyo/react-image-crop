@@ -45,14 +45,6 @@ Include the main js module:
 import ReactCrop from 'react-image-crop';
 ```
 
-Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
-
-```js
-import 'react-image-crop/dist/ReactCrop.css';
-// or scss:
-import 'react-image-crop/lib/ReactCrop.scss';
-```
-
 ## Example
 
 ```js
@@ -364,6 +356,6 @@ onImageLoaded = image => {
 
 ## Contributing / Developing
 
-To develop run `npm start`, this will recompile your JS and SCSS on changes.
+To develop run `npm start`, this will recompile your JS on changes.
 
 You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).

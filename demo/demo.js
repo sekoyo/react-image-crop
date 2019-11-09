@@ -2,7 +2,6 @@
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
 import ReactCrop from '../lib/ReactCrop';
-import '../dist/ReactCrop.css';
 
 const mp4Url = 'http://techslides.com/demos/sample-videos/small.mp4';
 

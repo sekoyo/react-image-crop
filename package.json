@@ -4,18 +4,15 @@
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "dist/ReactCrop.min.js",
-  "style": "dist/ReactCrop.css",
   "browserslist": "> 0.25%, not dead",
   "files": [
     "dist"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --progress --colors --watch --config demo/webpack.config.js & npm run sass-watch",
-    "sass-watch": "node-sass lib/ReactCrop.scss dist/ReactCrop.css --watch",
+    "start": "webpack --progress --colors --watch --config demo/webpack.config.js",
     "build:js": "webpack",
-    "build:css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
-    "build": "npm run build:js && npm run build:css",
+    "build": "npm run build:js",
     "prepare": "npm run build"
   },
   "author": "Dominic Tobias <dominic.tobias@gmail.com>",
@@ -35,16 +32,13 @@
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-class-properties": "^6.23.0",
-    "css-loader": "^3.1.4",
     "eslint": "^6.6.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
     "file-loader": "^4.2.0",
-    "node-sass": "^4.13.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "style-loader": "^1.0.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
   },
