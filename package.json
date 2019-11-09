@@ -54,7 +54,6 @@
   "dependencies": {
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
-    "clsx": "^1.0.4",
     "core-js": "^3.3.6",
     "prop-types": "^15.7.2"
   }
