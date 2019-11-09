@@ -29,6 +29,14 @@ function getConfig(env) {
           exclude: /node_modules/,
           use: 'babel-loader',
         },
+        {
+          test: /\.(png)$/i,
+          use: [
+            {
+              loader: 'file-loader',
+            },
+          ],
+        },
       ],
     },
     plugins: [

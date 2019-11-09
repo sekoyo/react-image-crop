@@ -40,6 +40,7 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
+    "file-loader": "^4.2.0",
     "node-sass": "^4.13.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
@@ -51,6 +52,8 @@
     "react": ">=15.2.2"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.22",
+    "@emotion/styled": "^10.0.23",
     "clsx": "^1.0.4",
     "core-js": "^3.3.6",
     "prop-types": "^15.7.2"
