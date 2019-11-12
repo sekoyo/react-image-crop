@@ -32,6 +32,10 @@ An image cropping tool for React with no dependencies.
 - No dependencies/small footprint (5KB gzip).
 - Min/max crop size.
 
+If React Image Crop doesn't cover your requirements then I advise to take a look at Doka.js. It features cropping, rotating, filtering, annotation, and lots more.
+
+[Learn more about Doka.js here](https://gumroad.com/a/703706227).
+
 ## Installation
 
 ```
