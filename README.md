@@ -18,8 +18,9 @@ An image cropping tool for React with no dependencies.
 6. [Props](#props)
 7. [FAQ](#faq)
    1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
-   2. [How to handle image EXIF orientation/rotation](#how-to-handle-image-exif-orientationrotation)
-   3. [How can I center the crop?](#how-can-i-center-the-crop)
+   2. [How to correct image EXIF orientation/rotation](#how-to-correct-image-exif-orientationrotation)
+   3. [How to filter, rotate and annotate](#how-to-filter-rotate-and-annotate)
+   4. [How can I center the crop?](#how-can-i-center-the-crop)
 8. [Contributing / Developing](#contributing--developing)
 
 ## Features
@@ -309,11 +310,17 @@ Some things to note:
 
 3. Another option to make the conversion faster is to scale the image down before converting it.
 
-### How to handle image EXIF orientation/rotation
+### How to correct image EXIF orientation/rotation
 
 You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
 
 You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
+
+If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Doka](https://gumroad.com/a/703706227).
+
+### How to filter, rotate and annotate
+
+This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then conisder using [Doka](https://gumroad.com/a/703706227).
 
 ### How can I center the crop?
 
