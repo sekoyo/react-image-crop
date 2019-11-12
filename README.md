@@ -322,6 +322,8 @@ If you're looking for a complete out of the box image editor which already handl
 
 This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then conisder using [Doka](https://gumroad.com/a/703706227).
 
+![Doka Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/doka-demo.gif)
+
 ### How can I center the crop?
 
 The easiest way is to use the percentage unit:
