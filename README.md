@@ -318,7 +318,7 @@ You can use the following library to load images, which will correct the rotatio
 
 If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Doka](https://gumroad.com/a/703706227).
 
-### How to filter, rotate and annotate
+<h3>How to filter, rotate and annotate</h3>
 
 This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then conisder using [Doka](https://gumroad.com/a/703706227).
 
