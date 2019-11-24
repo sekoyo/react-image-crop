@@ -113,19 +113,7 @@ class App extends PureComponent {
     </video>
   );
 
-  renderSelectionAddon = () => (
-    <button
-      type="button"
-      style={{
-        position: 'absolute',
-        bottom: -25,
-        right: 0,
-      }}
-      onClick={() => window.alert('You clicked the addon!')}
-    >
-      custom addon
-    </button>
-  );
+  renderSelectionAddon = () => <input placeholder="Type something" />;
 
   render() {
     const { croppedImageUrl } = this.state;

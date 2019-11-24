@@ -82,7 +82,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
     &::before,
     &::after {
       width: 1px;
-      height: 100%;
+      top: 0;
+      bottom: 0;
     }
 
     &::before {
@@ -99,7 +100,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   &__rule-of-thirds-hz {
     &::before,
     &::after {
-      width: 100%;
+      left: 0;
+      right: 0;
       height: 1px;
     }
 
