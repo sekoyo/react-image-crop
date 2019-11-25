@@ -1,14 +1,11 @@
 {
   "name": "react-image-crop",
-  "version": "8.4.1",
+  "version": "8.4.2",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "dist/ReactCrop.min.js",
   "style": "dist/ReactCrop.css",
   "browserslist": "> 0.25%, not dead",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --progress --colors --watch --config demo/webpack.config.js & npm run sass-watch",
