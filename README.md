@@ -34,7 +34,7 @@ An image cropping tool for React with no dependencies.
 
 If React Image Crop doesn't cover your requirements then I advise to take a look at Doka.js. It features cropping, rotating, filtering, annotation, and lots more.
 
-[Learn more about Doka.js here](https://gumroad.com/a/703706227)
+[Learn more about Doka.js here](https://gumroad.com/a/611955827)
 
 ## Installation
 
@@ -320,11 +320,11 @@ You might find that some images are rotated incorrectly. Unfortunately this is a
 
 You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
 
-If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Doka](https://gumroad.com/a/703706227).
+If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Doka](https://gumroad.com/a/611955827).
 
 <h3>How to filter, rotate and annotate</h3>
 
-This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then conisder using [Doka](https://gumroad.com/a/703706227).
+This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then conisder using [Doka](https://gumroad.com/a/611955827).
 
 ![Doka Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/doka-demo.gif)
 
