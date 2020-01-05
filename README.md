@@ -239,7 +239,15 @@ Render a custom HTML element in place of an image. Useful if you want to support
 
 ```js
 const videoComponent = (
-  <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
+  <video
+    autoPlay
+    loop
+    style={{ display: 'block', maxWidth: '100%' }}
+    onLoadStart={e => {
+      // You must inform ReactCrop when your media has loaded.
+      e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
+    }}
+  >
     <source src="sample.mp4" type="video/mp4" />
   </video>
 );

@@ -108,7 +108,15 @@ class App extends PureComponent {
   }
 
   renderVideo = () => (
-    <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
+    <video
+      autoPlay
+      loop
+      style={{ display: 'block', maxWidth: '100%' }}
+      onLoadStart={e => {
+        // You must inform ReactCrop when your media has loaded.
+        e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
+      }}
+    >
       <source src={mp4Url} type="video/mp4" />
     </video>
   );
