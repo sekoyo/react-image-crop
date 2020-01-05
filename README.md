@@ -332,7 +332,7 @@ If you're looking for a complete out of the box image editor which already handl
 
 <h3>How to filter, rotate and annotate</h3>
 
-This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then conisder using [Doka](https://gumroad.com/a/611955827).
+This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then consider using [Doka](https://gumroad.com/a/611955827).
 
 ![Doka Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/doka-demo.gif)
 
