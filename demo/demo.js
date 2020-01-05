@@ -114,8 +114,7 @@ class App extends PureComponent {
       style={{ display: 'block', maxWidth: '100%' }}
       onLoadStart={e => {
         // You must inform ReactCrop when your media has loaded.
-        const loadedEvent = new Event('medialoaded', { bubbles: true });
-        e.target.dispatchEvent(loadedEvent);
+        e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
       }}
     >
       <source src={mp4Url} type="video/mp4" />
