@@ -1,75 +1,61 @@
 /* eslint-disable jsx-a11y/media-has-caption, class-methods-use-this */
-import React, { PureComponent } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
 import ReactCrop from '../lib/ReactCrop';
 import '../dist/ReactCrop.css';
 
-const mp4Url = 'http://techslides.com/demos/sample-videos/small.mp4';
-
 /**
  * Load the image in the crop editor.
  */
-const cropEditor = document.querySelector('#crop-editor');
+// const cropEditor = document.querySelector('#crop-editor');
 
-class App extends PureComponent {
-  state = {
-    src: null,
-    crop: {
-      // x: 200,
-      // y: 200,
-      unit: 'px',
-      width: 380,
-      height: 380,
-      // aspect: 1,
-    },
-  };
-
-  onSelectFile = e => {
+function App() {
+  const [crop, setCrop] = useState({
+    unit: '%',
+    width: 30,
+    aspect: 1 / 1,
+  });
+  const [croppedImageUrl, setCroppedImageUrl] = useState();
+  const [src, setSrc] = useState(null);
+  const [imageRef, setImageRef] = useState(null);
+  const [fileUrl, setFileUrl] = useState(null);
+  function onSelectFile(e) {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        this.setState({ src: reader.result });
+        setSrc(reader.result);
       });
       reader.readAsDataURL(e.target.files[0]);
     }
+  }
+
+  // If you setState the crop in here you should return false.
+  const onImageLoaded = image => {
+    setImageRef(image);
   };
 
-  onImageLoaded = image => {
-    // this.imageRef = image;
-    // this.setState({ crop: { unit: 'px', width: 50, height: 50 } });
-    // return false;
+  const onCropComplete = crop => {
+    makeClientCrop(crop);
   };
 
-  onCropComplete = (crop, percentCrop) => {
-    console.log('onCropComplete', crop, percentCrop);
-    this.makeClientCrop(crop);
-  };
-
-  onCropChange = (crop, percentCrop) => {
-    // console.log('onCropChange', crop, percentCrop);
+  const onCropChange = (crop, percentCrop) => {
+    // You could also use percentCrop:
     // this.setState({ crop: percentCrop });
-    this.setState({ crop });
+    setCrop(crop);
   };
 
-  onDragStart = () => {
-    console.log('onDragStart');
-  };
+  async function makeClientCrop(crop) {
+    if (imageRef && crop.width && crop.height) {
+      const croppedImageUrl = await getCroppedImg(
+        imageRef,
+        crop,
+        'newFile.jpeg'
+      );
+      setCroppedImageUrl(croppedImageUrl);
+    }
+  }
 
-  onDragEnd = () => {
-    console.log('onDragEnd');
-  };
-
-  onChangeToIncompleteCropClick = () => {
-    this.setState({
-      crop: {
-        aspect: 16 / 9,
-        unit: '%',
-        width: 100,
-      },
-    });
-  };
-
-  getCroppedImg(image, crop, fileName) {
+  function getCroppedImg(image, crop, fileName) {
     const canvas = document.createElement('canvas');
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
@@ -89,72 +75,42 @@ class App extends PureComponent {
       crop.height
     );
 
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       canvas.toBlob(blob => {
-        blob.name = fileName; // eslint-disable-line no-param-reassign
-        window.URL.revokeObjectURL(this.fileUrl);
-        this.fileUrl = window.URL.createObjectURL(blob);
-        resolve(this.fileUrl);
+        if (!blob) {
+          //reject(new Error('Canvas is empty'));
+          console.error('Canvas is empty');
+          return;
+        }
+        blob.name = fileName;
+        window.URL.revokeObjectURL(fileUrl);
+        const objUrl = window.URL.createObjectURL(blob);
+        setFileUrl(objUrl);
+        resolve(objUrl);
       }, 'image/jpeg');
     });
   }
 
-  makeClientCrop(crop) {
-    if (this.imageRef && crop.width && crop.height) {
-      this.getCroppedImg(this.imageRef, crop, 'newFile.jpeg').then(croppedImageUrl =>
-        this.setState({ croppedImageUrl })
-      );
-    }
-  }
-
-  renderVideo = () => (
-    <video
-      autoPlay
-      loop
-      style={{ display: 'block', maxWidth: '100%' }}
-      onLoadStart={e => {
-        // You must inform ReactCrop when your media has loaded.
-        e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
-      }}
-    >
-      <source src={mp4Url} type="video/mp4" />
-    </video>
-  );
-
-  renderSelectionAddon = () => <input placeholder="Type something" />;
-
-  render() {
-    const { croppedImageUrl } = this.state;
-
-    return (
-      <div className="App">
-        <div>
-          <input type="file" onChange={this.onSelectFile} />
-        </div>
-        {this.state.src && (
-          <>
-            <ReactCrop
-              // renderComponent={this.renderVideo()}
-              src={this.state.src}
-              crop={this.state.crop}
-              ruleOfThirds
-              // circularCrop
-              onImageLoaded={this.onImageLoaded}
-              onComplete={this.onCropComplete}
-              onChange={this.onCropChange}
-              onDragStart={this.onDragStart}
-              onDragEnd={this.onDragEnd}
-              // renderSelectionAddon={this.renderSelectionAddon}
-              // minWidth={100}
-              minHeight={100}
-            />
-            <button onClick={this.onChangeToIncompleteCropClick}>Change to incomplete aspect crop</button>
-          </>
-        )}
-        {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} />}
+  return (
+    <div className="App">
+      <div>
+        <input type="file" accept="image/*" onChange={onSelectFile} />
       </div>
-    );
-  }
+      {src && (
+        <ReactCrop
+          src={src}
+          crop={crop}
+          ruleOfThirds
+          onImageLoaded={onImageLoaded}
+          onComplete={onCropComplete}
+          onChange={onCropChange}
+        />
+      )}
+      {croppedImageUrl && (
+        <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} />
+      )}
+    </div>
+  );
 }
 
 ReactDOM.render(<App />, cropEditor);
