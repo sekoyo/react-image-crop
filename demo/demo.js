@@ -23,7 +23,7 @@ class App extends PureComponent {
     },
   };
 
-  onSelectFile = (e) => {
+  onSelectFile = e => {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
       reader.addEventListener('load', () => {
@@ -33,7 +33,7 @@ class App extends PureComponent {
     }
   };
 
-  onImageLoaded = (image) => {
+  onImageLoaded = image => {
     // this.imageRef = image;
     // this.setState({ crop: { unit: 'px', width: 50, height: 50 } });
     // return false;
@@ -87,8 +87,8 @@ class App extends PureComponent {
       crop.height
     );
 
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
+    return new Promise(resolve => {
+      canvas.toBlob(blob => {
         blob.name = fileName; // eslint-disable-line no-param-reassign
         window.URL.revokeObjectURL(this.fileUrl);
         this.fileUrl = window.URL.createObjectURL(blob);
@@ -99,7 +99,7 @@ class App extends PureComponent {
 
   makeClientCrop(crop) {
     if (this.imageRef && crop.width && crop.height) {
-      this.getCroppedImg(this.imageRef, crop, 'newFile.jpeg').then((croppedImageUrl) =>
+      this.getCroppedImg(this.imageRef, crop, 'newFile.jpeg').then(croppedImageUrl =>
         this.setState({ croppedImageUrl })
       );
     }
@@ -110,7 +110,7 @@ class App extends PureComponent {
       autoPlay
       loop
       style={{ display: 'block', maxWidth: '100%' }}
-      onLoadStart={(e) => {
+      onLoadStart={e => {
         // You must inform ReactCrop when your media has loaded.
         e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
       }}
