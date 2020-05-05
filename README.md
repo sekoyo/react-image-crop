@@ -379,6 +379,7 @@ const onLoad = useCallback(img => {
   setCrop({
     unit: '%',
     width,
+    x,
     y,
     aspect,
   });
