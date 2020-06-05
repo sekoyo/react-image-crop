@@ -5,7 +5,7 @@ An image cropping tool for React with no dependencies.
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
 [Demo using class](https://codesandbox.io/s/72py4jlll6) | 
-[Demo using hook](https://codesandbox.io/s/beautiful-wildflower-kobkt)
+[Demo using hook](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
 
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
