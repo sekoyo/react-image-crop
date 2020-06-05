@@ -18,7 +18,7 @@ class App extends PureComponent {
       // x: 200,
       // y: 200,
       unit: '%',
-      width: 100,
+      width: 40,
       aspect: 16 / 9,
     },
   };
@@ -33,10 +33,23 @@ class App extends PureComponent {
     }
   };
 
-  onImageLoaded = image => {
-    // this.imageRef = image;
-    // this.setState({ crop: { unit: 'px', width: 50, height: 50 } });
-    // return false;
+  onImageLoaded = onLoad => e => {
+    this.imageRef = e.target;
+    const img = e.target;
+
+    const aspect = 16 / 9;
+    const width = img.width > img.height ? 100 : ((img.height * aspect) / img.width) * 100;
+    const height = img.height > img.width ? 100 : (img.width / aspect / img.height) * 100;
+    const y = (100 - height) / 2;
+    const x = (100 - width) / 2;
+
+    onLoad({
+      unit: '%',
+      width,
+      x,
+      y,
+      aspect,
+    });
   };
 
   onCropComplete = (crop, percentCrop) => {
@@ -105,16 +118,8 @@ class App extends PureComponent {
     }
   }
 
-  renderVideo = () => (
-    <video
-      autoPlay
-      loop
-      style={{ display: 'block', maxWidth: '100%' }}
-      onLoadStart={e => {
-        // You must inform ReactCrop when your media has loaded.
-        e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
-      }}
-    >
+  renderVideo = onLoad => (
+    <video autoPlay loop onLoadStart={onLoad}>
       <source src={mp4Url} type="video/mp4" />
     </video>
   );
@@ -132,12 +137,9 @@ class App extends PureComponent {
         {this.state.src && (
           <>
             <ReactCrop
-              // renderComponent={this.renderVideo()}
-              src={this.state.src}
               crop={this.state.crop}
               ruleOfThirds
               // circularCrop
-              onImageLoaded={this.onImageLoaded}
               onComplete={this.onCropComplete}
               onChange={this.onCropChange}
               onDragStart={this.onDragStart}
@@ -145,7 +147,11 @@ class App extends PureComponent {
               // renderSelectionAddon={this.renderSelectionAddon}
               // minWidth={100}
               // minHeight={100}
-            />
+            >
+              {/* {onLoad => <img src={this.state.src} onLoad={onLoad} />} */}
+              {onLoad => <img src={this.state.src} onLoad={this.onImageLoaded(onLoad)} />}
+              {/* {onLoad => this.renderVideo(onLoad)} */}
+            </ReactCrop>
             <button onClick={this.onChangeToIncompleteCropClick}>Change to incomplete aspect crop</button>
           </>
         )}

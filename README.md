@@ -1,6 +1,6 @@
 # React Image Crop
 
-An image cropping tool for React with no dependencies.
+A React cropping tool for anything (not just images) with no dependencies.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
@@ -61,10 +61,33 @@ import 'react-image-crop/lib/ReactCrop.scss';
 
 ## Example
 
-```js
+An image:
+
+```jsx
 function CropDemo({ src }) {
   const [crop, setCrop] = useState({ aspect: 16 / 9 });
-  return <ReactCrop src={src} crop={crop} onChange={newCrop => setCrop(newCrop)} />;
+  return (
+    <ReactCrop crop={crop} onChange={newCrop => setCrop(newCrop)}>
+      {onLoad => <img src={src} />}
+    </ReactCrop>
+  );
+}
+```
+
+A video:
+
+```jsx
+function CropDemo({ src }) {
+  const [crop, setCrop] = useState({ aspect: 16 / 9 });
+  return (
+    <ReactCrop crop={crop} onChange={newCrop => setCrop(newCrop)}>
+      {onLoad => (
+        <video autoPlay loop onLoadStart={onLoad}>
+          <source src="myvideo.mp4" type="video/mp4" />
+        </video>
+      )}
+    </ReactCrop>
+  );
 }
 ```
 
@@ -83,14 +106,6 @@ If you prefer to include ReactCrop globally by marking `react-image-crop` as ext
 Note when importing the script globally using a `<script>` tag access the component with `ReactCrop.Component`.
 
 ## Props
-
-#### src (required)
-
-```jsx
-<ReactCrop src="path/to/image.jpg" />
-```
-
-You can of course pass a blob url (using `URL.createObjectURL()` and `URL.revokeObjectURL()`) or base64 data.
 
 #### onChange(crop, percentCrop) (required)
 
@@ -121,7 +136,7 @@ crop: {
   height: 200
 }
 
-<ReactCrop src="path/to/image.jpg" crop={this.state.crop} />
+<ReactCrop crop={this.state.crop} />
 ```
 
 If you want a fixed aspect you can either omit `width` and `height`:
@@ -189,38 +204,11 @@ A string of classes to add to the main `ReactCrop` element.
 
 Inline styles object to be passed to the image wrapper element.
 
-#### imageStyle (optional)
-
-Inline styles object to be passed to the image element.
-
-#### imageAlt (optional)
-
-Add an alt attribute to the image element.
-
 #### onComplete(crop, percentCrop) (optional)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
 
 `percentCrop` is the crop as a percentage. A typical use case for it would be to save it so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image is smaller).
-
-#### onImageLoaded(image) (optional)
-
-A callback which happens when the image is loaded. Passes the image DOM element.
-
-Useful if you want to set a crop based on the image dimensions when using pixels:
-
-```js
-onImageLoaded = image => {
-  this.setState({ crop: { width: image.width, height: image.height } });
-  return false; // Return false when setting crop state in here.
-};
-```
-
-Note that you must **return false** in this callback if you are changing the crop object.
-
-#### onImageError(event) (optional)
-
-This event is called if the image had an error loading.
 
 #### onDragStart(event) (optional)
 
@@ -236,29 +224,7 @@ Allows setting the crossorigin attribute on the image.
 
 #### renderSelectionAddon(state) (optional)
 
-Render a custom element in crop selection.
-
-#### renderComponent (optional)
-
-Render a custom HTML element in place of an image. Useful if you want to support videos:
-
-```js
-const videoComponent = (
-  <video
-    autoPlay
-    loop
-    style={{ display: 'block', maxWidth: '100%' }}
-    onLoadStart={e => {
-      // You must inform ReactCrop when your media has loaded.
-      e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
-    }}
-  >
-    <source src="sample.mp4" type="video/mp4" />
-  </video>
-);
-
-<ReactCrop onChange={this.onCropChange} renderComponent={videoComponent} />;
-```
+Render a custom element inside the crop selection.
 
 #### ruleOfThirds (optional)
 
@@ -363,28 +329,36 @@ Also remember to set your crop using the percentCrop on changes or the crop will
 onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop });
 ```
 
-If you need more control over the crop you can set it in [onImageLoaded](#onimageloadedimage-optional). For example to center a percent crop:
+If you need more control over the crop you can set it in the `children` render function. For example to center a percent crop:
 
-```js
-const onLoad = useCallback(img => {
-  setImgRef(img);
+```jsx
+function CropDemo({ src }) {
+  const [crop, setCrop] = useState({ aspect: 16 / 9 });
 
-  const aspect = 16 / 9;
-  const width = img.width > img.height ? 100 : ((img.height * aspect) / img.width) * 100;
-  const height = img.height > img.width ? 100 : (img.width / aspect / img.height) * 100;
-  const y = (100 - height) / 2;
-  const x = (100 - width) / 2;
+  const handleImageLoad = e => {
+    const img = e.target;
 
-  setCrop({
-    unit: '%',
-    width,
-    x,
-    y,
-    aspect,
-  });
+    const aspect = 16 / 9;
+    const width = img.width > img.height ? 100 : ((img.height * aspect) / img.width) * 100;
+    const height = img.height > img.width ? 100 : (img.width / aspect / img.height) * 100;
+    const y = (100 - height) / 2;
+    const x = (100 - width) / 2;
 
-  return false; // Return false if you set crop state in here.
-}, []);
+    setCrop({
+      unit: '%',
+      width,
+      x,
+      y,
+      aspect,
+    });
+  };
+
+  return (
+    <ReactCrop crop={crop} onChange={newCrop => setCrop(newCrop)}>
+      {() => <img src={src} onLoad={handleImageLoad} />}
+    </ReactCrop>
+  );
+}
 ```
 
 ## Contributing / Developing
