@@ -17,9 +17,7 @@ class App extends PureComponent {
     crop: {
       // x: 200,
       // y: 200,
-      unit: '%',
-      width: 100,
-      aspect: 16 / 9,
+      aspect: 3 / 2,
     },
   };
 
@@ -143,8 +141,8 @@ class App extends PureComponent {
               onDragStart={this.onDragStart}
               onDragEnd={this.onDragEnd}
               // renderSelectionAddon={this.renderSelectionAddon}
-              // minWidth={100}
-              // minHeight={100}
+              minWidth={1080}
+              minHeight={1029}
             />
             <button onClick={this.onChangeToIncompleteCropClick}>Change to incomplete aspect crop</button>
           </>
