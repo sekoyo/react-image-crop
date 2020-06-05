@@ -18,7 +18,7 @@ class App extends PureComponent {
       // x: 200,
       // y: 200,
       unit: '%',
-      width: 30,
+      width: 100,
       aspect: 16 / 9,
     },
   };

@@ -4,7 +4,7 @@ An image cropping tool for React with no dependencies.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
-[Demo using class](https://codesandbox.io/s/72py4jlll6) | 
+[Demo using class](https://codesandbox.io/s/72py4jlll6) |
 [Demo using hook](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
 
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
@@ -192,7 +192,6 @@ Inline styles object to be passed to the image wrapper element.
 #### imageStyle (optional)
 
 Inline styles object to be passed to the image element.
-
 
 #### imageAlt (optional)
 
@@ -392,4 +391,4 @@ const onLoad = useCallback(img => {
 
 To develop run `npm start`, this will recompile your JS and SCSS on changes.
 
-You can test your changes by opening `demo/index.html` in a browser (you don't need to be running a server).
+You can test your changes by opening `test/index.html` in a browser (you don't need to be running a server).
