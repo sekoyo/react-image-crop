@@ -319,6 +319,37 @@ async test() {
 }
 ```
 
+Cropping an image using percentCrop:
+
+```js
+function cropImage({
+  // the image
+  image,
+  
+  // the height and width the resulting image
+  height,
+  width,
+  
+  // options for canvas.toDataURL
+  type,
+  encoderOptions,
+  
+  // the second argument passed to the onComplete callback
+  percentCrop,
+}){
+  const sx = image.naturalWidth * (percentCrop.x / 100)
+  const sy = image.naturalHeight * (percentCrop.y / 100)
+  const sWidth = image.naturalWidth * (percentCrop.width / 100)
+  const sHeight = image.naturalHeight * (percentCrop.height / 100)
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(image, sx, sy, sWidth, sHeight, 0, 0, width, height)
+  return canvas.toDataURL(type, encoderOptions)
+}
+```
+
 Some things to note:
 
 1. [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. We are using `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
