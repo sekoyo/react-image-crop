@@ -1,6 +1,6 @@
 # React Image Crop
 
-An image cropping tool for React with no dependencies.
+An image cropping tool for React with minimal dependencies.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
