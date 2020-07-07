@@ -370,14 +370,15 @@ const onLoad = useCallback(img => {
   setImgRef(img);
 
   const aspect = 16 / 9;
-  const width = img.width > img.height ? 100 : ((img.height * aspect) / img.width) * 100;
-  const height = img.height > img.width ? 100 : (img.width / aspect / img.height) * 100;
+  const width = img.width / aspect < img.height * aspect ? 100 : ((img.height * aspect) / img.width) * 100;
+  const height = img.width / aspect > img.height * aspect ? 100 : (img.width / aspect / img.height) * 100;
   const y = (100 - height) / 2;
   const x = (100 - width) / 2;
 
   setCrop({
     unit: '%',
     width,
+    height,
     x,
     y,
     aspect,
