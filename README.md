@@ -390,6 +390,6 @@ const onLoad = useCallback(img => {
 
 ## Contributing / Developing
 
-To develop run `npm start`, this will recompile your JS and SCSS on changes.
+To develop run `yarn start`, this will recompile your JS and SCSS on changes.
 
 You can test your changes by opening `test/index.html` in a browser (you don't need to be running a server).
