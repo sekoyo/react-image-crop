@@ -370,14 +370,15 @@ const onLoad = useCallback(img => {
   setImgRef(img);
 
   const aspect = 16 / 9;
-  const width = img.width > img.height ? 100 : ((img.height * aspect) / img.width) * 100;
-  const height = img.height > img.width ? 100 : (img.width / aspect / img.height) * 100;
+  const width = img.width / aspect < img.height * aspect ? 100 : ((img.height * aspect) / img.width) * 100;
+  const height = img.width / aspect > img.height * aspect ? 100 : (img.width / aspect / img.height) * 100;
   const y = (100 - height) / 2;
   const x = (100 - width) / 2;
 
   setCrop({
     unit: '%',
     width,
+    height,
     x,
     y,
     aspect,
@@ -389,6 +390,6 @@ const onLoad = useCallback(img => {
 
 ## Contributing / Developing
 
-To develop run `npm start`, this will recompile your JS and SCSS on changes.
+To develop run `yarn start`, this will recompile your JS and SCSS on changes.
 
 You can test your changes by opening `test/index.html` in a browser (you don't need to be running a server).
