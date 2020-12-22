@@ -1,3 +1,5 @@
+v10:
+
 - Render image at full size underneath crop, whited out
 - User drags around to move image
 - User can resize crop
