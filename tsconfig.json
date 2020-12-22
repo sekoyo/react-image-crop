@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "target": "ES2018",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "declaration": true,
+    "declarationDir": "./dist",
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src"
+  ]
+}

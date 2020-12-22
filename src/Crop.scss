@@ -21,13 +21,7 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   display: inline-block;
   cursor: crosshair;
   overflow: hidden;
-
-  img,
-  video {
-    display: block;
-    max-width: 100%;
-    touch-action: manipulation;
-  }
+  max-width: 100%;
 
   &:focus {
     outline: none;
@@ -36,6 +30,12 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   &--disabled,
   &--locked {
     cursor: inherit;
+  }
+
+  &__image {
+    display: block;
+    max-width: 100%;
+    touch-action: manipulation;
   }
 
   &__crop-selection {

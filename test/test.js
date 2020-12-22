@@ -144,9 +144,9 @@ class App extends PureComponent {
               onChange={this.onCropChange}
               onDragStart={this.onDragStart}
               onDragEnd={this.onDragEnd}
-              // renderSelectionAddon={this.renderSelectionAddon}
-              // minWidth={100}
-              // minHeight={100}
+            // renderSelectionAddon={this.renderSelectionAddon}
+            // minWidth={100}
+            // minHeight={100}
             >
               {/* {onLoad => <img src={this.state.src} onLoad={onLoad} />} */}
               {onLoad => <img src={this.state.src} onLoad={this.onImageLoaded(onLoad)} />}

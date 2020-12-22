@@ -1,19 +1,35 @@
+/* eslint-env node */
 module.exports = {
-  extends: ['eslint:recommended', 'plugin:react/recommended'],
-  parser: 'babel-eslint',
+  root: true,
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended',
+  ],
   env: {
     browser: true,
+    es2018: true
   },
-  plugins: ['react', 'jsx-a11y', 'import'],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
+    process: 'readonly',
+  },
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module',
+  },
   rules: {
-    'operator-linebreak': 0,
-    'no-restricted-globals': 0,
-    'max-len': ['error', { code: 160 }],
-    'arrow-parens': 0,
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
-    'react/destructuring-assignment': 0,
-    'jsx-a11y/tabindex-no-positive': 0,
-    'jsx-a11y/no-noninteractive-tabindex': 0,
-    'react/jsx-wrap-multilines': 0,
+    '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/explicit-function-return-type': 0,
+    '@typescript-eslint/explicit-module-boundary-types': 0,
+    '@typescript-eslint/no-namespace': 0,
+    '@typescript-eslint/ban-types': 0,
   },
 };
