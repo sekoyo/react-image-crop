@@ -4,8 +4,8 @@ A React cropping tool for anything (not just images) with no dependencies.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
-[Demo using class](https://codesandbox.io/s/72py4jlll6) |
-[Demo using hook](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
+[Demo using a class component](https://codesandbox.io/s/72py4jlll6) |
+[Demo using a function & hooks](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
 
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
@@ -26,11 +26,12 @@ A React cropping tool for anything (not just images) with no dependencies.
 
 ## Features
 
+- For anything, not just images.
 - Responsive (you can use pixels or percentages).
 - Touch enabled.
 - Free-form or fixed aspect crops.
 - Keyboard support for nudging selection.
-- No dependencies/small footprint (5KB gzip).
+- No dependencies/small footprint (11KB min, 3.5KB gzip).
 - Min/max crop size.
 
 If React Image Crop doesn't cover your requirements then I advise to take a look at Doka.js. It features cropping, rotating, filtering, annotation, and lots more.
@@ -40,7 +41,8 @@ If React Image Crop doesn't cover your requirements then I advise to take a look
 ## Installation
 
 ```
-npm i react-image-crop --save
+npm install --save react-image-crop
+yarn add react-image-crop
 ```
 
 ## Usage
@@ -48,15 +50,15 @@ npm i react-image-crop --save
 Include the main js module:
 
 ```js
-import ReactCrop from 'react-image-crop';
+import { Crop } from 'react-image-crop';
 ```
 
 Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
 ```js
-import 'react-image-crop/dist/ReactCrop.css';
+import 'react-image-crop/dist/styles.css';
 // or scss:
-import 'react-image-crop/lib/ReactCrop.scss';
+import 'react-image-crop/src/Crop.scss';
 ```
 
 ## Example
@@ -68,7 +70,7 @@ function CropDemo({ src }) {
   const [crop, setCrop] = useState({ aspect: 16 / 9 });
   return (
     <ReactCrop crop={crop} onChange={newCrop => setCrop(newCrop)}>
-      {onLoad => <img src={src} />}
+      <img src={src} />
     </ReactCrop>
   );
 }
@@ -337,19 +339,23 @@ function CropDemo({ src }) {
 
   const handleImageLoad = e => {
     const img = e.target;
+    // Note: You should get image dimensions with `getBoundingClientRect` **NOT**
+    // with image.width/height/naturalWidth/naturaHeight as these are rounded.
+    const { width, height } = img.getBoundingClientRect();
 
     const aspect = 16 / 9;
-    const width = img.width > img.height ? 100 : ((img.height * aspect) / img.width) * 100;
-    const height = img.height > img.width ? 100 : (img.width / aspect / img.height) * 100;
+    const width = width > height ? 100 : ((height * aspect) / width) * 100;
+    const height = height > width ? 100 : (width / aspect / height) * 100;
     const y = (100 - height) / 2;
     const x = (100 - width) / 2;
 
     setCrop({
       unit: '%',
-      width,
       x,
       y,
       aspect,
+      width,
+      height,
     });
   };
 
@@ -363,6 +369,8 @@ function CropDemo({ src }) {
 
 ## Contributing / Developing
 
-To develop run `npm start`, this will recompile your JS and SCSS on changes.
+For the first time link with `yarn link`, then go into test/ and run `yarn link react-image-crop`.
 
-You can test your changes by opening `test/index.html` in a browser (you don't need to be running a server).
+Run `yarn start`, this will recompile your JS and SCSS on changes.
+
+Go into the test folder and `yarn install && yarn start`, then open the browser at the URL shown.

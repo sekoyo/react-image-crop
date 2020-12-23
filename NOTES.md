@@ -1,7 +1,0 @@
-v10:
-
-- Render image at full size underneath crop, whited out
-- User drags around to move image
-- User can resize crop
-- User can adjust image size with scrollwheel or pinch zoom
-- No crossover to worry about

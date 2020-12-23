@@ -3,7 +3,8 @@ import replace from '@rollup/plugin-replace';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
-import del from 'rollup-plugin-delete'
+// import del from 'rollup-plugin-delete'
+import { terser } from "rollup-plugin-terser";
 import scss from 'rollup-plugin-scss'
 
 const globals = {
@@ -20,9 +21,11 @@ export default {
     format: 'esm',
     globals,
   },
+  external,
   // inlineDynamicImports: true,
   plugins: [
-    del({ targets: 'dist/*' }),
+    // This makes ParcelJS when running in /test throw an error on updates.
+    // del({ targets: 'dist/*' }),
     replace({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
@@ -31,7 +34,7 @@ export default {
       extensions,
     }),
     typescript(),
-    scss({ output: 'dist/styles.css' })
+    scss({ output: 'dist/styles.css' }),
+    terser()
   ],
-  external,
 };

@@ -1,36 +1,50 @@
 import { CropObject, CropOrd, OffsetCoords } from './types';
 
+interface PartialCropObjectW extends Omit<CropObject, 'width'> {
+  width?: number;
+}
+interface PartialCropObjectH extends Omit<CropObject, 'height'> {
+  height?: number;
+}
+type PartialCropObject = PartialCropObjectW | PartialCropObjectH;
+
 export function clamp(num: number, min: number, max: number) {
   return Math.min(Math.max(num, min), max);
 }
 
-export function isCropValid(crop?: CropObject) {
-  return crop && !isNaN(crop.width) && !isNaN(crop.height);
+export function isCropDrawn(crop?: CropObject) {
+  return crop && crop.width && crop.height;
 }
 
-export function makeAspectCrop(crop: CropObject, imageWidth: number, imageHeight: number) {
-  const aspectCrop: CropObject = { ...crop };
-  const aspect = crop.aspect ?? 1;
+// Note: You should get image dimensions with `getBoundingClientRect` **NOT**
+// with image.width/height/naturalWidth/naturaHeight as these are rounded.
+export function makeAspectCrop(crop: PartialCropObject, imageWidth: number, imageHeight: number) {
+  const pixelCrop = convertToPixelCrop({ width: 0, height: 0, ...crop }, imageWidth, imageHeight);
+  const aspect = pixelCrop.aspect || 1;
 
-  if (crop.width) {
-    aspectCrop.height = aspectCrop.width / aspect;
+  if (pixelCrop.width) {
+    pixelCrop.height = pixelCrop.width / aspect;
   }
 
-  if (crop.height) {
-    aspectCrop.width = aspectCrop.height * aspect;
+  if (pixelCrop.height) {
+    pixelCrop.width = pixelCrop.height * aspect;
   }
 
-  if (aspectCrop.y + aspectCrop.height > imageHeight) {
-    aspectCrop.height = imageHeight - aspectCrop.y;
-    aspectCrop.width = aspectCrop.height * aspect;
+  if (pixelCrop.y + pixelCrop.height > imageHeight) {
+    pixelCrop.height = imageHeight - pixelCrop.y;
+    pixelCrop.width = pixelCrop.height * aspect;
   }
 
-  if (aspectCrop.x + aspectCrop.width > imageWidth) {
-    aspectCrop.width = imageWidth - aspectCrop.x;
-    aspectCrop.height = aspectCrop.width / aspect;
+  if (pixelCrop.x + pixelCrop.width > imageWidth) {
+    pixelCrop.width = imageWidth - pixelCrop.x;
+    pixelCrop.height = pixelCrop.width / aspect;
   }
 
-  return aspectCrop;
+  if (crop.unit === 'px') {
+    return pixelCrop;
+  }
+
+  return convertToPercentCrop(pixelCrop, imageWidth, imageHeight);
 }
 
 export function convertToPercentCrop(crop: CropObject, imageWidth: number, imageHeight: number): CropObject {
@@ -65,14 +79,6 @@ export function convertToPixelCrop(crop: CropObject, imageWidth: number, imageHe
     width: (crop.width * imageWidth) / 100,
     height: (crop.height * imageHeight) / 100,
   };
-}
-
-export function resolveCrop(pixelCrop: CropObject, imageWidth: number, imageHeight: number) {
-  if (pixelCrop.aspect && (!pixelCrop.width || !pixelCrop.height)) {
-    return makeAspectCrop(pixelCrop, imageWidth, imageHeight);
-  }
-
-  return pixelCrop;
 }
 
 export function containCrop(prevCrop: CropObject, crop: CropObject, imageWidth: number, imageHeight: number) {
@@ -130,38 +136,6 @@ export function containCrop(prevCrop: CropObject, crop: CropObject, imageWidth: 
   }
 
   return contained;
-}
-
-export function getDocumentOffset() {
-  if (typeof document === 'undefined') {
-    return { top: 0, left: 0 };
-  }
-
-  const { clientTop = 0, clientLeft = 0 } = document.documentElement || {};
-  return { top: clientTop, left: clientLeft };
-}
-
-export function getWindowOffset() {
-  if (typeof document === 'undefined') {
-    return { top: 0, left: 0 };
-  }
-
-  const { pageYOffset = 0, pageXOffset = 0 } = window;
-  return { top: pageYOffset, left: pageXOffset };
-}
-
-export function getElementOffset(el?: HTMLElement | null) {
-  if (!el) {
-    return { top: 0, left: 0 };
-  }
-  const rect = el.getBoundingClientRect();
-  const doc = getDocumentOffset();
-  const win = getWindowOffset();
-
-  const top = rect.top + win.top - doc.top;
-  const left = rect.left + win.left - doc.left;
-
-  return { top, left };
 }
 
 export function straightenYPath(

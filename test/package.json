@@ -1,0 +1,19 @@
+{
+  "name": "crop-test",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "parcel src/index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-image-crop": "^8.6.6"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}
