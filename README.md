@@ -367,7 +367,7 @@ If you need more control over the crop you can set it in [onImageLoaded](#onimag
 
 ```js
 const onLoad = useCallback(img => {
-  setImgRef(img);
+  imgRef.current = img;
 
   const aspect = 16 / 9;
   const width = img.width / aspect < img.height * aspect ? 100 : ((img.height * aspect) / img.width) * 100;
