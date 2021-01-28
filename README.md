@@ -319,6 +319,8 @@ async test() {
 }
 ```
 
+There are other considerations to take into account such as cropping from an off-screen image if your image is sized down. Or taking into account the pixel ratio of the device and setting `image/png` and `imageSmoothingQuality`. For a more advanced example check out the [react hook demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o).
+
 Some things to note:
 
 1. [toDataURL](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL) is synchronous and will block the main thread, for large images this could be for as long as a couple of seconds. We are using `toDataURL('image/jpeg')` otherwise it will default to `image/png` and the conversion will be significantly slower.
