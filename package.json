@@ -15,7 +15,7 @@
     "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Dominic Tobias <dominic.tobias@gmail.com>",
+  "author": "Dominic Tobias (https://github.com/DominicTobias/)",
   "keywords": [
     "react",
     "reactjs",
