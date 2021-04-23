@@ -5,6 +5,9 @@
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "dist/ReactCrop.min.js",
   "style": "dist/ReactCrop.css",
+  "files": [
+    "dist"
+  ],
   "browserslist": "last 3 versions, not IE > 0",
   "scripts": {
     "start": "webpack --progress --colors --watch --config test/webpack.config.js & npm run sass-watch",
@@ -38,14 +41,14 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "node-sass": "^5.0.0",
-    "react": "^17.0.1",
-    "react-dom": "^16.13.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "style-loader": "^2.0.0",
     "webpack": "^4.44.2",
     "webpack-cli": "^3.3.12"
   },
   "peerDependencies": {
-    "react": ">=16.13.1"
+    "react": ">=16.13.1 || ^17.0.0"
   },
   "dependencies": {
     "clsx": "^1.1.1",
