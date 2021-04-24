@@ -1,6 +1,6 @@
 {
   "name": "react-image-crop",
-  "version": "8.6.7",
+  "version": "8.6.8",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "dist/ReactCrop.min.js",
@@ -10,10 +10,10 @@
   ],
   "browserslist": "last 3 versions, not IE > 0",
   "scripts": {
-    "start": "webpack --progress --colors --watch --config test/webpack.config.js & npm run sass-watch",
-    "sass-watch": "node-sass lib/ReactCrop.scss dist/ReactCrop.css --watch",
+    "start": "webpack --progress --watch --config test/webpack.config.js & npm run sass-watch",
+    "sass-watch": "dart-sass lib/ReactCrop.scss dist/ReactCrop.css --watch",
     "build:js": "webpack",
-    "build:css": "node-sass lib/ReactCrop.scss dist/ReactCrop.css",
+    "build:css": "dart-sass lib/ReactCrop.scss dist/ReactCrop.css",
     "build": "npm run build:js && npm run build:css",
     "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -28,31 +28,31 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-react": "^7.12.10",
+    "@babel/core": "^7.13.16",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-react": "^7.13.13",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "css-loader": "^5.0.1",
-    "eslint": "^7.16.0",
+    "css-loader": "^5.2.4",
+    "dart-sass": "^1.25.0",
+    "eslint": "^7.25.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.21.5",
-    "node-sass": "^5.0.0",
+    "eslint-plugin-react": "^7.23.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "style-loader": "^2.0.0",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12"
+    "webpack": "^5.35.1",
+    "webpack-cli": "^4.6.0"
   },
   "peerDependencies": {
-    "react": ">=16.13.1 || ^17.0.0"
+    "react": ">=16.13.1"
   },
   "dependencies": {
     "clsx": "^1.1.1",
-    "core-js": "^3.8.1",
+    "core-js": "^3.11.0",
     "prop-types": "^15.7.2"
   }
 }
