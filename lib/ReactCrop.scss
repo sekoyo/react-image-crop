@@ -1,3 +1,5 @@
+@use "sass:math";
+
 // SASS variables for normal drag handle and bar size.
 // Override in your scss file by setting these variables FIRST, then including this file.
 $drag-handle-width: 10px !default;
@@ -15,6 +17,10 @@ $drag-handle-mobile-height: 24px !default;
 // Handle color/border.
 $drag-handle-background-colour: rgba(0, 0, 0, 0.2) !default;
 $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
+
+$half-drag-handle-height: math.div($drag-handle-height, 2);
+$half-drag-handle-width: math.div($drag-handle-width, 2);
+$half-drag-bar-size: math.div($drag-bar-size, 2);
 
 .ReactCrop {
   position: relative;
@@ -134,8 +140,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-nw {
     top: 0;
     left: 0;
-    margin-top: -(ceil($drag-handle-height / 2));
-    margin-left: -(ceil($drag-handle-width / 2));
+    margin-top: -$half-drag-handle-height;
+    margin-left: -$half-drag-handle-width;
     cursor: nw-resize;
 
     &::after {
@@ -146,8 +152,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-n {
     top: 0;
     left: 50%;
-    margin-top: -(ceil($drag-handle-height / 2));
-    margin-left: -(ceil($drag-handle-width / 2));
+    margin-top: -$half-drag-handle-height;
+    margin-left: -$half-drag-handle-width;
     cursor: n-resize;
 
     &::after {
@@ -157,8 +163,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-ne {
     top: 0;
     right: 0;
-    margin-top: -(ceil($drag-handle-height / 2));
-    margin-right: -(ceil($drag-handle-width / 2));
+    margin-top: -$half-drag-handle-height;
+    margin-right: -$half-drag-handle-width;
     cursor: ne-resize;
 
     &::after {
@@ -169,8 +175,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-e {
     top: 50%;
     right: 0;
-    margin-top: -(ceil($drag-handle-height / 2));
-    margin-right: -(ceil($drag-handle-width / 2));
+    margin-top: -$half-drag-handle-height;
+    margin-right: -$half-drag-handle-width;
     cursor: e-resize;
 
     &::after {
@@ -180,8 +186,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-se {
     bottom: 0;
     right: 0;
-    margin-bottom: -(ceil($drag-handle-height / 2));
-    margin-right: -(ceil($drag-handle-width / 2));
+    margin-bottom: -$half-drag-handle-height;
+    margin-right: -$half-drag-handle-width;
     cursor: se-resize;
 
     &::after {
@@ -192,8 +198,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-s {
     bottom: 0;
     left: 50%;
-    margin-bottom: -(ceil($drag-handle-height / 2));
-    margin-left: -(ceil($drag-handle-width / 2));
+    margin-bottom: -$half-drag-handle-height;
+    margin-left: -$half-drag-handle-width;
     cursor: s-resize;
 
     &::after {
@@ -203,8 +209,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-sw {
     bottom: 0;
     left: 0;
-    margin-bottom: -(ceil($drag-handle-height / 2));
-    margin-left: -(ceil($drag-handle-width / 2));
+    margin-bottom: -$half-drag-handle-height;
+    margin-left: -$half-drag-handle-width;
     cursor: sw-resize;
 
     &::after {
@@ -215,8 +221,8 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
   .ord-w {
     top: 50%;
     left: 0;
-    margin-top: -(ceil($drag-handle-height / 2));
-    margin-left: -(ceil($drag-handle-width / 2));
+    margin-top: -$half-drag-handle-height;
+    margin-left: -$half-drag-handle-width;
     cursor: w-resize;
 
     &::after {
@@ -238,28 +244,28 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
       left: 0;
       width: 100%;
       height: $drag-bar-size;
-      margin-top: -($drag-bar-size / 2);
+      margin-top: -$half-drag-bar-size;
     }
     &.ord-e {
       right: 0;
       top: 0;
       width: $drag-bar-size;
       height: 100%;
-      margin-right: -($drag-bar-size / 2);
+      margin-right: -$half-drag-bar-size;
     }
     &.ord-s {
       bottom: 0;
       left: 0;
       width: 100%;
       height: $drag-bar-size;
-      margin-bottom: -($drag-bar-size / 2);
+      margin-bottom: -$half-drag-bar-size;
     }
     &.ord-w {
       top: 0;
       left: 0;
       width: $drag-bar-size;
       height: 100%;
-      margin-left: -($drag-bar-size / 2);
+      margin-left: -$half-drag-bar-size;
     }
   }
 
