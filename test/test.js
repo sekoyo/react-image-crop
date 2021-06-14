@@ -38,7 +38,7 @@ class App extends PureComponent {
   };
 
   onCropComplete = (crop, percentCrop) => {
-    console.log('onCropComplete', crop, percentCrop);
+    // console.log('onCropComplete', crop, percentCrop);
     this.makeClientCrop(crop);
   };
 
@@ -48,11 +48,11 @@ class App extends PureComponent {
   };
 
   onDragStart = () => {
-    console.log('onDragStart');
+    // console.log('onDragStart');
   };
 
   onDragEnd = () => {
-    console.log('onDragEnd');
+    // console.log('onDragEnd');
   };
 
   onChangeToIncompleteCropClick = () => {
@@ -141,8 +141,8 @@ class App extends PureComponent {
               onDragStart={this.onDragStart}
               onDragEnd={this.onDragEnd}
               // renderSelectionAddon={this.renderSelectionAddon}
-              minWidth={300}
-              minHeight={300}
+              minWidth={200}
+              minHeight={200}
             />
             <button onClick={this.onChangeToIncompleteCropClick}>Change to incomplete aspect crop</button>
           </>
