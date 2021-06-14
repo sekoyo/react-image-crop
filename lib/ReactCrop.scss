@@ -41,7 +41,7 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
   &__image {
     display: block;
     max-width: 100%;
-    touch-action: manipulation;
+    touch-action: none;
   }
 
   &__crop-selection {
@@ -52,7 +52,7 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     box-sizing: border-box;
     cursor: move;
     box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.5);
-    touch-action: manipulation;
+    touch-action: none;
 
     .ReactCrop--disabled & {
       cursor: inherit;
