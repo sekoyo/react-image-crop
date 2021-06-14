@@ -53,7 +53,6 @@
   },
   "dependencies": {
     "clsx": "^1.1.1",
-    "core-js": "^3.14.0",
     "prop-types": "^15.7.2"
   }
 }
