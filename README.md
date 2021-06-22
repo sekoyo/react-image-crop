@@ -282,13 +282,20 @@ However here's a ready to use function that returns a file blob for the cropped 
  * @param {Object} crop - crop Object
  * @param {String} fileName - Name of the returned file in Promise
  */
-function getCroppedImg(image, crop, fileName) {
-  const canvas = document.createElement('canvas');
+export function getCroppedImg(image, crop, fileName) {
+  const canvas = document.createElement("canvas");
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
   canvas.width = crop.width;
   canvas.height = crop.height;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
+
+  // New lines to be added
+  const pixelRatio = window.devicePixelRatio;
+  canvas.width = crop.width * pixelRatio;
+  canvas.height = crop.height * pixelRatio;
+  ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  ctx.imageSmoothingQuality = "high";
 
   ctx.drawImage(
     image,
@@ -299,18 +306,23 @@ function getCroppedImg(image, crop, fileName) {
     0,
     0,
     crop.width,
-    crop.height,
+    crop.height
   );
 
   // As Base64 string
-  // const base64Image = canvas.toDataURL('image/jpeg');
+  // const base64Image = canvas.toDataURL("image/jpeg");
+  // return base64Image;
 
   // As a blob
   return new Promise((resolve, reject) => {
-    canvas.toBlob(blob => {
-      blob.name = fileName;
-      resolve(blob);
-    }, 'image/jpeg', 1);
+    canvas.toBlob(
+      (blob) => {
+        blob.name = fileName;
+        resolve(blob);
+      },
+      "image/jpeg",
+      1
+    );
   });
 }
 
