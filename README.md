@@ -268,6 +268,10 @@ Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the
 
 Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
+#### scale (optional)
+
+If a parent element is zoomed or scaled, you can pass in the scale factor in order to correct the cropping bounds. Defaults to `1`.
+
 ## FAQ
 
 ### What about showing the crop on the client?
