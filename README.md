@@ -272,6 +272,10 @@ Show the crop area as a circle. If your aspect is not 1 (a square) then the circ
 
 If a parent element is zoomed or scaled, you can pass in the scale factor in order to correct the cropping bounds. Defaults to `1`.
 
+#### rotate (optional)
+
+If a parent element is rotated, you can pass in the rotation in degrees in order to correct the cropping bounds. Defaults to `0`, range is from `-180` to `180`.
+
 ## FAQ
 
 ### What about showing the crop on the client?
