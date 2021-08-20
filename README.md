@@ -268,6 +268,18 @@ Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the
 
 Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
+#### rotate (optional)
+
+Rotates the image, you should pass a value between `-180` and `180`. Defaults to `0`.
+
+#### scale (optional)
+
+The image source (can be base64 or a blob just like a normal image).
+
+#### zoom (optional)
+
+If your app has the ability to zoom the whole lot (image and crop), then you should pass in the zoom factor here. It is a non-visual prop to keep pointer coords accurate and not to be confused with the more commonly used `scale` prop which scales the image. Defaults to `1`.
+
 ## FAQ
 
 ### What about showing the crop on the client?

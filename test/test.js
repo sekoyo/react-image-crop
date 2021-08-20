@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/media-has-caption, class-methods-use-this */
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom'; // eslint-disable-line
-import ReactCrop from '../lib/ReactCrop';
-import '../dist/ReactCrop.css';
+import ReactCrop from '../src/ReactCrop';
+import '../src/ReactCrop.scss';
 
 const mp4Url = 'http://techslides.com/demos/sample-videos/small.mp4';
 
@@ -14,6 +14,8 @@ const cropEditor = document.querySelector('#crop-editor');
 class App extends PureComponent {
   state = {
     src: null,
+    scale: 1,
+    rotate: 0,
     crop: {
       // x: 200,
       // y: 200,
@@ -120,12 +122,33 @@ class App extends PureComponent {
   renderSelectionAddon = () => <input placeholder="Type something" />;
 
   render() {
-    const { croppedImageUrl } = this.state;
+    const { croppedImageUrl, scale, rotate } = this.state;
+
+    // console.log({ scale, rotate });
 
     return (
       <div className="App">
         <div>
           <input type="file" onChange={this.onSelectFile} />
+          <div>
+            <label>Scale: </label>
+            <input
+              type="number"
+              step="0.1"
+              value={scale}
+              disabled={!this.state.src}
+              onChange={e => this.setState({ scale: Number(e.target.value) })}
+            />
+          </div>
+          <div>
+            <label>Rotate: </label>
+            <input
+              type="number"
+              value={rotate}
+              disabled={!this.state.src}
+              onChange={e => this.setState({ rotate: Math.min(180, Math.max(-180, Number(e.target.value))) })}
+            />
+          </div>
         </div>
         {this.state.src && (
           <>
@@ -133,6 +156,8 @@ class App extends PureComponent {
               // renderComponent={this.renderVideo()}
               src={this.state.src}
               crop={this.state.crop}
+              scale={scale}
+              rotate={rotate}
               ruleOfThirds
               // circularCrop
               onImageLoaded={this.onImageLoaded}
