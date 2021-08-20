@@ -4,6 +4,7 @@
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
   "main": "dist/ReactCrop.min.js",
+  "types": "dist/index.d.ts",
   "style": "dist/ReactCrop.css",
   "files": [
     "dist",
