@@ -278,7 +278,11 @@ The image source (can be base64 or a blob just like a normal image).
 
 #### zoom (optional)
 
-If your app has the ability to zoom the whole lot (image and crop), then you should pass in the zoom factor here. It is a non-visual prop to keep pointer coords accurate and not to be confused with the more commonly used `scale` prop which scales the image. Defaults to `1`.
+A non-visual prop to keep pointer coords accurate when a parent element is scaled. Not to be confused with the `scale` prop which scales the image itself. Defaults to `1`.
+
+#### spin (optional)
+
+A non-visual prop to keep pointer coords accurate when a parent element is rotated. Not to be confused with the `rotate` prop which rotates the image itself. Defaults to `0`, range is from `-180` to `180`.
 
 ## FAQ
 
