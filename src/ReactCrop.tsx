@@ -161,7 +161,7 @@ type YOrds = 'n' | 's';
 type XYOrds = 'nw' | 'ne' | 'se' | 'sw';
 type Ords = XOrds | YOrds | XYOrds;
 
-interface Crop {
+export interface Crop {
   aspect?: number;
   x: number;
   y: number;
@@ -194,7 +194,7 @@ export interface ReactCropProps {
   /** A string of classes to add to the main `ReactCrop` element. */
   className?: string;
   /** A React Node that will be inserted into the `ReactCrop` element */
-  children: React.ReactNode;
+  children?: React.ReactNode;
   /** Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to false. */
   circularCrop?: boolean;
   /** All crop params are initially optional. See README.md for more info. */
@@ -234,7 +234,7 @@ export interface ReactCropProps {
   /** Render a custom HTML element in place of an image. Useful if you want to support videos. */
   renderComponent?: React.ReactNode;
   /** Render a custom element in crop selection. */
-  renderSelectionAddon: (state: ReactCropState) => React.ReactNode;
+  renderSelectionAddon?: (state: ReactCropState) => React.ReactNode;
   /** Rotates the image, you should pass a value between -180 and 180. Defaults to 0. */
   rotate?: number;
   /** Show rule of thirds lines in the cropped area. Defaults to false. */
@@ -423,8 +423,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     (this.componentRef.current as HTMLDivElement).focus({ preventScroll: true }); // All other browsers
 
     const rect = (this.mediaWrapperRef.current as HTMLDivElement).getBoundingClientRect();
-    const x = e.clientX - rect.left / zoom;
-    const y = e.clientY - rect.top / zoom;
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
 
     const nextCrop: Crop = {
       unit: 'px',
@@ -486,8 +486,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     const { evData } = this;
 
-    evData.xDiff = e.clientX - evData.clientStartX / zoom;
-    evData.yDiff = e.clientY - evData.clientStartY / zoom;
+    evData.xDiff = (e.clientX - evData.clientStartX) / zoom;
+    evData.yDiff = (e.clientY - evData.clientStartY) / zoom;
 
     let nextCrop;
 
@@ -623,8 +623,13 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   };
 
   get mediaDimensions() {
-    const { clientWidth, clientHeight } = this.mediaWrapperRef.current as HTMLDivElement;
-    return { width: clientWidth, height: clientHeight };
+    let width = 0
+    let height = 0
+    if (this.mediaWrapperRef.current) {
+      width = this.mediaWrapperRef.current.clientWidth
+      height = this.mediaWrapperRef.current.clientHeight
+    }
+    return { width, height };
   }
 
   getCropStyle() {
