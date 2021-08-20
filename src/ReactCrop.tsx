@@ -390,7 +390,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       yInversed,
       xCrossOver: xInversed,
       yCrossOver: yInversed,
-      lastYCrossover: yInversed,
+      lastYCrossover: false,
       startXCrossOver: xInversed,
       startYCrossOver: yInversed,
       isResize: Boolean(ord),
@@ -623,11 +623,11 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   };
 
   get mediaDimensions() {
-    let width = 0
-    let height = 0
+    let width = 0;
+    let height = 0;
     if (this.mediaWrapperRef.current) {
-      width = this.mediaWrapperRef.current.clientWidth
-      height = this.mediaWrapperRef.current.clientHeight
+      width = this.mediaWrapperRef.current.clientWidth;
+      height = this.mediaWrapperRef.current.clientHeight;
     }
     return { width, height };
   }
