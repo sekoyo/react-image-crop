@@ -392,7 +392,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       yInversed,
       xCrossOver: xInversed,
       yCrossOver: yInversed,
-      lastYCrossover: false,
+      lastYCrossover: yInversed,
       startXCrossOver: xInversed,
       startYCrossOver: yInversed,
       isResize: Boolean(ord),
