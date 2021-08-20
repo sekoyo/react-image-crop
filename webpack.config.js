@@ -13,6 +13,7 @@ function getConfig(env) {
       libraryTarget: 'umd',
       filename: env === 'production' ? 'ReactCrop.min.js' : 'ReactCrop.js',
       globalObject: 'this',
+      clean: true,
     },
     target: 'web',
     externals: {
