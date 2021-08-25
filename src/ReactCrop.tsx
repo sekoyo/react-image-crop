@@ -245,8 +245,10 @@ export interface ReactCropProps {
   src: string;
   /** Inline styles object to be passed to the image wrapper element. */
   style?: React.CSSProperties;
-  /** If your app has the ability to zoom the whole lot (image and crop), then you should pass in the zoom factor here. It is a non-visual prop to keep pointer coords accurate and not to be confused with the more commonly used `scale` prop which scales the image. Defaults to 1. */
+  /** A non-visual prop to keep pointer coords accurate when a parent element is scaled. Not to be confused with the `scale` prop which scales the image itself. Defaults to 1. */
   zoom?: number;
+  /** A non-visual prop to keep pointer coords accurate when a parent element is rotated. Not to be confused with the `rotate` prop which rotates the image itself. Defaults to 0, range is from -180 to 180. */
+  spin?: number;
 }
 
 export interface ReactCropState {
@@ -390,7 +392,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       yInversed,
       xCrossOver: xInversed,
       yCrossOver: yInversed,
-      lastYCrossover: false,
+      lastYCrossover: yInversed,
       startXCrossOver: xInversed,
       startYCrossOver: yInversed,
       isResize: Boolean(ord),
@@ -402,7 +404,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   };
 
   onComponentPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const { crop, disabled, locked, keepSelection, onChange, zoom = 1 } = this.props;
+    const { crop, disabled, locked, keepSelection, onChange, zoom = 1, spin = 0 } = this.props;
 
     const componentEl = (this.mediaWrapperRef.current as HTMLDivElement).firstChild;
 
@@ -423,8 +425,25 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     (this.componentRef.current as HTMLDivElement).focus({ preventScroll: true }); // All other browsers
 
     const rect = (this.mediaWrapperRef.current as HTMLDivElement).getBoundingClientRect();
-    const x = (e.clientX - rect.left) / zoom;
-    const y = (e.clientY - rect.top) / zoom;
+    let x = 0;
+    let y = 0;
+    let scaledX = (e.clientX - rect.left) / zoom;
+    let scaledY = (e.clientY - rect.top) / zoom;
+    let degrees = spin;
+    let radians = Math.abs((degrees * Math.PI) / 180.0);
+    if ((degrees > -45 && degrees <= 45) || (Math.abs(degrees) > 135 && Math.abs(degrees) <= 180)) {
+      // Top and Bottom
+      x = scaledX * Math.cos(radians);
+      y = scaledY * Math.cos(radians);
+    } else if (degrees > 45 && degrees <= 135) {
+      // Left
+      x = scaledY * Math.sin(radians);
+      y = scaledX * Math.sin(radians) * -1;
+    } else if (degrees > -135 && degrees <= -45) {
+      // Right
+      x = scaledY * Math.sin(radians) * -1;
+      y = scaledX * Math.sin(radians);
+    }
 
     const nextCrop: Crop = {
       unit: 'px',
@@ -465,7 +484,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   };
 
   onDocPointerMove = (e: PointerEvent) => {
-    const { crop, disabled, onChange, onDragStart, zoom = 1 } = this.props;
+    const { crop, disabled, onChange, onDragStart, zoom = 1, spin = 0 } = this.props;
 
     if (disabled) {
       return;
@@ -486,8 +505,23 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     const { evData } = this;
 
-    evData.xDiff = (e.clientX - evData.clientStartX) / zoom;
-    evData.yDiff = (e.clientY - evData.clientStartY) / zoom;
+    let scaledX = (e.clientX - evData.clientStartX) / zoom;
+    let scaledY = (e.clientY - evData.clientStartY) / zoom;
+    let degrees = spin;
+    let radians = Math.abs((degrees * Math.PI) / 180.0);
+    if ((degrees > -45 && degrees <= 45) || (Math.abs(degrees) > 135 && Math.abs(degrees) <= 180)) {
+      // Top and Bottom
+      evData.xDiff = scaledX * Math.cos(radians);
+      evData.yDiff = scaledY * Math.cos(radians);
+    } else if (degrees > 45 && degrees <= 135) {
+      // Left
+      evData.xDiff = scaledY * Math.sin(radians);
+      evData.yDiff = scaledX * Math.sin(radians) * -1;
+    } else if (degrees > -135 && degrees <= -45) {
+      // Right
+      evData.xDiff = scaledY * Math.sin(radians) * -1;
+      evData.yDiff = scaledX * Math.sin(radians);
+    }
 
     let nextCrop;
 
@@ -776,8 +810,52 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     return nextCrop;
   }
 
+  getRotatedCursor(handle: string, degrees: number) {
+    if ((degrees > -45 && degrees <= 45) || (Math.abs(degrees) > 135 && Math.abs(degrees) <= 180)) {
+      // Top and Bottom
+      switch(handle) {
+        case "nw":
+          return {cursor: "nw-resize"};
+        case "n":
+          return {cursor: "n-resize"};
+        case "ne":
+          return {cursor: "ne-resize"};
+        case "e":
+          return {cursor: "e-resize"};
+        case "se":
+          return {cursor: "se-resize"};
+        case "s":
+          return {cursor: "s-resize"};
+        case "sw":
+          return {cursor: "sw-resize"};
+        case "w":
+          return {cursor: "w-resize"};
+      }
+    } else if ((degrees > -135 && degrees <= -45) || (degrees > 45 && degrees <= 135)) {
+      // Left and Right
+      switch(handle) {
+        case "nw":
+          return {cursor: "ne-resize"};
+        case "n":
+          return {cursor: "w-resize"};
+        case "ne":
+          return {cursor: "nw-resize"};
+        case "e":
+          return {cursor: "s-resize"};
+        case "se":
+          return {cursor: "sw-resize"};
+        case "s":
+          return {cursor: "e-resize"};
+        case "sw":
+          return {cursor: "se-resize"};
+        case "w":
+          return {cursor: "n-resize"};
+      }
+    }
+  }
+
   createCropSelection() {
-    const { disabled, locked, renderSelectionAddon, ruleOfThirds, crop } = this.props;
+    const { disabled, locked, renderSelectionAddon, ruleOfThirds, crop, spin = 0 } = this.props;
     const style = this.getCropStyle();
 
     return (
@@ -789,14 +867,14 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
             <div className="ReactCrop__drag-bar ord-s" data-ord="s" />
             <div className="ReactCrop__drag-bar ord-w" data-ord="w" />
 
-            <div className="ReactCrop__drag-handle ord-nw" data-ord="nw" />
-            <div className="ReactCrop__drag-handle ord-n" data-ord="n" />
-            <div className="ReactCrop__drag-handle ord-ne" data-ord="ne" />
-            <div className="ReactCrop__drag-handle ord-e" data-ord="e" />
-            <div className="ReactCrop__drag-handle ord-se" data-ord="se" />
-            <div className="ReactCrop__drag-handle ord-s" data-ord="s" />
-            <div className="ReactCrop__drag-handle ord-sw" data-ord="sw" />
-            <div className="ReactCrop__drag-handle ord-w" data-ord="w" />
+            <div className="ReactCrop__drag-handle ord-nw" data-ord="nw" style={this.getRotatedCursor("nw", spin)} />
+            <div className="ReactCrop__drag-handle ord-n" data-ord="n" style={this.getRotatedCursor("n", spin)} />
+            <div className="ReactCrop__drag-handle ord-ne" data-ord="ne" style={this.getRotatedCursor("ne", spin)} />
+            <div className="ReactCrop__drag-handle ord-e" data-ord="e" style={this.getRotatedCursor("e", spin)} />
+            <div className="ReactCrop__drag-handle ord-se" data-ord="se" style={this.getRotatedCursor("se", spin)} />
+            <div className="ReactCrop__drag-handle ord-s" data-ord="s" style={this.getRotatedCursor("s", spin)} />
+            <div className="ReactCrop__drag-handle ord-sw" data-ord="sw" style={this.getRotatedCursor("sw", spin)} />
+            <div className="ReactCrop__drag-handle ord-w" data-ord="w" style={this.getRotatedCursor("w", spin)} />
           </div>
         )}
         {renderSelectionAddon && isCropValid(crop) && (
