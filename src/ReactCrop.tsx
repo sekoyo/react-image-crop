@@ -811,45 +811,25 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   getRotatedCursor(handle: string, degrees: number) {
-    if ((degrees > -45 && degrees <= 45) || (Math.abs(degrees) > 135 && Math.abs(degrees) <= 180)) {
-      // Top and Bottom
-      switch(handle) {
-        case "nw":
-          return {cursor: "nw-resize"};
-        case "n":
-          return {cursor: "n-resize"};
-        case "ne":
-          return {cursor: "ne-resize"};
-        case "e":
-          return {cursor: "e-resize"};
-        case "se":
-          return {cursor: "se-resize"};
-        case "s":
-          return {cursor: "s-resize"};
-        case "sw":
-          return {cursor: "sw-resize"};
-        case "w":
-          return {cursor: "w-resize"};
-      }
-    } else if ((degrees > -135 && degrees <= -45) || (degrees > 45 && degrees <= 135)) {
+    if ((degrees > -135 && degrees <= -45) || (degrees > 45 && degrees <= 135)) {
       // Left and Right
-      switch(handle) {
-        case "nw":
-          return {cursor: "ne-resize"};
-        case "n":
-          return {cursor: "w-resize"};
-        case "ne":
-          return {cursor: "nw-resize"};
-        case "e":
-          return {cursor: "s-resize"};
-        case "se":
-          return {cursor: "sw-resize"};
-        case "s":
-          return {cursor: "e-resize"};
-        case "sw":
-          return {cursor: "se-resize"};
-        case "w":
-          return {cursor: "n-resize"};
+      switch (handle) {
+        case 'nw':
+          return { cursor: 'ne-resize' };
+        case 'n':
+          return { cursor: 'w-resize' };
+        case 'ne':
+          return { cursor: 'nw-resize' };
+        case 'e':
+          return { cursor: 's-resize' };
+        case 'se':
+          return { cursor: 'sw-resize' };
+        case 's':
+          return { cursor: 'e-resize' };
+        case 'sw':
+          return { cursor: 'se-resize' };
+        case 'w':
+          return { cursor: 'n-resize' };
       }
     }
   }
@@ -867,14 +847,14 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
             <div className="ReactCrop__drag-bar ord-s" data-ord="s" />
             <div className="ReactCrop__drag-bar ord-w" data-ord="w" />
 
-            <div className="ReactCrop__drag-handle ord-nw" data-ord="nw" style={this.getRotatedCursor("nw", spin)} />
-            <div className="ReactCrop__drag-handle ord-n" data-ord="n" style={this.getRotatedCursor("n", spin)} />
-            <div className="ReactCrop__drag-handle ord-ne" data-ord="ne" style={this.getRotatedCursor("ne", spin)} />
-            <div className="ReactCrop__drag-handle ord-e" data-ord="e" style={this.getRotatedCursor("e", spin)} />
-            <div className="ReactCrop__drag-handle ord-se" data-ord="se" style={this.getRotatedCursor("se", spin)} />
-            <div className="ReactCrop__drag-handle ord-s" data-ord="s" style={this.getRotatedCursor("s", spin)} />
-            <div className="ReactCrop__drag-handle ord-sw" data-ord="sw" style={this.getRotatedCursor("sw", spin)} />
-            <div className="ReactCrop__drag-handle ord-w" data-ord="w" style={this.getRotatedCursor("w", spin)} />
+            <div className="ReactCrop__drag-handle ord-nw" data-ord="nw" style={this.getRotatedCursor('nw', spin)} />
+            <div className="ReactCrop__drag-handle ord-n" data-ord="n" style={this.getRotatedCursor('n', spin)} />
+            <div className="ReactCrop__drag-handle ord-ne" data-ord="ne" style={this.getRotatedCursor('ne', spin)} />
+            <div className="ReactCrop__drag-handle ord-e" data-ord="e" style={this.getRotatedCursor('e', spin)} />
+            <div className="ReactCrop__drag-handle ord-se" data-ord="se" style={this.getRotatedCursor('se', spin)} />
+            <div className="ReactCrop__drag-handle ord-s" data-ord="s" style={this.getRotatedCursor('s', spin)} />
+            <div className="ReactCrop__drag-handle ord-sw" data-ord="sw" style={this.getRotatedCursor('sw', spin)} />
+            <div className="ReactCrop__drag-handle ord-w" data-ord="w" style={this.getRotatedCursor('w', spin)} />
           </div>
         )}
         {renderSelectionAddon && isCropValid(crop) && (
