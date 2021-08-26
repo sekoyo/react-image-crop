@@ -16,6 +16,7 @@ class App extends PureComponent {
     src: null,
     scale: 1,
     rotate: 0,
+    spin: 0,
     crop: {
       // x: 200,
       // y: 200,
@@ -122,7 +123,7 @@ class App extends PureComponent {
   renderSelectionAddon = () => <input placeholder="Type something" />;
 
   render() {
-    const { croppedImageUrl, scale, rotate } = this.state;
+    const { croppedImageUrl, scale, rotate, spin, src, crop } = this.state;
 
     // console.log({ scale, rotate });
 
@@ -136,7 +137,7 @@ class App extends PureComponent {
               type="number"
               step="0.1"
               value={scale}
-              disabled={!this.state.src}
+              disabled={!src}
               onChange={e => this.setState({ scale: Number(e.target.value) })}
             />
           </div>
@@ -145,17 +146,26 @@ class App extends PureComponent {
             <input
               type="number"
               value={rotate}
-              disabled={!this.state.src}
+              disabled={!src}
               onChange={e => this.setState({ rotate: Math.min(180, Math.max(-180, Number(e.target.value))) })}
             />
           </div>
+          <div>
+            <label>Spin: </label>
+            <input
+              type="number"
+              value={spin}
+              disabled={!src}
+              onChange={e => this.setState({ spin: Math.min(180, Math.max(-180, Number(e.target.value))) })}
+            />
+          </div>
         </div>
-        {this.state.src && (
+        {src && (
           <>
             <ReactCrop
               // renderComponent={this.renderVideo()}
-              src={this.state.src}
-              crop={this.state.crop}
+              src={src}
+              crop={crop}
               scale={scale}
               rotate={rotate}
               ruleOfThirds
