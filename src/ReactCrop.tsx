@@ -316,8 +316,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     if (
       this.imageRef.current &&
-      prevProps.crop !== crop &&
       crop &&
+      prevProps.crop !== crop &&
       crop.aspect &&
       ((crop.width && !crop.height) || (!crop.width && crop.height))
     ) {
