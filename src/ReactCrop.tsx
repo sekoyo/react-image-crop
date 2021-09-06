@@ -225,7 +225,7 @@ export interface ReactCropProps {
   onComplete?: (crop: Crop, percentageCrop: Crop) => void;
   /** This event is called if the image had an error loading. */
   onImageError?: React.DOMAttributes<HTMLImageElement>['onError'];
-  /** A callback which happens when the image is loaded. Passes the image DOM element. */
+  /** A callback which happens when the image is loaded. Passes the image DOM element. Return false if you set the crop with setState in there as otherwise the subsequent onChange + onComplete will not have your updated crop. */
   onImageLoaded?: (image: HTMLImageElement) => void | boolean;
   /** A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component. */
   onDragStart?: (e: PointerEvent) => void;
