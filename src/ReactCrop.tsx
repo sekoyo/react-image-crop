@@ -15,8 +15,8 @@ function clamp(num: number, min: number, max: number) {
   return Math.min(Math.max(num, min), max);
 }
 
-function isCropValid(crop: Crop) {
-  return crop && !isNaN(crop.width) && !isNaN(crop.height);
+function isCropValid(crop: Partial<Crop>) {
+  return crop && crop.width && !isNaN(crop.width) && crop.height && !isNaN(crop.height);
 }
 
 function makeAspectCrop(crop: Crop, imageWidth: number, imageHeight: number) {
@@ -55,37 +55,37 @@ function makeAspectCrop(crop: Crop, imageWidth: number, imageHeight: number) {
   return completeCrop;
 }
 
-function convertToPercentCrop(crop: Crop, imageWidth: number, imageHeight: number): Crop {
+function convertToPercentCrop(crop: Partial<Crop>, imageWidth: number, imageHeight: number): Crop {
   if (crop.unit === '%') {
-    return crop;
+    return { ...defaultCrop, ...crop };
   }
 
   return {
     unit: '%',
     aspect: crop.aspect,
-    x: (crop.x / imageWidth) * 100,
-    y: (crop.y / imageHeight) * 100,
-    width: (crop.width / imageWidth) * 100,
-    height: (crop.height / imageHeight) * 100,
+    x: crop.x ? (crop.x / imageWidth) * 100 : 0,
+    y: crop.y ? (crop.y / imageHeight) * 100 : 0,
+    width: crop.width ? (crop.width / imageWidth) * 100 : 0,
+    height: crop.height ? (crop.height / imageHeight) * 100 : 0,
   };
 }
 
-function convertToPixelCrop(crop: Crop, imageWidth: number, imageHeight: number): Crop {
+function convertToPixelCrop(crop: Partial<Crop>, imageWidth: number, imageHeight: number): Crop {
   if (!crop.unit) {
-    return { ...crop, unit: 'px' };
+    return { ...defaultCrop, ...crop, unit: 'px' };
   }
 
   if (crop.unit === 'px') {
-    return crop;
+    return { ...defaultCrop, ...crop };
   }
 
   return {
     unit: 'px',
     aspect: crop.aspect,
-    x: (crop.x * imageWidth) / 100,
-    y: (crop.y * imageHeight) / 100,
-    width: (crop.width * imageWidth) / 100,
-    height: (crop.height * imageHeight) / 100,
+    x: crop.x ? (crop.x * imageWidth) / 100 : 0,
+    y: crop.y ? (crop.y * imageHeight) / 100 : 0,
+    width: crop.width ? (crop.width * imageWidth) / 100 : 0,
+    height: crop.height ? (crop.height * imageHeight) / 100 : 0,
   };
 }
 
@@ -97,61 +97,60 @@ function resolveCrop(pixelCrop: Crop, imageWidth: number, imageHeight: number) {
   return pixelCrop;
 }
 
-function containCrop(prevCrop: Crop, crop: Crop, imageWidth: number, imageHeight: number) {
+function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: number, imageHeight: number) {
   const pixelCrop = convertToPixelCrop(crop, imageWidth, imageHeight);
   const prevPixelCrop = convertToPixelCrop(prevCrop, imageWidth, imageHeight);
-  const contained = { ...pixelCrop };
 
   // Non-aspects are simple
   if (!pixelCrop.aspect) {
     if (pixelCrop.x < 0) {
-      contained.x = 0;
-      contained.width += pixelCrop.x;
+      pixelCrop.x = 0;
+      pixelCrop.width += pixelCrop.x;
     } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
-      contained.width = imageWidth - pixelCrop.x;
+      pixelCrop.width = imageWidth - pixelCrop.x;
     }
 
     if (pixelCrop.y + pixelCrop.height > imageHeight) {
-      contained.height = imageHeight - pixelCrop.y;
+      pixelCrop.height = imageHeight - pixelCrop.y;
     }
 
-    return contained;
+    return pixelCrop;
   }
 
   let adjustedForX = false;
 
   if (pixelCrop.x < 0) {
-    contained.x = 0;
-    contained.width += pixelCrop.x;
-    contained.height = contained.width / pixelCrop.aspect;
+    pixelCrop.x = 0;
+    pixelCrop.width += pixelCrop.x;
+    pixelCrop.height = pixelCrop.width / pixelCrop.aspect;
     adjustedForX = true;
   } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
-    contained.width = imageWidth - pixelCrop.x;
-    contained.height = contained.width / pixelCrop.aspect;
+    pixelCrop.width = imageWidth - pixelCrop.x;
+    pixelCrop.height = pixelCrop.width / pixelCrop.aspect;
     adjustedForX = true;
   }
 
   // If sizing in up direction we need to pin Y at the point it
   // would be at the boundary.
-  if (adjustedForX && prevPixelCrop.y > contained.y) {
-    contained.y = pixelCrop.y + (pixelCrop.height - contained.height);
+  if (adjustedForX && prevPixelCrop.y > pixelCrop.y) {
+    pixelCrop.y = pixelCrop.y + (pixelCrop.height - pixelCrop.height);
   }
 
   let adjustedForY = false;
 
-  if (contained.y + contained.height > imageHeight) {
-    contained.height = imageHeight - pixelCrop.y;
-    contained.width = contained.height * pixelCrop.aspect;
+  if (pixelCrop.y + pixelCrop.height > imageHeight) {
+    pixelCrop.height = imageHeight - pixelCrop.y;
+    pixelCrop.width = pixelCrop.height * pixelCrop.aspect;
     adjustedForY = true;
   }
 
   // If sizing in left direction we need to pin X at the point it
   // would be at the boundary.
-  if (adjustedForY && prevPixelCrop.x > contained.x) {
-    contained.x = pixelCrop.x + (pixelCrop.width - contained.width);
+  if (adjustedForY && prevPixelCrop.x > pixelCrop.x) {
+    pixelCrop.x = pixelCrop.x + (pixelCrop.width - pixelCrop.width);
   }
 
-  return contained;
+  return pixelCrop;
 }
 
 const DOC_MOVE_OPTS = { capture: true, passive: false };
@@ -198,7 +197,7 @@ export interface ReactCropProps {
   /** Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to false. */
   circularCrop?: boolean;
   /** All crop params are initially optional. See README.md for more info. */
-  crop: Crop;
+  crop: Partial<Crop>;
   /** Allows setting the crossorigin attribute on the image. */
   crossorigin?: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>['crossOrigin'];
   /** If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling. */
