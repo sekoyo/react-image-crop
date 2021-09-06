@@ -35,7 +35,7 @@ class App extends PureComponent {
   };
 
   onImageLoaded = image => {
-    // this.imageRef = image;
+    this.imageRef = image;
     // this.setState({ crop: { unit: 'px', width: 50, height: 50 } });
     // return false;
   };
