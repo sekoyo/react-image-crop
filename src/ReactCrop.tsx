@@ -104,8 +104,8 @@ function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: n
   // Non-aspects are simple
   if (!pixelCrop.aspect) {
     if (pixelCrop.x < 0) {
-      pixelCrop.x = 0;
       pixelCrop.width += pixelCrop.x;
+      pixelCrop.x = 0;
     } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
       pixelCrop.width = imageWidth - pixelCrop.x;
     }
