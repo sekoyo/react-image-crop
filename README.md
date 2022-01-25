@@ -274,7 +274,7 @@ Rotates the image, you should pass a value between `-180` and `180`. Defaults to
 
 #### scale (optional)
 
-The image source (can be base64 or a blob just like a normal image).
+Scales the image (zooms in or out). Defaults to 1 (normal scale). You can combine with something like [react-zoom-pan-pinch](https://www.npmjs.com/package/react-zoom-pan-pinch).
 
 #### zoom (optional)
 
