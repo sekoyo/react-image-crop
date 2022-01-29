@@ -190,6 +190,18 @@ interface EVData {
 }
 
 export interface ReactCropProps {
+  /** An object of labels to override the built-in English ones */
+  ariaLabels?: {
+    cropArea?: string;
+    nwDragHandle?: string;
+    nDragHandle?: string;
+    neDragHandle?: string;
+    eDragHandle?: string;
+    seDragHandle?: string;
+    sDragHandle?: string;
+    swDragHandle?: string;
+    wDragHandle?: string;
+  };
   /** A string of classes to add to the main `ReactCrop` element. */
   className?: string;
   /** A React Node that will be inserted into the `ReactCrop` element */
@@ -596,6 +608,88 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   };
 
+  onHandlerKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    handle: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
+  ) => {
+    const { crop, disabled, minWidth = 0, maxWidth, minHeight = 0, maxHeight, onChange } = this.props;
+    const { width, height } = this.mediaDimensions;
+
+    // Keep the event from bubbling up to the container
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.stopPropagation();
+      e.preventDefault();
+    } else {
+      return;
+    }
+
+    // Cardinal directions only support 2 arrow keys each
+    if (
+      ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (handle === 'e' || handle === 'w')) ||
+      ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && (handle === 's' || handle === 'n'))
+    ) {
+      return;
+    }
+
+    if (disabled) {
+      return;
+    }
+
+    let changed = false;
+
+    if (!isCropValid(crop)) {
+      return;
+    }
+
+    const nextCrop = this.makeNewCrop();
+    const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey;
+    const offset = ctrlCmdPressed
+      ? ReactCrop.nudgeStepLarge
+      : e.shiftKey
+      ? ReactCrop.nudgeStepMedium
+      : ReactCrop.nudgeStep;
+    let newWidth;
+    let newHeight;
+
+    // TODO: The crop area will leave the designated area (would be valid if moved vertically etc)
+    // TODO: Probably shouldn't expand farther to the right after already hitting the edge since that's the wrong direction
+
+    if (e.key === 'ArrowLeft' && (handle === 'nw' || handle === 'w' || handle === 'sw')) {
+      changed = true;
+
+      // left means larger width when on a west handler
+      newWidth = nextCrop.width + offset;
+      newWidth = clamp(newWidth, minWidth, maxWidth || width);
+      nextCrop.width = newWidth;
+
+      nextCrop.x -= offset;
+      nextCrop.x = clamp(nextCrop.x, 0, width);
+
+      // Height stays the same unless using aspect
+      if (crop.aspect) {
+        newHeight = nextCrop.width / crop.aspect;
+        newHeight = clamp(newHeight, minHeight, maxHeight || height);
+      } else {
+        newHeight = nextCrop.height;
+      }
+      nextCrop.height = newHeight;
+    }
+    // else if(e.key === 'ArrowLeft' && (handle === 'ne' || handle === 'e' || handle === 'se'))
+
+    // else if(e.key === 'ArrowRight' && (handle === 'nw' || handle === 'w' || handle === 'sw'))
+    // else if(e.key === 'ArrowRight' && (handle === 'ne' || handle === 'e' || handle === 'se'))
+
+    // else if(e.key === 'ArrowDown' && (handle === 'ne' || handle === 'n' || handle === 'nw'))
+    // else if(e.key === 'ArrowDown' && (handle === 'se' || handle === 's' || handle === 'sw'))
+
+    // else if(e.key === 'ArrowUp' && (handle === 'ne' || handle === 'n' || handle === 'nw'))
+    // else if(e.key === 'ArrowUp' && (handle === 'se' || handle === 's' || handle === 'sw'))
+
+    if (changed && isCropValid(nextCrop)) {
+      onChange(convertToPixelCrop(nextCrop, width, height), convertToPercentCrop(nextCrop, width, height));
+    }
+  };
+
   onComponentKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
     this.keysDown.delete(e.key);
   };
@@ -839,7 +933,19 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     const style = this.getCropStyle();
 
     return (
-      <div style={style} className="ReactCrop__crop-selection" onPointerDown={this.onCropPointerDown}>
+      <div
+        style={style}
+        className="ReactCrop__crop-selection"
+        onPointerDown={this.onCropPointerDown}
+        aria-label={
+          this.props.ariaLabels && this.props.ariaLabels.cropArea
+            ? this.props.ariaLabels.cropArea
+            : 'Use the arrow keys to move the crop selection area'
+        }
+        tabIndex={0}
+        onKeyDown={this.onComponentKeyDown}
+        onKeyUp={this.onComponentKeyUp}
+      >
         {!disabled && !locked && (
           <div className="ReactCrop__drag-elements">
             <div className="ReactCrop__drag-bar ord-n" data-ord="n" />
@@ -847,14 +953,118 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
             <div className="ReactCrop__drag-bar ord-s" data-ord="s" />
             <div className="ReactCrop__drag-bar ord-w" data-ord="w" />
 
-            <div className="ReactCrop__drag-handle ord-nw" data-ord="nw" style={this.getRotatedCursor('nw', spin)} />
-            <div className="ReactCrop__drag-handle ord-n" data-ord="n" style={this.getRotatedCursor('n', spin)} />
-            <div className="ReactCrop__drag-handle ord-ne" data-ord="ne" style={this.getRotatedCursor('ne', spin)} />
-            <div className="ReactCrop__drag-handle ord-e" data-ord="e" style={this.getRotatedCursor('e', spin)} />
-            <div className="ReactCrop__drag-handle ord-se" data-ord="se" style={this.getRotatedCursor('se', spin)} />
-            <div className="ReactCrop__drag-handle ord-s" data-ord="s" style={this.getRotatedCursor('s', spin)} />
-            <div className="ReactCrop__drag-handle ord-sw" data-ord="sw" style={this.getRotatedCursor('sw', spin)} />
-            <div className="ReactCrop__drag-handle ord-w" data-ord="w" style={this.getRotatedCursor('w', spin)} />
+            <div
+              className="ReactCrop__drag-handle ord-nw"
+              data-ord="nw"
+              style={this.getRotatedCursor('nw', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.nwDragHandle
+                  ? this.props.ariaLabels.nwDragHandle
+                  : 'Use the arrow keys to move the north west drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 'nw');
+              }}
+            />
+            <div
+              className="ReactCrop__drag-handle ord-n"
+              data-ord="n"
+              style={this.getRotatedCursor('n', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.nDragHandle
+                  ? this.props.ariaLabels.nDragHandle
+                  : 'Use the up and down arrow keys to move the north drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 'n');
+              }}
+            />
+            <div
+              className="ReactCrop__drag-handle ord-ne"
+              data-ord="ne"
+              style={this.getRotatedCursor('ne', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.neDragHandle
+                  ? this.props.ariaLabels.neDragHandle
+                  : 'Use the arrow keys to move the north east drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 'ne');
+              }}
+            />
+            <div
+              className="ReactCrop__drag-handle ord-e"
+              data-ord="e"
+              style={this.getRotatedCursor('e', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.eDragHandle
+                  ? this.props.ariaLabels.eDragHandle
+                  : 'Use the up and down arrow keys to move the east drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 'e');
+              }}
+            />
+            <div
+              className="ReactCrop__drag-handle ord-se"
+              data-ord="se"
+              style={this.getRotatedCursor('se', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.seDragHandle
+                  ? this.props.ariaLabels.seDragHandle
+                  : 'Use the arrow keys to move the south east drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 'se');
+              }}
+            />
+            <div
+              className="ReactCrop__drag-handle ord-s"
+              data-ord="s"
+              style={this.getRotatedCursor('s', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.sDragHandle
+                  ? this.props.ariaLabels.sDragHandle
+                  : 'Use the up and down arrow keys to move the south drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 's');
+              }}
+            />
+            <div
+              className="ReactCrop__drag-handle ord-sw"
+              data-ord="sw"
+              style={this.getRotatedCursor('sw', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.swDragHandle
+                  ? this.props.ariaLabels.swDragHandle
+                  : 'Use the arrow keys to move the south west drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 'sw');
+              }}
+            />
+            <div
+              className="ReactCrop__drag-handle ord-w"
+              data-ord="w"
+              style={this.getRotatedCursor('w', spin)}
+              tabIndex={0}
+              aria-label={
+                this.props.ariaLabels && this.props.ariaLabels.wDragHandle
+                  ? this.props.ariaLabels.wDragHandle
+                  : 'Use the up and down arrow keys to move the west drag handle to change the crop selection area'
+              }
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                this.onHandlerKeyDown(e, 'w');
+              }}
+            />
           </div>
         )}
         {renderSelectionAddon && isCropValid(crop) && (
@@ -940,9 +1150,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         className={componentClasses}
         style={style}
         onPointerDown={this.onComponentPointerDown}
-        tabIndex={0}
-        onKeyDown={this.onComponentKeyDown}
-        onKeyUp={this.onComponentKeyUp}
       >
         <div ref={this.mediaWrapperRef} style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}>
           {renderComponent || (
