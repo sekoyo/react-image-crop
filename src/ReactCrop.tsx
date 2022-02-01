@@ -201,16 +201,16 @@ interface EVData {
 export interface ReactCropProps {
   /** An object of labels to override the built-in English ones */
   ariaLabels?: {
-    cropArea?: string;
-    nwDragHandle?: string;
-    nDragHandle?: string;
-    neDragHandle?: string;
-    eDragHandle?: string;
-    seDragHandle?: string;
-    sDragHandle?: string;
-    swDragHandle?: string;
-    wDragHandle?: string;
-  };
+    cropArea?: string
+    nwDragHandle?: string
+    nDragHandle?: string
+    neDragHandle?: string
+    eDragHandle?: string
+    seDragHandle?: string
+    sDragHandle?: string
+    swDragHandle?: string
+    wDragHandle?: string
+  }
   /** A string of classes to add to the main `ReactCrop` element. */
   className?: string
   /** A React Node that will be inserted into the `ReactCrop` element */
@@ -621,17 +621,17 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     e: React.KeyboardEvent<HTMLDivElement>,
     handle: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
   ) => {
-    const { crop, disabled, minWidth = 0, maxWidth = 0, onChange, onComplete } = this.props;
-    const { width, height } = this.mediaDimensions;
-    if (!this.imageRef.current) return; // TODO: Hmm....need to see why TS is complaining
-    const { width: imageWidth, height: imageHeight } = this.imageRef.current;
+    const { crop, disabled, minWidth = 0, maxWidth = 0, onChange, onComplete } = this.props
+    const { width, height } = this.mediaDimensions
+    if (!this.imageRef.current) return // TODO: Hmm....need to see why TS is complaining
+    const { width: imageWidth, height: imageHeight } = this.imageRef.current
 
     // Keep the event from bubbling up to the container
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      e.stopPropagation();
-      e.preventDefault();
+      e.stopPropagation()
+      e.preventDefault()
     } else {
-      return;
+      return
     }
 
     // Cardinal directions only support 2 arrow keys each
@@ -639,92 +639,136 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (handle === 'e' || handle === 'w')) ||
       ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && (handle === 's' || handle === 'n'))
     ) {
-      return;
+      return
     }
 
     if (disabled) {
-      return;
+      return
     }
 
-    let changed = false;
+    let changed = false
 
     if (!isCropValid(crop)) {
-      return;
+      return
     }
 
-    const nextCrop = this.makeNewCrop();
-    const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey;
+    const nextCrop = this.makeNewCrop()
+    const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const offset = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
       : e.shiftKey
       ? ReactCrop.nudgeStepMedium
-      : ReactCrop.nudgeStep;
-    let newWidth;
-    let newHeight;
+      : ReactCrop.nudgeStep
+    let newWidth
+    let newHeight
 
     if (e.key === 'ArrowLeft' && (handle === 'nw' || handle === 'w' || handle === 'sw')) {
-      changed = true;
+      changed = true
 
       // If there is nowhere to move to the left, don't change the crop
-      if (nextCrop.x <= 0) return;
+      if (nextCrop.x <= 0) return
 
       // left means larger width when on a west handler
-      newWidth = nextCrop.width + offset;
-      nextCrop.x -= offset;
+      newWidth = nextCrop.width + offset
+      nextCrop.x -= offset
 
       // Height stays the same unless using aspect
       if (crop.aspect) {
-        newHeight = newWidth / crop.aspect;
+        newHeight = newWidth / crop.aspect
       } else {
-        newHeight = nextCrop.height;
+        newHeight = nextCrop.height
       }
     } else if (e.key === 'ArrowLeft' && (handle === 'ne' || handle === 'e' || handle === 'se')) {
-      changed = true;
+      changed = true
 
       // left means smaller width when on an east handler
-      newWidth = nextCrop.width - offset;
+      newWidth = nextCrop.width - offset
 
       // Height stays the same unless using aspect
       if (crop.aspect) {
-        newHeight = newWidth / crop.aspect;
+        newHeight = newWidth / crop.aspect
       } else {
-        newHeight = nextCrop.height;
+        newHeight = nextCrop.height
       }
     } else if (e.key === 'ArrowRight' && (handle === 'nw' || handle === 'w' || handle === 'sw')) {
-      changed = true;
+      changed = true
 
       // If there is nowhere to move to the right, don't change the crop
-      if (nextCrop.x >= imageWidth) return;
+      if (nextCrop.x >= imageWidth) return
 
       // right means smaller width when on a west handler
-      newWidth = nextCrop.width - offset;
-      nextCrop.x += offset;
+      newWidth = nextCrop.width - offset
+      nextCrop.x += offset
 
       // Height stays the same unless using aspect
       if (crop.aspect) {
-        newHeight = newWidth / crop.aspect;
+        newHeight = newWidth / crop.aspect
       } else {
-        newHeight = nextCrop.height;
+        newHeight = nextCrop.height
       }
     } else if (e.key === 'ArrowRight' && (handle === 'ne' || handle === 'e' || handle === 'se')) {
-      changed = true;
+      changed = true
 
       // right means larger width when on an east handler
-      newWidth = nextCrop.width + offset;
+      newWidth = nextCrop.width + offset
 
       // Height stays the same unless using aspect
       if (crop.aspect) {
-        newHeight = newWidth / crop.aspect;
+        newHeight = newWidth / crop.aspect
       } else {
-        newHeight = nextCrop.height;
+        newHeight = nextCrop.height
+      }
+    } else if (e.key === 'ArrowDown' && (handle === 'ne' || handle === 'n' || handle === 'nw')) {
+      changed = true
+
+      // down means smaller height when on a north handler
+      newHeight = nextCrop.height - offset
+      nextCrop.y += offset
+
+      // Width stays the same unless using aspect
+      if (crop.aspect) {
+        newWidth = newHeight * crop.aspect
+      } else {
+        newWidth = nextCrop.width
+      }
+    } else if (e.key === 'ArrowDown' && (handle === 'se' || handle === 's' || handle === 'sw')) {
+      changed = true
+
+      // down means larger height when on a south handler
+      newHeight = nextCrop.height + offset
+
+      // Width stays the same unless using aspect
+      if (crop.aspect) {
+        newWidth = newHeight * crop.aspect
+      } else {
+        newWidth = nextCrop.width
+      }
+    } else if (e.key === 'ArrowUp' && (handle === 'ne' || handle === 'n' || handle === 'nw')) {
+      changed = true
+
+      // up means larger height when on a north handler
+      newHeight = nextCrop.height + offset
+      nextCrop.y -= offset
+
+      // Width stays the same unless using aspect
+      if (crop.aspect) {
+        newWidth = newHeight * crop.aspect
+      } else {
+        newWidth = nextCrop.width
+      }
+    } else if (e.key === 'ArrowUp' && (handle === 'se' || handle === 's' || handle === 'sw')) {
+      changed = true
+
+      // up means smaller height when on a south handler
+      newHeight = nextCrop.height - offset
+
+      // Width stays the same unless using aspect
+      if (crop.aspect) {
+        newWidth = newHeight * crop.aspect
+      } else {
+        newWidth = nextCrop.width
       }
     }
-
-    // else if(e.key === 'ArrowDown' && (handle === 'ne' || handle === 'n' || handle === 'nw')) {
-    // else if(e.key === 'ArrowDown' && (handle === 'se' || handle === 's' || handle === 'sw')) {
-
-    // else if(e.key === 'ArrowUp' && (handle === 'ne' || handle === 'n' || handle === 'nw')) {
-    // else if(e.key === 'ArrowUp' && (handle === 'se' || handle === 's' || handle === 'sw')) {
 
     if (changed) {
       const containedCrop = containCrop(
@@ -739,24 +783,24 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         },
         width,
         height
-      );
+      )
 
-      nextCrop.x = containedCrop.x;
-      nextCrop.y = containedCrop.y;
-      nextCrop.width = clamp(containedCrop.width, minWidth, maxWidth || width);
-      nextCrop.height = containedCrop.height;
+      nextCrop.x = containedCrop.x
+      nextCrop.y = containedCrop.y
+      nextCrop.width = clamp(containedCrop.width, minWidth, maxWidth || width)
+      nextCrop.height = containedCrop.height
 
       if (isCropValid(nextCrop)) {
-        const pixelCrop = convertToPixelCrop(nextCrop, width, height);
-        const percentCrop = convertToPercentCrop(nextCrop, width, height);
-        onChange(pixelCrop, percentCrop);
+        const pixelCrop = convertToPixelCrop(nextCrop, width, height)
+        const percentCrop = convertToPercentCrop(nextCrop, width, height)
+        onChange(pixelCrop, percentCrop)
 
         if (onComplete) {
-          onComplete(pixelCrop, percentCrop);
+          onComplete(pixelCrop, percentCrop)
         }
       }
     }
-  };
+  }
 
   onComponentKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
     this.keysDown.delete(e.key)
@@ -1032,7 +1076,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the arrow keys to move the north west drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'nw');
+                this.onHandlerKeyDown(e, 'nw')
               }}
             />
             <div
@@ -1046,7 +1090,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the up and down arrow keys to move the north drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'n');
+                this.onHandlerKeyDown(e, 'n')
               }}
             />
             <div
@@ -1060,7 +1104,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the arrow keys to move the north east drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'ne');
+                this.onHandlerKeyDown(e, 'ne')
               }}
             />
             <div
@@ -1074,7 +1118,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the up and down arrow keys to move the east drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'e');
+                this.onHandlerKeyDown(e, 'e')
               }}
             />
             <div
@@ -1088,7 +1132,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the arrow keys to move the south east drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'se');
+                this.onHandlerKeyDown(e, 'se')
               }}
             />
             <div
@@ -1102,7 +1146,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the up and down arrow keys to move the south drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 's');
+                this.onHandlerKeyDown(e, 's')
               }}
             />
             <div
@@ -1116,7 +1160,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the arrow keys to move the south west drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'sw');
+                this.onHandlerKeyDown(e, 'sw')
               }}
             />
             <div
@@ -1130,7 +1174,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                   : 'Use the up and down arrow keys to move the west drag handle to change the crop selection area'
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'w');
+                this.onHandlerKeyDown(e, 'w')
               }}
             />
           </div>
