@@ -612,7 +612,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     e: React.KeyboardEvent<HTMLDivElement>,
     handle: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
   ) => {
-    const { crop, disabled, minWidth = 0, maxWidth, minHeight = 0, maxHeight, onChange } = this.props;
+    const { crop, disabled, minWidth = 0, maxWidth = 0, onChange, onComplete } = this.props;
     const { width, height } = this.mediaDimensions;
 
     // Keep the event from bubbling up to the container
@@ -651,28 +651,41 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     let newWidth;
     let newHeight;
 
-    // TODO: The crop area will leave the designated area (would be valid if moved vertically etc)
-    // TODO: Probably shouldn't expand farther to the right after already hitting the edge since that's the wrong direction
-
     if (e.key === 'ArrowLeft' && (handle === 'nw' || handle === 'w' || handle === 'sw')) {
       changed = true;
 
+      // If there is nowhere to move to the left, don't change the crop
+      if (nextCrop.x <= 0) return;
+
       // left means larger width when on a west handler
       newWidth = nextCrop.width + offset;
-      newWidth = clamp(newWidth, minWidth, maxWidth || width);
-      nextCrop.width = newWidth;
-
       nextCrop.x -= offset;
-      nextCrop.x = clamp(nextCrop.x, 0, width);
 
       // Height stays the same unless using aspect
       if (crop.aspect) {
-        newHeight = nextCrop.width / crop.aspect;
-        newHeight = clamp(newHeight, minHeight, maxHeight || height);
+        newHeight = newWidth / crop.aspect;
       } else {
         newHeight = nextCrop.height;
       }
-      nextCrop.height = newHeight;
+
+      const containedCrop = containCrop(
+        this.props.crop,
+        {
+          unit: nextCrop.unit,
+          x: nextCrop.x,
+          y: nextCrop.y,
+          width: newWidth,
+          height: newHeight,
+          aspect: nextCrop.aspect,
+        },
+        width,
+        height
+      );
+
+      nextCrop.x = containedCrop.x;
+      nextCrop.y = containedCrop.y;
+      nextCrop.width = clamp(containedCrop.width, minWidth, maxWidth || width);
+      nextCrop.height = containedCrop.height;
     }
     // else if(e.key === 'ArrowLeft' && (handle === 'ne' || handle === 'e' || handle === 'se'))
 
@@ -686,7 +699,12 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     // else if(e.key === 'ArrowUp' && (handle === 'se' || handle === 's' || handle === 'sw'))
 
     if (changed && isCropValid(nextCrop)) {
-      onChange(convertToPixelCrop(nextCrop, width, height), convertToPercentCrop(nextCrop, width, height));
+      const pixelCrop = convertToPixelCrop(nextCrop, width, height);
+      const percentCrop = convertToPercentCrop(nextCrop, width, height);
+      onChange(pixelCrop, percentCrop);
+      if (onComplete) {
+        onComplete(pixelCrop, percentCrop);
+      }
     }
   };
 
