@@ -614,6 +614,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   ) => {
     const { crop, disabled, minWidth = 0, maxWidth = 0, onChange, onComplete } = this.props;
     const { width, height } = this.mediaDimensions;
+    if (!this.imageRef.current) return; // TODO: Hmm....need to see why TS is complaining
+    const { width: imageWidth, height: imageHeight } = this.imageRef.current;
 
     // Keep the event from bubbling up to the container
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -667,7 +669,55 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       } else {
         newHeight = nextCrop.height;
       }
+    } else if (e.key === 'ArrowLeft' && (handle === 'ne' || handle === 'e' || handle === 'se')) {
+      changed = true;
 
+      // left means smaller width when on an east handler
+      newWidth = nextCrop.width - offset;
+
+      // Height stays the same unless using aspect
+      if (crop.aspect) {
+        newHeight = newWidth / crop.aspect;
+      } else {
+        newHeight = nextCrop.height;
+      }
+    } else if (e.key === 'ArrowRight' && (handle === 'nw' || handle === 'w' || handle === 'sw')) {
+      changed = true;
+
+      // If there is nowhere to move to the right, don't change the crop
+      if (nextCrop.x >= imageWidth) return;
+
+      // right means smaller width when on a west handler
+      newWidth = nextCrop.width - offset;
+      nextCrop.x += offset;
+
+      // Height stays the same unless using aspect
+      if (crop.aspect) {
+        newHeight = newWidth / crop.aspect;
+      } else {
+        newHeight = nextCrop.height;
+      }
+    } else if (e.key === 'ArrowRight' && (handle === 'ne' || handle === 'e' || handle === 'se')) {
+      changed = true;
+
+      // right means larger width when on an east handler
+      newWidth = nextCrop.width + offset;
+
+      // Height stays the same unless using aspect
+      if (crop.aspect) {
+        newHeight = newWidth / crop.aspect;
+      } else {
+        newHeight = nextCrop.height;
+      }
+    }
+
+    // else if(e.key === 'ArrowDown' && (handle === 'ne' || handle === 'n' || handle === 'nw')) {
+    // else if(e.key === 'ArrowDown' && (handle === 'se' || handle === 's' || handle === 'sw')) {
+
+    // else if(e.key === 'ArrowUp' && (handle === 'ne' || handle === 'n' || handle === 'nw')) {
+    // else if(e.key === 'ArrowUp' && (handle === 'se' || handle === 's' || handle === 'sw')) {
+
+    if (changed) {
       const containedCrop = containCrop(
         this.props.crop,
         {
@@ -686,24 +736,15 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       nextCrop.y = containedCrop.y;
       nextCrop.width = clamp(containedCrop.width, minWidth, maxWidth || width);
       nextCrop.height = containedCrop.height;
-    }
-    // else if(e.key === 'ArrowLeft' && (handle === 'ne' || handle === 'e' || handle === 'se'))
 
-    // else if(e.key === 'ArrowRight' && (handle === 'nw' || handle === 'w' || handle === 'sw'))
-    // else if(e.key === 'ArrowRight' && (handle === 'ne' || handle === 'e' || handle === 'se'))
+      if (isCropValid(nextCrop)) {
+        const pixelCrop = convertToPixelCrop(nextCrop, width, height);
+        const percentCrop = convertToPercentCrop(nextCrop, width, height);
+        onChange(pixelCrop, percentCrop);
 
-    // else if(e.key === 'ArrowDown' && (handle === 'ne' || handle === 'n' || handle === 'nw'))
-    // else if(e.key === 'ArrowDown' && (handle === 'se' || handle === 's' || handle === 'sw'))
-
-    // else if(e.key === 'ArrowUp' && (handle === 'ne' || handle === 'n' || handle === 'nw'))
-    // else if(e.key === 'ArrowUp' && (handle === 'se' || handle === 's' || handle === 'sw'))
-
-    if (changed && isCropValid(nextCrop)) {
-      const pixelCrop = convertToPixelCrop(nextCrop, width, height);
-      const percentCrop = convertToPercentCrop(nextCrop, width, height);
-      onChange(pixelCrop, percentCrop);
-      if (onComplete) {
-        onComplete(pixelCrop, percentCrop);
+        if (onComplete) {
+          onComplete(pixelCrop, percentCrop);
+        }
       }
     }
   };
