@@ -138,7 +138,12 @@ function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: n
 
   let adjustedForY = false;
 
-  if (pixelCrop.y + pixelCrop.height > imageHeight) {
+  if (pixelCrop.y < 0) {
+    pixelCrop.y = 0;
+    pixelCrop.height +=  pixelCrop.y;
+    pixelCrop.width = pixelCrop.height * pixelCrop.aspect;
+    adjustedForX = true;
+  } else if (pixelCrop.y + pixelCrop.height > imageHeight) {
     pixelCrop.height = imageHeight - pixelCrop.y;
     pixelCrop.width = pixelCrop.height * pixelCrop.aspect;
     adjustedForY = true;
