@@ -98,7 +98,6 @@ function resolveCrop(pixelCrop: Crop, imageWidth: number, imageHeight: number) {
 }
 
 function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: number, imageHeight: number) {
-  console.log('containCrop')
   const pixelCrop = convertToPixelCrop(crop, imageWidth, imageHeight)
   const prevPixelCrop = convertToPixelCrop(prevCrop, imageWidth, imageHeight)
 
