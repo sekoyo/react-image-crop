@@ -131,9 +131,13 @@ function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: n
   if (prevPixelCrop.y > pixelCrop.y) {
     if (pixelCrop.x + pixelCrop.width >= imageWidth) {
       // ...and we've hit the right border, don't adjust Y.
+      // Adjust height so crop selection doesn't move if Y is adjusted.
+      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
       pixelCrop.y = prevPixelCrop.y
     } else if (pixelCrop.x <= 0) {
       // ...and we've hit the left border, don't adjust Y.
+      // Adjust height so crop selection doesn't move if Y is adjusted.
+      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
       pixelCrop.y = prevPixelCrop.y
     }
   }
@@ -150,6 +154,8 @@ function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: n
 
   // If sizing in left direction and we've hit the bottom border, don't adjust X.
   if (pixelCrop.x < prevPixelCrop.x && pixelCrop.y + pixelCrop.height >= imageHeight) {
+    // Adjust width so crop selection doesn't move if X is adjusted.
+    pixelCrop.width += prevPixelCrop.width - pixelCrop.width
     pixelCrop.x = prevPixelCrop.x
   }
 
