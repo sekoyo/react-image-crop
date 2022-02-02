@@ -787,7 +787,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
       nextCrop.x = containedCrop.x
       nextCrop.y = containedCrop.y
-      nextCrop.width = clamp(containedCrop.width, minWidth, maxWidth || width)
+      nextCrop.width = containedCrop.width
       nextCrop.height = containedCrop.height
 
       if (isCropValid(nextCrop)) {
