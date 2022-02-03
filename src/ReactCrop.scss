@@ -29,10 +29,6 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
   overflow: hidden;
   max-width: 100%;
 
-  &:focus {
-    outline: none;
-  }
-
   &--disabled,
   &--locked {
     cursor: inherit;
@@ -64,6 +60,11 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     }
 
     border: 1px dashed white;
+
+    &:focus {
+      outline: none;
+      border: 1px solid blue;
+    }
   }
   &--invisible-crop &__crop-selection {
     display: none;
@@ -131,6 +132,12 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
       // This stops the borders disappearing when keyboard
       // nudging.
       outline: 1px solid transparent;
+    }
+
+    &:focus {
+      &::after {
+        border-color: blue;
+      }
     }
   }
 

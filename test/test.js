@@ -132,8 +132,9 @@ class App extends PureComponent {
         <div>
           <input type="file" onChange={this.onSelectFile} />
           <div>
-            <label>Scale: </label>
+            <label htmlFor="scaleInput">Scale: </label>
             <input
+              id="scaleInput"
               type="number"
               step="0.1"
               value={scale}
@@ -142,8 +143,9 @@ class App extends PureComponent {
             />
           </div>
           <div>
-            <label>Rotate: </label>
+            <label htmlFor="RotateInput">Rotate: </label>
             <input
+              id="RotateInput"
               type="number"
               value={rotate}
               disabled={!src}
@@ -151,8 +153,9 @@ class App extends PureComponent {
             />
           </div>
           <div>
-            <label>Spin: </label>
+            <label htmlFor="SpinInput">Spin: </label>
             <input
+              id="SpinInput"
               type="number"
               value={spin}
               disabled={!src}
