@@ -20,7 +20,7 @@ class App extends PureComponent {
     crop: {
       // x: 200,
       // y: 200,
-      aspect: 3 / 2,
+      // aspect: 3 / 2,
     },
   }
 
@@ -178,10 +178,10 @@ class App extends PureComponent {
             onDragStart={this.onDragStart}
             onDragEnd={this.onDragEnd}
             // renderSelectionAddon={this.renderSelectionAddon}
-            minWidth={50}
-            minHeight={50}
-            maxWidth={200}
-            maxHeight={200}
+            // minWidth={50}
+            // minHeight={50}
+            // maxWidth={200}
+            // maxHeight={200}
           />
         )}
         {src && (
