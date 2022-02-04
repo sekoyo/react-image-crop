@@ -178,8 +178,10 @@ class App extends PureComponent {
             onDragStart={this.onDragStart}
             onDragEnd={this.onDragEnd}
             // renderSelectionAddon={this.renderSelectionAddon}
-            // minWidth={200}
-            // minHeight={200}
+            minWidth={50}
+            minHeight={50}
+            maxWidth={200}
+            maxHeight={200}
           />
         )}
         {src && (

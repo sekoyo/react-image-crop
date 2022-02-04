@@ -462,7 +462,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     e: React.KeyboardEvent<HTMLDivElement>,
     ord: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
   ) => {
-    const { crop, disabled, onChange, onComplete } = this.props
+    const { crop, disabled, maxWidth, maxHeight, onChange, onComplete } = this.props
     const { width: mediaWidth, height: mediaHeight } = this.mediaDimensions
 
     if (disabled) {
@@ -482,7 +482,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
 
     const nextCrop = convertToPixelCrop(crop, mediaWidth, mediaHeight)
-    const maxCrop = getMaxCrop(nextCrop, ord, mediaWidth, mediaHeight)
+    const maxCrop = getMaxCrop(nextCrop, ord, mediaWidth, mediaHeight, maxWidth, maxHeight)
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const offset = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge

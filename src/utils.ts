@@ -170,58 +170,74 @@ export function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageW
   return pixelCrop
 }
 
-// TODO: Add maxWidth, maxHeight
-export function getMaxCrop(pixelCrop: Crop, ord: Ords, containerWidth: number, containerHeight: number) {
+export function getMaxCrop(
+  pixelCrop: Crop,
+  ord: Ords,
+  containerWidth: number,
+  containerHeight: number,
+  maxWidth = containerWidth,
+  maxHeight = containerHeight
+) {
   const maxCrop = { ...pixelCrop }
+
+  const getMaxWidthLeft = () => Math.min(maxWidth, maxCrop.x + maxCrop.width)
+
+  const getMaxHeightTop = () => Math.min(maxHeight, maxCrop.y + maxCrop.height)
+
+  const getMaxWidthRight = () => Math.min(maxWidth, containerWidth - maxCrop.x)
+
+  const getMaxHeightBottom = () => Math.min(maxHeight, containerHeight - maxCrop.y)
 
   if (!maxCrop.aspect) {
     if (ord === 'n') {
-      maxCrop.height = maxCrop.y + maxCrop.height
-      maxCrop.y = 0
+      const height = getMaxHeightTop()
+      maxCrop.y -= height - maxCrop.height
+      maxCrop.height = height
     } else if (ord === 'ne') {
-      maxCrop.height = maxCrop.y + maxCrop.height
-      maxCrop.width = containerWidth - maxCrop.x
-      maxCrop.y = 0
+      const height = getMaxHeightTop()
+      maxCrop.y -= height - maxCrop.height
+      maxCrop.height = height
+      maxCrop.width = getMaxWidthRight()
     } else if (ord === 'e') {
-      maxCrop.width = containerWidth - maxCrop.x
+      maxCrop.width = getMaxWidthRight()
     } else if (ord === 'se') {
-      maxCrop.width = containerWidth - maxCrop.x
-      maxCrop.height = containerHeight - maxCrop.y
+      maxCrop.width = getMaxWidthRight()
+      maxCrop.height = getMaxHeightBottom()
     } else if (ord === 's') {
-      maxCrop.height = containerHeight - maxCrop.y
+      maxCrop.height = getMaxHeightBottom()
     } else if (ord === 'sw') {
-      maxCrop.width = maxCrop.x + maxCrop.width
-      maxCrop.height = maxCrop.y + maxCrop.height
-      maxCrop.x = 0
+      const width = getMaxWidthLeft()
+      maxCrop.x -= width - maxCrop.width
+      maxCrop.width = width
+      maxCrop.height = getMaxHeightBottom()
     } else if (ord === 'w') {
-      maxCrop.width = maxCrop.x + maxCrop.width
-      maxCrop.x = 0
+      const width = getMaxWidthLeft()
+      maxCrop.x -= width - maxCrop.width
+      maxCrop.width = width
     } else if (ord === 'nw') {
-      maxCrop.width = maxCrop.x + maxCrop.width
-      maxCrop.height = maxCrop.y + maxCrop.height
-      maxCrop.x = 0
-      maxCrop.y = 0
+      const height = getMaxHeightTop()
+      maxCrop.y -= height - maxCrop.height
+      maxCrop.height = height
+      const width = getMaxWidthLeft()
+      maxCrop.x -= width - maxCrop.width
+      maxCrop.width = width
     }
   } else {
     let longestWidth = 0
     let longestHeight = 0
 
     if (ord === 'ne') {
-      // Furthest corner is SW.
-      longestWidth = containerWidth - maxCrop.x
-      longestHeight = maxCrop.y + maxCrop.height
+      longestWidth = getMaxWidthRight()
+      longestHeight = getMaxHeightTop()
     } else if (ord === 'se') {
-      // Furthest corner is NW.
-      longestWidth = containerWidth - maxCrop.x
-      longestHeight = containerHeight - maxCrop.y
+      longestWidth = getMaxWidthRight()
+      longestHeight = getMaxHeightBottom()
     } else if (ord === 'sw') {
-      // Furthest corner is NE.
-      longestWidth = maxCrop.x + maxCrop.width
-      longestHeight = containerHeight - maxCrop.y
+      longestWidth = getMaxWidthLeft()
+      longestHeight = getMaxHeightBottom()
     } else if (ord === 'nw') {
-      // Furthest corner is SE.
-      longestWidth = maxCrop.x + maxCrop.width
-      longestHeight = maxCrop.y + maxCrop.height
+      longestWidth = getMaxWidthLeft()
+      longestHeight = getMaxHeightTop()
     }
 
     const ratioX = longestWidth / maxCrop.width
