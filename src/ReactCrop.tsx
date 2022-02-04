@@ -11,8 +11,8 @@ import {
   convertToPercentCrop,
   convertToPixelCrop,
   resolveCrop,
-  containCrop,
   getMaxCrop,
+  getMinCrop,
 } from './utils'
 
 import './ReactCrop.scss'
@@ -38,6 +38,72 @@ interface EVData {
 }
 
 const DOC_MOVE_OPTS = { capture: true, passive: false }
+
+// NOTE: This function will be refactored out.
+function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: number, imageHeight: number) {
+  const pixelCrop = convertToPixelCrop(crop, imageWidth, imageHeight)
+  const prevPixelCrop = convertToPixelCrop(prevCrop, imageWidth, imageHeight)
+
+  // Non-aspects are simple
+  if (!pixelCrop.aspect) {
+    if (pixelCrop.x < 0) {
+      pixelCrop.width += pixelCrop.x
+      pixelCrop.x = 0
+    } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
+      pixelCrop.width = imageWidth - pixelCrop.x
+    }
+
+    if (pixelCrop.y + pixelCrop.height > imageHeight) {
+      pixelCrop.height = imageHeight - pixelCrop.y
+    }
+
+    return pixelCrop
+  }
+
+  // Contain crop if overflowing on X.
+  if (pixelCrop.x < 0) {
+    pixelCrop.width = pixelCrop.x + pixelCrop.width
+    pixelCrop.x = 0
+    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
+  } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
+    pixelCrop.width = imageWidth - pixelCrop.x
+    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
+  }
+
+  // If sizing in up direction...
+  if (prevPixelCrop.y > pixelCrop.y) {
+    if (pixelCrop.x + pixelCrop.width >= imageWidth) {
+      // ...and we've hit the right border, don't adjust Y.
+      // Adjust height so crop selection doesn't move if Y is adjusted.
+      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
+      pixelCrop.y = prevPixelCrop.y
+    } else if (pixelCrop.x <= 0) {
+      // ...and we've hit the left border, don't adjust Y.
+      // Adjust height so crop selection doesn't move if Y is adjusted.
+      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
+      pixelCrop.y = prevPixelCrop.y
+    }
+  }
+
+  // Contain crop if overflowing on Y.
+  if (pixelCrop.y < 0) {
+    pixelCrop.height = pixelCrop.y + pixelCrop.height
+    pixelCrop.y = 0
+    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
+  } else if (pixelCrop.y + pixelCrop.height > imageHeight) {
+    pixelCrop.height = imageHeight - pixelCrop.y
+    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
+  }
+
+  // If sizing in left direction and we've hit the bottom border, don't adjust X.
+  if (pixelCrop.x < prevPixelCrop.x && pixelCrop.y + pixelCrop.height >= imageHeight) {
+    // Adjust width so crop selection doesn't move if X is adjusted.
+    pixelCrop.width += prevPixelCrop.width - pixelCrop.width
+    pixelCrop.x = prevPixelCrop.x
+  }
+
+  return pixelCrop
+}
 
 export interface ReactCropProps {
   /** An object of labels to override the built-in English ones */
@@ -462,7 +528,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     e: React.KeyboardEvent<HTMLDivElement>,
     ord: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
   ) => {
-    const { crop, disabled, maxWidth, maxHeight, onChange, onComplete } = this.props
+    const { crop, disabled, minWidth, minHeight, maxWidth, maxHeight, onChange, onComplete } = this.props
     const { width: mediaWidth, height: mediaHeight } = this.mediaDimensions
 
     if (disabled) {
@@ -483,6 +549,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     const nextCrop = convertToPixelCrop(crop, mediaWidth, mediaHeight)
     const maxCrop = getMaxCrop(nextCrop, ord, mediaWidth, mediaHeight, maxWidth, maxHeight)
+    const minCrop = getMinCrop(nextCrop, ord, minWidth, minHeight)
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const offset = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
@@ -502,14 +569,14 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       } else if (ord === 'ne' || ord === 'e' || ord === 'se') {
         // Right side
         widthChanged = true
-        nextCrop.width = Math.max(0, nextCrop.width - offset)
+        nextCrop.width = Math.max(minCrop.width, nextCrop.width - offset)
       }
     } else if (e.key === 'ArrowRight') {
       if (ord === 'nw' || ord === 'w' || ord === 'sw') {
         // Left side
         widthChanged = true
-        nextCrop.x = Math.min(mediaWidth, nextCrop.x + offset)
-        nextCrop.width = Math.max(0, nextCrop.width - offset)
+        nextCrop.x = Math.min(minCrop.x, nextCrop.x + offset)
+        nextCrop.width = Math.max(minCrop.width, nextCrop.width - offset)
       } else if (ord === 'ne' || ord === 'e' || ord === 'se') {
         // Right side
         widthChanged = true
@@ -526,14 +593,14 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       } else if (ord === 'sw' || ord === 's' || ord === 'se') {
         // Bottom side
         heightChanged = true
-        nextCrop.height = Math.max(0, nextCrop.height - offset)
+        nextCrop.height = Math.max(minCrop.height, nextCrop.height - offset)
       }
     } else if (e.key === 'ArrowDown') {
       if (ord === 'nw' || ord === 'n' || ord === 'ne') {
         // Top side
         heightChanged = true
-        nextCrop.y = Math.min(mediaHeight, nextCrop.y + offset)
-        nextCrop.height = Math.max(0, nextCrop.height - offset)
+        nextCrop.y = Math.min(minCrop.y, nextCrop.y + offset)
+        nextCrop.height = Math.max(minCrop.height, nextCrop.height - offset)
       } else if (ord === 'sw' || ord === 's' || ord === 'se') {
         // Bottom side
         heightChanged = true

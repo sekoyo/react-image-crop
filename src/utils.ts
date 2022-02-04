@@ -105,69 +105,36 @@ export function resolveCrop(pixelCrop: Crop, imageWidth: number, imageHeight: nu
   return pixelCrop
 }
 
-export function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: number, imageHeight: number) {
-  const pixelCrop = convertToPixelCrop(crop, imageWidth, imageHeight)
-  const prevPixelCrop = convertToPixelCrop(prevCrop, imageWidth, imageHeight)
+export function getMinCrop(pixelCrop: Crop, ord: Ords, minWidth = 0, minHeight = 0) {
+  const minCrop = { ...pixelCrop }
 
-  // Non-aspects are simple
-  if (!pixelCrop.aspect) {
-    if (pixelCrop.x < 0) {
-      pixelCrop.width += pixelCrop.x
-      pixelCrop.x = 0
-    } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
-      pixelCrop.width = imageWidth - pixelCrop.x
-    }
-
-    if (pixelCrop.y + pixelCrop.height > imageHeight) {
-      pixelCrop.height = imageHeight - pixelCrop.y
-    }
-
-    return pixelCrop
-  }
-
-  // Contain crop if overflowing on X.
-  if (pixelCrop.x < 0) {
-    pixelCrop.width = pixelCrop.x + pixelCrop.width
-    pixelCrop.x = 0
-    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
-  } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
-    pixelCrop.width = imageWidth - pixelCrop.x
-    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
-  }
-
-  // If sizing in up direction...
-  if (prevPixelCrop.y > pixelCrop.y) {
-    if (pixelCrop.x + pixelCrop.width >= imageWidth) {
-      // ...and we've hit the right border, don't adjust Y.
-      // Adjust height so crop selection doesn't move if Y is adjusted.
-      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
-      pixelCrop.y = prevPixelCrop.y
-    } else if (pixelCrop.x <= 0) {
-      // ...and we've hit the left border, don't adjust Y.
-      // Adjust height so crop selection doesn't move if Y is adjusted.
-      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
-      pixelCrop.y = prevPixelCrop.y
+  if (!minCrop.aspect) {
+    minCrop.width = minWidth
+    minCrop.height = minHeight
+  } else {
+    if (minWidth < minHeight) {
+      minCrop.width = minWidth
+      minCrop.height = minCrop.width / minCrop.aspect
+    } else {
+      minCrop.width = minHeight * minCrop.aspect
+      minCrop.height = minHeight
     }
   }
 
-  // Contain crop if overflowing on Y.
-  if (pixelCrop.y < 0) {
-    pixelCrop.height = pixelCrop.y + pixelCrop.height
-    pixelCrop.y = 0
-    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
-  } else if (pixelCrop.y + pixelCrop.height > imageHeight) {
-    pixelCrop.height = imageHeight - pixelCrop.y
-    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
+  // Adjust x+y so it's sized towards the opposite
+  // side.
+  if (ord === 'n' || ord === 'ne') {
+    minCrop.y += pixelCrop.height - minCrop.height
+  } else if (ord === 'sw') {
+    minCrop.x += pixelCrop.width - minCrop.width
+  } else if (ord === 'nw') {
+    minCrop.x += pixelCrop.width - minCrop.width
+    minCrop.y += pixelCrop.height - minCrop.height
+  } else if (ord === 'w') {
+    minCrop.x += pixelCrop.width - minCrop.width
   }
 
-  // If sizing in left direction and we've hit the bottom border, don't adjust X.
-  if (pixelCrop.x < prevPixelCrop.x && pixelCrop.y + pixelCrop.height >= imageHeight) {
-    // Adjust width so crop selection doesn't move if X is adjusted.
-    pixelCrop.width += prevPixelCrop.width - pixelCrop.width
-    pixelCrop.x = prevPixelCrop.x
-  }
-
-  return pixelCrop
+  return minCrop
 }
 
 export function getMaxCrop(
