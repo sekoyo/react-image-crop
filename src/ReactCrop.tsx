@@ -35,16 +35,74 @@ interface EVData {
   startYCrossOver: boolean
   isResize: boolean
   ord: Ords
-  maxCrop: Crop
 }
 
 const DOC_MOVE_OPTS = { capture: true, passive: false }
-const emptyCrop: Crop = {
-  unit: 'px',
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0,
+
+// NOTE: This function will be refactored out.
+function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: number, imageHeight: number) {
+  const pixelCrop = convertToPixelCrop(crop, imageWidth, imageHeight)
+  const prevPixelCrop = convertToPixelCrop(prevCrop, imageWidth, imageHeight)
+
+  // Non-aspects are simple
+  if (!pixelCrop.aspect) {
+    if (pixelCrop.x < 0) {
+      pixelCrop.width += pixelCrop.x
+      pixelCrop.x = 0
+    } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
+      pixelCrop.width = imageWidth - pixelCrop.x
+    }
+
+    if (pixelCrop.y + pixelCrop.height > imageHeight) {
+      pixelCrop.height = imageHeight - pixelCrop.y
+    }
+
+    return pixelCrop
+  }
+
+  // Contain crop if overflowing on X.
+  if (pixelCrop.x < 0) {
+    pixelCrop.width = pixelCrop.x + pixelCrop.width
+    pixelCrop.x = 0
+    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
+  } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
+    pixelCrop.width = imageWidth - pixelCrop.x
+    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
+  }
+
+  // If sizing in up direction...
+  if (prevPixelCrop.y > pixelCrop.y) {
+    if (pixelCrop.x + pixelCrop.width >= imageWidth) {
+      // ...and we've hit the right border, don't adjust Y.
+      // Adjust height so crop selection doesn't move if Y is adjusted.
+      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
+      pixelCrop.y = prevPixelCrop.y
+    } else if (pixelCrop.x <= 0) {
+      // ...and we've hit the left border, don't adjust Y.
+      // Adjust height so crop selection doesn't move if Y is adjusted.
+      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
+      pixelCrop.y = prevPixelCrop.y
+    }
+  }
+
+  // Contain crop if overflowing on Y.
+  if (pixelCrop.y < 0) {
+    pixelCrop.height = pixelCrop.y + pixelCrop.height
+    pixelCrop.y = 0
+    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
+  } else if (pixelCrop.y + pixelCrop.height > imageHeight) {
+    pixelCrop.height = imageHeight - pixelCrop.y
+    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
+  }
+
+  // If sizing in left direction and we've hit the bottom border, don't adjust X.
+  if (pixelCrop.x < prevPixelCrop.x && pixelCrop.y + pixelCrop.height >= imageHeight) {
+    // Adjust width so crop selection doesn't move if X is adjusted.
+    pixelCrop.width += prevPixelCrop.width - pixelCrop.width
+    pixelCrop.x = prevPixelCrop.x
+  }
+
+  return pixelCrop
 }
 
 export interface ReactCropProps {
@@ -156,7 +214,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     startYCrossOver: false,
     isResize: true,
     ord: 'nw',
-    maxCrop: emptyCrop,
   }
 
   componentRef = createRef<HTMLDivElement>()
@@ -230,7 +287,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   onCropPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const { crop, disabled, minWidth, minHeight, maxWidth, maxHeight } = this.props
+    const { crop, disabled } = this.props
     const { width, height } = this.mediaDimensions
     const pixelCrop = convertToPixelCrop(crop, width, height)
 
@@ -246,7 +303,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     // Focus for detecting keypress.
     ;(this.componentRef.current as HTMLDivElement).focus({ preventScroll: true }) // All other browsers
 
-    const ord = (e.target as HTMLElement).dataset.ord as Ords
+    const { ord } = (e.target as HTMLElement).dataset
     const xInversed = ord === 'nw' || ord === 'w' || ord === 'sw'
     const yInversed = ord === 'nw' || ord === 'n' || ord === 'ne'
 
@@ -267,8 +324,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       startXCrossOver: xInversed,
       startYCrossOver: yInversed,
       isResize: Boolean(ord),
-      ord,
-      maxCrop: getMaxCrop(pixelCrop, ord, width, height, maxWidth, maxHeight),
+      ord: (ord || 'ne') as Ords,
     }
 
     this.mouseDownOnCrop = true
@@ -276,19 +332,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   onComponentPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const {
-      crop,
-      minWidth,
-      minHeight,
-      maxWidth,
-      maxHeight,
-      disabled,
-      locked,
-      keepSelection,
-      onChange,
-      zoom = 1,
-      spin = 0,
-    } = this.props
+    const { crop, disabled, locked, keepSelection, onChange, zoom = 1, spin = 0 } = this.props
 
     const componentEl = (this.mediaWrapperRef.current as HTMLDivElement).firstChild
 
@@ -339,7 +383,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
 
     const { width, height } = this.mediaDimensions
-    const defaultOrd: Ords = 'nw'
 
     this.evData = {
       clientStartX: e.clientX,
@@ -358,8 +401,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       startXCrossOver: false,
       startYCrossOver: false,
       isResize: true,
-      ord: defaultOrd,
-      maxCrop: getMaxCrop(nextCrop, defaultOrd, width, height, maxWidth, maxHeight),
+      ord: 'nw',
     }
 
     this.mouseDownOnCrop = true
@@ -759,19 +801,21 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       }
     }
 
-    let containedCrop: Crop = {
-      unit: nextCrop.unit,
-      x: newX,
-      y: newY,
-      width: newSize.width,
-      height: newSize.height,
-      aspect: nextCrop.aspect,
-    }
+    const { width, height } = this.mediaDimensions
 
-    // If any dimensions overflow maxCrop use that.
-    if (containedCrop.width > evData.maxCrop.width || containedCrop.height > evData.maxCrop.height) {
-      containedCrop = evData.maxCrop
-    }
+    const containedCrop = containCrop(
+      this.props.crop,
+      {
+        unit: nextCrop.unit,
+        x: newX,
+        y: newY,
+        width: newSize.width,
+        height: newSize.height,
+        aspect: nextCrop.aspect,
+      },
+      width,
+      height
+    )
 
     // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
     if (nextCrop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
@@ -789,6 +833,17 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     evData.lastYCrossover = evData.yCrossOver
     this.crossOverCheck()
+
+    // Improve: This should go to the min box not
+    // the last one.
+    // Contain crop can result in crops that are too
+    // small to meet minimums. Fixes #425.
+    if (nextCrop.width < minWidth) {
+      return crop
+    }
+    if (nextCrop.height < minHeight) {
+      return crop
+    }
 
     return nextCrop
   }
