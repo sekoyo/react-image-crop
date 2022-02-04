@@ -1,14 +1,14 @@
 @use 'sass:math';
 
+// Query to kick us into "mobile" mode with larger drag handles/bars.
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
+$mobile-media-query: '(pointer: coarse)' !default;
+
 // SASS variables for normal drag handle and bar size.
 // Override in your scss file by setting these variables FIRST, then including this file.
 $drag-handle-width: 10px !default;
 $drag-handle-height: 10px !default;
 $drag-bar-size: 6px !default;
-
-// Query to kick us into "mobile" mode with larger drag handles/bars.
-// See: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
-$mobile-media-query: '(pointer: coarse)' !default;
 
 // Mobile handle/bar sizes.  Override as above.
 $drag-handle-mobile-width: 24px !default;
@@ -17,6 +17,8 @@ $drag-handle-mobile-height: 24px !default;
 // Handle color/border.
 $drag-handle-background-colour: rgba(0, 0, 0, 0.2) !default;
 $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
+$drag-handle-active-border-color: blue !default;
+$drag-handle-active-bg-color: #2dbfff !default;
 
 $half-drag-handle-height: math.div($drag-handle-height, 2);
 $half-drag-handle-width: math.div($drag-handle-width, 2);
@@ -28,6 +30,12 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
   cursor: crosshair;
   overflow: hidden;
   max-width: 100%;
+
+  & *,
+  & *::before,
+  & *::after {
+    box-sizing: border-box;
+  }
 
   &--disabled,
   &--locked {
@@ -45,7 +53,6 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     top: 0;
     left: 0;
     transform: translate3d(0, 0, 0);
-    box-sizing: border-box;
     cursor: move;
     box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.5);
     touch-action: none;
@@ -63,7 +70,8 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
 
     &:focus {
       outline: none;
-      border: 1px solid blue;
+      border-color: $drag-handle-active-border-color;
+      border-style: solid;
     }
   }
   &--invisible-crop &__crop-selection {
@@ -127,7 +135,6 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
       height: $drag-handle-height;
       background-color: $drag-handle-background-colour;
       border: $drag-handle-border;
-      box-sizing: border-box;
 
       // This stops the borders disappearing when keyboard
       // nudging.
@@ -136,7 +143,8 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
 
     &:focus {
       &::after {
-        border-color: blue;
+        border-color: $drag-handle-active-border-color;
+        background: $drag-handle-active-bg-color;
       }
     }
   }

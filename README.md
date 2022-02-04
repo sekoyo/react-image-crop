@@ -29,11 +29,11 @@ An image cropping tool for React with no dependencies.
 - Responsive (you can use pixels or percentages).
 - Touch enabled.
 - Free-form or fixed aspect crops.
-- Keyboard support for nudging selection.
+- Fully keyboard accessible (a11y).
 - No dependencies/small footprint (5KB gzip).
 - Min/max crop size.
 
-If React Image Crop doesn't cover your requirements then I advise to take a look at [Pintura](https://gumroad.com/a/611955827). It features cropping, rotating, filtering, annotation, and lots more.
+If React Image Crop doesn't cover your requirements then take a look at [Pintura](https://gumroad.com/a/611955827). It features cropping, rotating, filtering, annotation, and lots more.
 
 [Learn more about Pintura here](https://gumroad.com/a/611955827)
 
@@ -41,6 +41,7 @@ If React Image Crop doesn't cover your requirements then I advise to take a look
 
 ```
 npm i react-image-crop --save
+yarn add react-image-crop
 ```
 
 ## Usage
@@ -48,23 +49,23 @@ npm i react-image-crop --save
 Include the main js module:
 
 ```js
-import ReactCrop from 'react-image-crop';
+import ReactCrop from 'react-image-crop'
 ```
 
 Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
 
 ```js
-import 'react-image-crop/dist/ReactCrop.css';
+import 'react-image-crop/dist/ReactCrop.css'
 // or scss:
-import 'react-image-crop/src/ReactCrop.scss';
+import 'react-image-crop/src/ReactCrop.scss'
 ```
 
 ## Example
 
 ```js
 function CropDemo({ src }) {
-  const [crop, setCrop] = useState({ aspect: 16 / 9 });
-  return <ReactCrop src={src} crop={crop} onChange={newCrop => setCrop(newCrop)} />;
+  const [crop, setCrop] = useState({ aspect: 16 / 9 })
+  return <ReactCrop src={src} crop={crop} onChange={newCrop => setCrop(newCrop)} />
 }
 ```
 
@@ -100,8 +101,8 @@ Note you _must_ implement this callback and update your crop state, otherwise no
 
 ```js
 onChange = crop => {
-  this.setState({ crop });
-};
+  this.setState({ crop })
+}
 ```
 
 You can use either `crop` or `percentCrop`, the library can handle either interchangeably. Percent crops will be drawn using percentages, not converted to pixels.
@@ -128,7 +129,7 @@ If you want a fixed aspect you can either omit `width` and `height`:
 
 ```js
 crop: {
-  aspect: 16 / 9;
+  aspect: 16 / 9
 }
 ```
 
@@ -211,9 +212,9 @@ Useful if you want to set a crop based on the image dimensions when using pixels
 
 ```js
 onImageLoaded = image => {
-  this.setState({ crop: { width: image.width, height: image.height } });
-  return false; // Return false when setting crop state in here.
-};
+  this.setState({ crop: { width: image.width, height: image.height } })
+  return false // Return false when setting crop state in here.
+}
 ```
 
 Note that you must **return false** in this callback if you are changing the crop object.
@@ -250,14 +251,14 @@ const videoComponent = (
     style={{ display: 'block', maxWidth: '100%' }}
     onLoadStart={e => {
       // You must inform ReactCrop when your media has loaded.
-      e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }));
+      e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }))
     }}
   >
     <source src="sample.mp4" type="video/mp4" />
   </video>
-);
+)
 
-<ReactCrop onChange={this.onCropChange} renderComponent={videoComponent} />;
+;<ReactCrop onChange={this.onCropChange} renderComponent={videoComponent} />
 ```
 
 #### ruleOfThirds (optional)
@@ -390,20 +391,20 @@ crop: {
 Also remember to set your crop using the percentCrop on changes or the crop will go off-center if the container size changes (e.g. browser resize):
 
 ```js
-onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop });
+onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop })
 ```
 
 If you need more control over the crop you can set it in [onImageLoaded](#onimageloadedimage-optional). For example to center a percent crop:
 
 ```js
 const onLoad = useCallback(img => {
-  imgRef.current = img;
+  imgRef.current = img
 
-  const aspect = 16 / 9;
-  const width = img.width / aspect < img.height * aspect ? 100 : ((img.height * aspect) / img.width) * 100;
-  const height = img.width / aspect > img.height * aspect ? 100 : (img.width / aspect / img.height) * 100;
-  const y = (100 - height) / 2;
-  const x = (100 - width) / 2;
+  const aspect = 16 / 9
+  const width = img.width / aspect < img.height * aspect ? 100 : ((img.height * aspect) / img.width) * 100
+  const height = img.width / aspect > img.height * aspect ? 100 : (img.width / aspect / img.height) * 100
+  const y = (100 - height) / 2
+  const x = (100 - width) / 2
 
   setCrop({
     unit: '%',
@@ -412,10 +413,10 @@ const onLoad = useCallback(img => {
     x,
     y,
     aspect,
-  });
+  })
 
-  return false; // Return false if you set crop state in here.
-}, []);
+  return false // Return false if you set crop state in here.
+}, [])
 ```
 
 ## Contributing / Developing

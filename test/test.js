@@ -41,13 +41,13 @@ class App extends PureComponent {
   }
 
   onCropComplete = (crop, percentCrop) => {
-    // console.log('onCropComplete', crop, percentCrop);
+    // console.log('onCropComplete', crop, percentCrop)
     this.makeClientCrop(crop)
   }
 
   onCropChange = (crop, percentCrop) => {
     // console.log('onCropChange', crop, percentCrop);
-    this.setState({ crop: percentCrop })
+    this.setState({ crop })
   }
 
   onDragStart = () => {
