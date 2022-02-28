@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/media-has-caption, class-methods-use-this */
 import React, { PureComponent } from 'react'
 import ReactDOM from 'react-dom' // eslint-disable-line
+
 import ReactCrop from '../src/ReactCrop'
 import '../src/ReactCrop.scss'
 
@@ -20,7 +21,7 @@ class App extends PureComponent {
     crop: {
       // x: 200,
       // y: 200,
-      aspect: 3 / 2,
+      // aspect: 16 / 9,
     },
   }
 
@@ -34,8 +35,8 @@ class App extends PureComponent {
     }
   }
 
-  onImageLoaded = image => {
-    this.imageRef = image
+  onImageLoaded = e => {
+    this.imageRef = e.target
     // this.setState({ crop: { unit: 'px', width: 50, height: 50 } });
     // return false;
   }
@@ -68,6 +69,8 @@ class App extends PureComponent {
     })
   }
 
+  // Todo: apply scaling and rotation + update against
+  // codesandbox demo.
   getCroppedImg(image, crop, fileName) {
     const canvas = document.createElement('canvas')
     const scaleX = image.naturalWidth / image.width
@@ -90,10 +93,12 @@ class App extends PureComponent {
 
     return new Promise(resolve => {
       canvas.toBlob(blob => {
-        blob.name = fileName // eslint-disable-line no-param-reassign
-        window.URL.revokeObjectURL(this.fileUrl)
-        this.fileUrl = window.URL.createObjectURL(blob)
-        resolve(this.fileUrl)
+        if (blob) {
+          blob.name = fileName
+          window.URL.revokeObjectURL(this.fileUrl)
+          this.fileUrl = window.URL.createObjectURL(blob)
+          resolve(this.fileUrl)
+        }
       }, 'image/jpeg')
     })
   }
@@ -107,15 +112,7 @@ class App extends PureComponent {
   }
 
   renderVideo = () => (
-    <video
-      autoPlay
-      loop
-      style={{ display: 'block', maxWidth: '100%' }}
-      onLoadStart={e => {
-        // You must inform ReactCrop when your media has loaded.
-        e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }))
-      }}
-    >
+    <video autoPlay loop style={{ display: 'block', maxWidth: '100%' }}>
       <source src={mp4Url} type="video/mp4" />
     </video>
   )
@@ -165,14 +162,9 @@ class App extends PureComponent {
         </div>
         {src && (
           <ReactCrop
-            // renderComponent={this.renderVideo()}
-            src={src}
             crop={crop}
-            scale={scale}
-            rotate={rotate}
             ruleOfThirds
             // circularCrop
-            onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}
             onDragStart={this.onDragStart}
@@ -180,9 +172,11 @@ class App extends PureComponent {
             // renderSelectionAddon={this.renderSelectionAddon}
             // minWidth={50}
             // minHeight={50}
-            maxWidth={200}
-            maxHeight={200}
-          />
+            // maxWidth={200}
+            // maxHeight={200}
+          >
+            <img src={src} style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }} onLoad={this.onImageLoaded} />
+          </ReactCrop>
         )}
         {src && (
           <button style={{ display: 'block' }} onClick={this.onChangeToIncompleteCropClick}>

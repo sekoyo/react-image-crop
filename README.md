@@ -277,14 +277,6 @@ Rotates the image, you should pass a value between `-180` and `180`. Defaults to
 
 Scales the image (zooms in or out). Defaults to 1 (normal scale). You can combine with something like [react-zoom-pan-pinch](https://www.npmjs.com/package/react-zoom-pan-pinch).
 
-#### zoom (optional)
-
-A non-visual prop to keep pointer coords accurate when a parent element is scaled. Not to be confused with the `scale` prop which scales the image itself. Defaults to `1`.
-
-#### spin (optional)
-
-A non-visual prop to keep pointer coords accurate when a parent element is rotated. Not to be confused with the `rotate` prop which rotates the image itself. Defaults to `0`, range is from `-180` to `180`.
-
 ## FAQ
 
 ### What about showing the crop on the client?
