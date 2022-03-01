@@ -1,7 +1,7 @@
 import React, { PureComponent, createRef } from 'react'
 import clsx from 'clsx'
 
-import { Ords, XYOrds, Crop, PixelCrop } from './types'
+import { Ords, XYOrds, Crop, PixelCrop, PercentCrop } from './types'
 import { defaultCrop, clamp, areCropsEqual, convertToPercentCrop, convertToPixelCrop, containCrop } from './utils'
 
 import './ReactCrop.scss'
@@ -32,7 +32,9 @@ export interface ReactCropProps {
     swDragHandle: string
     wDragHandle: string
   }
-  /** A string of classes to add to the main `ReactCrop` element. */
+  /** The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape. */
+  aspect?: number
+  /** Classes to pass to the `ReactCrop` element. */
   className?: string
   /** The elements that you want to perform a crop on. For example
    * an image or video. */
@@ -56,9 +58,9 @@ export interface ReactCropProps {
   /** A maximum crop height, in pixels. */
   maxHeight?: number
   /** A callback which happens for every change of the crop. You should set the crop to state and pass it back into the library via the `crop` prop. */
-  onChange: (crop: Crop, percentageCrop: Crop) => void
+  onChange: (crop: PixelCrop, percentageCrop: PercentCrop) => void
   /** A callback which happens after a resize, drag, or nudge. Passes the current crop state object in pixels and percent. */
-  onComplete?: (crop: Crop, percentageCrop: Crop) => void
+  onComplete?: (crop: PixelCrop, percentageCrop: PercentCrop) => void
   /** A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component. */
   onDragStart?: (e: PointerEvent) => void
   /** A callback which happens when a user releases the cursor or touch after dragging or resizing. */
@@ -252,22 +254,22 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     // Focus for detecting keypress.
     ;(this.componentRef.current as HTMLDivElement).focus({ preventScroll: true })
 
-    const nextCrop: Crop = {
+    const { box } = this
+    const cropX = e.clientX - box.x
+    const cropY = e.clientY - box.y
+    const nextCrop: PixelCrop = {
       unit: 'px',
-      aspect: crop ? crop.aspect : undefined,
-      x: 0,
-      y: 0,
+      x: cropX,
+      y: cropY,
       width: 0,
       height: 0,
     }
 
-    const { box } = this
-
     this.evData = {
       startClientX: e.clientX,
       startClientY: e.clientY,
-      startCropX: e.clientX - box.x,
-      startCropY: e.clientY - box.y,
+      startCropX: cropX,
+      startCropY: cropY,
       clientX: e.clientX,
       clientY: e.clientY,
       isResize: true,
@@ -382,7 +384,17 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     e: React.KeyboardEvent<HTMLDivElement>,
     ord: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
   ) => {
-    const { crop, disabled, minWidth = 0, minHeight = 0, maxWidth, maxHeight, onChange, onComplete } = this.props
+    const {
+      aspect = 0,
+      crop,
+      disabled,
+      minWidth = 0,
+      minHeight = 0,
+      maxWidth,
+      maxHeight,
+      onChange,
+      onComplete,
+    } = this.props
     const { box } = this
 
     if (disabled || !crop) {
@@ -435,7 +447,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         tmpCrop.width -= offset
         tmpCrop.height -= offset
       } else if (ord === 'w') {
-        // Niche: Will move to right if minWidth hit.
+        // Niche: Will move right if minWidth hit.
         tmpCrop.x += offset
         tmpCrop.width -= offset
       } else if (ord === 'sw') {
@@ -484,7 +496,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         tmpCrop.width -= offset
         tmpCrop.height -= offset
       } else if (ord === 'n') {
-        // Niche: Will move to down if minHeight hit.
+        // Niche: Will move down if minHeight hit.
         tmpCrop.y += offset
         tmpCrop.height -= offset
       } else if (ord === 'ne') {
@@ -503,8 +515,17 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       }
     }
 
-    const containedCrop = containCrop(tmpCrop, ord, box.width, box.height, minWidth, minHeight, maxWidth, maxHeight)
-    console.log(tmpCrop, containedCrop)
+    const containedCrop = containCrop(
+      tmpCrop,
+      aspect,
+      ord,
+      box.width,
+      box.height,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight
+    )
 
     if (!areCropsEqual(crop, containedCrop)) {
       const percentCrop = convertToPercentCrop(containedCrop, box.width, box.height)
@@ -586,7 +607,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   resizeCrop() {
     const { box, evData } = this
-    const { minWidth = 0, minHeight = 0, maxWidth, maxHeight } = this.props
+    const { aspect = 0, minWidth = 0, minHeight = 0, maxWidth, maxHeight } = this.props
     const area = this.getPointRegion()
     const nextCrop = this.makePixelCrop()
     const resolvedOrd: Ords = evData.ord ? evData.ord : area
@@ -595,7 +616,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     const tmpCrop: PixelCrop = {
       unit: 'px',
-      aspect: nextCrop.aspect,
       x: 0,
       y: 0,
       width: 0,
@@ -606,8 +626,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       tmpCrop.x = evData.startCropX
       tmpCrop.width = xDiff
 
-      if (tmpCrop.aspect) {
-        tmpCrop.height = tmpCrop.width / tmpCrop.aspect
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
         tmpCrop.y = evData.startCropY - tmpCrop.height
       } else {
         tmpCrop.height = Math.abs(yDiff)
@@ -618,8 +638,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       tmpCrop.y = evData.startCropY
       tmpCrop.width = xDiff
 
-      if (tmpCrop.aspect) {
-        tmpCrop.height = tmpCrop.width / tmpCrop.aspect
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
       } else {
         tmpCrop.height = yDiff
       }
@@ -628,8 +648,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       tmpCrop.y = evData.startCropY
       tmpCrop.width = Math.abs(xDiff)
 
-      if (tmpCrop.aspect) {
-        tmpCrop.height = tmpCrop.width / tmpCrop.aspect
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
       } else {
         tmpCrop.height = yDiff
       }
@@ -637,8 +657,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       tmpCrop.x = evData.startCropX + xDiff
       tmpCrop.width = Math.abs(xDiff)
 
-      if (tmpCrop.aspect) {
-        tmpCrop.height = tmpCrop.width / tmpCrop.aspect
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
         tmpCrop.y = evData.startCropY - tmpCrop.height
       } else {
         tmpCrop.height = Math.abs(yDiff)
@@ -646,10 +666,21 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       }
     }
 
-    const containedCrop = containCrop(tmpCrop, area, box.width, box.height, minWidth, minHeight, maxWidth, maxHeight)
+    const containedCrop = containCrop(
+      tmpCrop,
+      aspect,
+      area,
+      box.width,
+      box.height,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight
+    )
 
-    // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
-    if (nextCrop.aspect || ReactCrop.xyOrds.indexOf(resolvedOrd) > -1) {
+    // Apply x/y/width/height changes depending on ordinate
+    // (fixed aspect always applies both).
+    if (aspect || ReactCrop.xyOrds.indexOf(resolvedOrd) > -1) {
       nextCrop.x = containedCrop.x
       nextCrop.y = containedCrop.y
       nextCrop.width = containedCrop.width
@@ -770,7 +801,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   render() {
-    const { children, circularCrop, className, crop, disabled, locked, style, ruleOfThirds } = this.props
+    const { aspect, children, circularCrop, className, crop, disabled, locked, style, ruleOfThirds } = this.props
 
     const { cropIsActive, newCropIsBeingDrawn } = this.state
     const cropSelection = crop && this.componentRef ? this.createCropSelection() : null
@@ -780,7 +811,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       'ReactCrop--disabled': disabled,
       'ReactCrop--locked': locked,
       'ReactCrop--new-crop': newCropIsBeingDrawn,
-      'ReactCrop--fixed-aspect': crop && crop.aspect,
+      'ReactCrop--fixed-aspect': crop && aspect,
       'ReactCrop--circular-crop': crop && circularCrop,
       'ReactCrop--rule-of-thirds': crop && ruleOfThirds,
       'ReactCrop--invisible-crop': !this.dragStarted && crop && !crop.width && !crop.height,

@@ -1,6 +1,6 @@
-import { PixelCrop, Crop, Ords } from './types'
+import { PixelCrop, PercentCrop, Crop, Ords } from './types'
 
-export const defaultCrop: Crop = {
+export const defaultCrop: PixelCrop = {
   x: 0,
   y: 0,
   width: 0,
@@ -18,48 +18,58 @@ export function areCropsEqual(cropA: Partial<Crop>, cropB: Partial<Crop>) {
     cropA.height === cropB.height &&
     cropA.x === cropB.x &&
     cropA.y === cropB.y &&
-    cropA.aspect === cropB.aspect &&
     cropA.unit === cropB.unit
   )
 }
 
-export function makeAspectCrop(crop: Partial<Crop>, containerWidth: number, containerHeight: number) {
-  if (!crop.aspect || isNaN(crop.aspect)) {
-    console.error('`crop.aspect` should be a number.', crop)
-    return { ...defaultCrop, ...crop }
-  }
-
+export function makeAspectCrop(crop: Partial<Crop>, aspect: number, containerWidth: number, containerHeight: number) {
   const pixelCrop = convertToPixelCrop(crop, containerWidth, containerHeight)
 
   if (crop.width) {
-    pixelCrop.height = pixelCrop.width / crop.aspect
+    pixelCrop.height = pixelCrop.width / aspect
   }
 
   if (crop.height) {
-    pixelCrop.width = pixelCrop.height * crop.aspect
+    pixelCrop.width = pixelCrop.height * aspect
   }
 
   if (pixelCrop.y + pixelCrop.height > containerHeight) {
     pixelCrop.height = containerHeight - pixelCrop.y
-    pixelCrop.width = pixelCrop.height * crop.aspect
+    pixelCrop.width = pixelCrop.height * aspect
   }
 
   if (pixelCrop.x + pixelCrop.width > containerWidth) {
     pixelCrop.width = containerWidth - pixelCrop.x
-    pixelCrop.height = pixelCrop.width / crop.aspect
+    pixelCrop.height = pixelCrop.width / aspect
   }
 
   return pixelCrop
 }
 
-export function convertToPercentCrop(crop: Partial<Crop>, containerWidth: number, containerHeight: number): Crop {
+export function centerCrop(crop: Crop, containerWidth: number, containerHeight: number) {
+  const pixelCrop = convertToPixelCrop(crop, containerWidth, containerHeight)
+
+  pixelCrop.x = (containerWidth - pixelCrop.width) / 2
+  pixelCrop.y = (containerHeight - pixelCrop.height) / 2
+
   if (crop.unit === '%') {
-    return { ...defaultCrop, ...crop }
+    return convertToPercentCrop(pixelCrop, containerWidth, containerHeight)
+  }
+
+  return pixelCrop
+}
+
+export function convertToPercentCrop(
+  crop: Partial<Crop>,
+  containerWidth: number,
+  containerHeight: number
+): PercentCrop {
+  if (crop.unit === '%') {
+    return { ...defaultCrop, ...crop, unit: '%' }
   }
 
   return {
     unit: '%',
-    aspect: crop.aspect,
     x: crop.x ? (crop.x / containerWidth) * 100 : 0,
     y: crop.y ? (crop.y / containerHeight) * 100 : 0,
     width: crop.width ? (crop.width / containerWidth) * 100 : 0,
@@ -78,7 +88,6 @@ export function convertToPixelCrop(crop: Partial<Crop>, containerWidth: number, 
 
   return {
     unit: 'px',
-    aspect: crop.aspect,
     x: crop.x ? (crop.x * containerWidth) / 100 : 0,
     y: crop.y ? (crop.y * containerHeight) / 100 : 0,
     width: crop.width ? (crop.width * containerWidth) / 100 : 0,
@@ -88,6 +97,7 @@ export function convertToPixelCrop(crop: Partial<Crop>, containerWidth: number, 
 
 export function containCrop(
   pixelCrop: PixelCrop,
+  aspect: number,
   ord: Ords,
   containerWidth: number,
   containerHeight: number,
@@ -102,15 +112,15 @@ export function containCrop(
   let _maxWidth = maxWidth
   let _maxHeight = maxHeight
 
-  if (containedCrop.aspect) {
-    if (containedCrop.aspect > 1) {
+  if (aspect) {
+    if (aspect > 1) {
       // Landscape - increase width min + max.
-      _minWidth = minHeight * containedCrop.aspect
-      _maxWidth = maxWidth * containedCrop.aspect
+      _minWidth = minHeight * aspect
+      _maxWidth = maxWidth * aspect
     } else {
       // Portrait - increase height min + max.
-      _minHeight = minWidth / containedCrop.aspect
-      _maxHeight = maxHeight / containedCrop.aspect
+      _minHeight = minWidth / aspect
+      _maxHeight = maxHeight / aspect
     }
   }
 
@@ -177,11 +187,11 @@ export function containCrop(
   }
 
   // Maintain aspect after size fixing.
-  if (containedCrop.aspect) {
+  if (aspect) {
     const currAspect = containedCrop.width / containedCrop.height
-    if (currAspect < containedCrop.aspect) {
-      // Crop is shrunk on the x so adjust the y.
-      const newHeight = containedCrop.width / containedCrop.aspect
+    if (currAspect < aspect) {
+      // Crop is shrunk on the width so adjust the height.
+      const newHeight = containedCrop.width / aspect
 
       if (ord === 'nw' || ord == 'ne') {
         // Stops box moving when min is hit.
@@ -189,9 +199,9 @@ export function containCrop(
       }
 
       containedCrop.height = newHeight
-    } else if (currAspect > containedCrop.aspect) {
-      // Crop is shrunk on the y so adjust the x.
-      const newWidth = containedCrop.height * containedCrop.aspect
+    } else if (currAspect > aspect) {
+      // Crop is shrunk on the height so adjust the width.
+      const newWidth = containedCrop.height * aspect
 
       if (ord === 'sw' || ord == 'nw') {
         // Stops box moving when max is hit.
