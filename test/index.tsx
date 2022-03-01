@@ -15,7 +15,6 @@ interface AppState {
   src: string
   scale: number
   rotate: number
-  spin: number
   crop?: Crop
   croppedImageUrl: string
 }
@@ -25,7 +24,6 @@ class App extends PureComponent<{}, AppState> {
     src: '',
     scale: 1,
     rotate: 0,
-    spin: 0,
     crop: undefined,
     croppedImageUrl: '',
   }
@@ -144,7 +142,7 @@ class App extends PureComponent<{}, AppState> {
   renderSelectionAddon = () => <input placeholder="Type something" />
 
   render() {
-    const { croppedImageUrl, scale, rotate, spin, src, crop } = this.state
+    const { croppedImageUrl, scale, rotate, src, crop } = this.state
 
     // console.log({ scale, rotate });
 
@@ -171,16 +169,6 @@ class App extends PureComponent<{}, AppState> {
               value={rotate}
               disabled={!src}
               onChange={e => this.setState({ rotate: Math.min(180, Math.max(-180, Number(e.target.value))) })}
-            />
-          </div>
-          <div>
-            <label htmlFor="SpinInput">Spin: </label>
-            <input
-              id="SpinInput"
-              type="number"
-              value={spin}
-              disabled={!src}
-              onChange={e => this.setState({ spin: Math.min(180, Math.max(-180, Number(e.target.value))) })}
             />
           </div>
         </div>

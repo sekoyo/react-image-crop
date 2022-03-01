@@ -4,8 +4,7 @@ An image cropping tool for React with no dependencies.
 
 [![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
 
-[Demo using class](https://codesandbox.io/s/72py4jlll6) |
-[Demo using hook](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
+[CodeSanbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
 
 ![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
@@ -18,9 +17,9 @@ An image cropping tool for React with no dependencies.
 5. [CDN](#cdn)
 6. [Props](#props)
 7. [FAQ](#faq)
-   1. [What about showing the crop on the client?](#what-about-showing-the-crop-on-the-client)
-   2. [How to correct image EXIF orientation/rotation](#how-to-correct-image-exif-orientationrotation)
-   3. [How to filter, rotate and annotate](#how-to-filter-rotate-and-annotate)
+   1. [How can I generate a crop preview in the browser?](#how-can-i-generate-a-crop-preview-in-the-browser)
+   2. [How to correct image EXIF orientation/rotation?](#how-to-correct-image-exif-orientationrotation)
+   3. [How to filter, rotate and annotate?](#how-to-filter-rotate-and-annotate)
    4. [How can I center the crop?](#how-can-i-center-the-crop)
 8. [Contributing / Developing](#contributing--developing)
 
@@ -88,7 +87,7 @@ Note when importing the script globally using a `<script>` tag access the compon
 
 ## Props
 
-#### onChange(crop, percentCrop) (required)
+#### ⚜️ onChange(crop, percentCrop) **(required)**
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
 
@@ -103,11 +102,7 @@ onChange = (crop, percentCrop) => {
 
 `crop` and `percentCrop` are interchangeable. `crop` uses pixels and `percentCrop` uses percentages to position and size itself. Percent crops are resistant to image/media resizing.
 
-#### aspect
-
-The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape.
-
-#### crop
+#### ⚜️ crop
 
 \* _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` and passed into the component._
 
@@ -127,71 +122,75 @@ Crops that you set are not corrected so you must ensure that they are in bounds 
 
 Since percentage crops with fixed aspect ratios are tricky you can use the helper method `makeAspectCrop`. See [How can I center the crop?](#how-can-i-center-the-crop) for an example.
 
-#### minWidth (optional)
+#### ⚜️ aspect
+
+The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape.
+
+#### ⚜️ minWidth
 
 A minimum crop width, in pixels.
 
-#### minHeight (optional)
+#### ⚜️ minHeight
 
 A minimum crop height, in pixels.
 
-#### maxWidth (optional)
+#### ⚜️ maxWidth
 
 A maximum crop width, in pixels.
 
-#### maxHeight (optional)
+#### ⚜️ maxHeight
 
 A maximum crop height, in pixels.
 
-#### keepSelection (optional)
+#### ⚜️ keepSelection
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.
 
-#### disabled (optional)
+#### ⚜️ disabled
 
 If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-#### locked (optional)
+#### ⚜️ locked
 
 If true then the user cannot create or resize a crop, but can still drag the existing crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
 
-#### className (optional)
+#### ⚜️ className
 
 A string of classes to add to the main `ReactCrop` element.
 
-#### style (optional)
+#### ⚜️ style
 
 Inline styles object to be passed to the image wrapper element.
 
-#### onComplete(crop, percentCrop) (optional)
+#### ⚜️ onComplete(crop, percentCrop)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
 
 `percentCrop` is the crop as a percentage. A typical use case for it would be to save it so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image is smaller).
 
-#### onDragStart(event) (optional)
+#### ⚜️ onDragStart(event)
 
 A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
 
-#### onDragEnd(event) (optional)
+#### ⚜️ onDragEnd(event)
 
 A callback which happens when a user releases the cursor or touch after dragging or resizing.
 
-#### renderSelectionAddon(state) (optional)
+#### ⚜️ renderSelectionAddon(state)
 
 Render a custom element in crop selection.
 
-#### ruleOfThirds (optional)
+#### ⚜️ ruleOfThirds
 
 Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the cropped area. Defaults to `false`.
 
-#### circularCrop (optional)
+#### ⚜️ circularCrop
 
 Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
 ## FAQ
 
-### What about showing the crop on the client?
+### How can I generate a crop preview in the browser?
 
 I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend.
 
@@ -256,7 +255,7 @@ Some things to consider:
 
 - Scaling down during conversion to reduce upload size (e.g. from a phone camera)
 
-### How to correct image EXIF orientation/rotation
+### How to correct image EXIF orientation/rotation?
 
 You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
 
@@ -266,7 +265,7 @@ You can read an issue on this subject here: https://github.com/DominicTobias/rea
 
 If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Pintura](https://gumroad.com/a/611955827).
 
-<h3>How to filter, rotate and annotate</h3>
+<h3>How to filter, rotate and annotate?</h3>
 
 This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then consider using [Pintura](https://gumroad.com/a/611955827).
 
