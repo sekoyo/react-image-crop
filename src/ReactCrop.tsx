@@ -145,6 +145,18 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
+  componentDidUpdate(prevProps: ReactCropProps) {
+    const { crop, onComplete } = this.props
+
+    // Manually trigger a onComplete when a new crop is
+    // rendered which is helpful for things like crop previews.
+    if (onComplete && !prevProps.crop && crop) {
+      const { box } = this
+      console.log({ box })
+      onComplete(convertToPixelCrop(crop, box.width, box.height), convertToPercentCrop(crop, box.width, box.height))
+    }
+  }
+
   componentWillUnmount() {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
@@ -697,7 +709,14 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   createCropSelection() {
-    const { ariaLabels, disabled, locked, renderSelectionAddon, ruleOfThirds, crop } = this.props
+    const {
+      ariaLabels = ReactCrop.defaultProps.ariaLabels,
+      disabled,
+      locked,
+      renderSelectionAddon,
+      ruleOfThirds,
+      crop,
+    } = this.props
     const style = this.getCropStyle()
 
     if (!crop) {
@@ -709,7 +728,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         style={style}
         className="ReactCrop__crop-selection"
         onPointerDown={this.onCropPointerDown}
-        aria-label={ariaLabels?.cropArea}
+        aria-label={ariaLabels.cropArea}
         tabIndex={0}
         onKeyDown={this.onComponentKeyDown}
         onKeyUp={this.onComponentKeyUp}
@@ -725,56 +744,56 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               className="ReactCrop__drag-handle ord-nw"
               data-ord="nw"
               tabIndex={0}
-              aria-label={ariaLabels?.nwDragHandle}
+              aria-label={ariaLabels.nwDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'nw')}
             />
             <div
               className="ReactCrop__drag-handle ord-n"
               data-ord="n"
               tabIndex={0}
-              aria-label={ariaLabels?.nDragHandle}
+              aria-label={ariaLabels.nDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'n')}
             />
             <div
               className="ReactCrop__drag-handle ord-ne"
               data-ord="ne"
               tabIndex={0}
-              aria-label={ariaLabels?.neDragHandle}
+              aria-label={ariaLabels.neDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'ne')}
             />
             <div
               className="ReactCrop__drag-handle ord-e"
               data-ord="e"
               tabIndex={0}
-              aria-label={ariaLabels?.eDragHandle}
+              aria-label={ariaLabels.eDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'e')}
             />
             <div
               className="ReactCrop__drag-handle ord-se"
               data-ord="se"
               tabIndex={0}
-              aria-label={ariaLabels?.seDragHandle}
+              aria-label={ariaLabels.seDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'se')}
             />
             <div
               className="ReactCrop__drag-handle ord-s"
               data-ord="s"
               tabIndex={0}
-              aria-label={ariaLabels?.sDragHandle}
+              aria-label={ariaLabels.sDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 's')}
             />
             <div
               className="ReactCrop__drag-handle ord-sw"
               data-ord="sw"
               tabIndex={0}
-              aria-label={ariaLabels?.swDragHandle}
+              aria-label={ariaLabels.swDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'sw')}
             />
             <div
               className="ReactCrop__drag-handle ord-w"
               data-ord="w"
               tabIndex={0}
-              aria-label={ariaLabels?.wDragHandle}
+              aria-label={ariaLabels.wDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'w')}
             />
           </div>

@@ -178,7 +178,7 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 #### ⚜️ renderSelectionAddon(state)
 
-Render a custom element in crop selection.
+Render a custom element inside crop the selection.
 
 #### ⚜️ ruleOfThirds
 
@@ -186,7 +186,7 @@ Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the
 
 #### ⚜️ circularCrop
 
-Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to `false`.
+Show the crop area as a circle. If your `aspect` is not `1` (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
 ## FAQ
 

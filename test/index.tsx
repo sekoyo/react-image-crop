@@ -16,6 +16,7 @@ interface AppState {
   scale: number
   rotate: number
   crop?: Crop
+  completedCrop?: PixelCrop
   croppedImageUrl: string
 }
 
@@ -25,6 +26,7 @@ class App extends PureComponent<{}, AppState> {
     scale: 1,
     rotate: 0,
     crop: undefined,
+    completedCrop: undefined,
     croppedImageUrl: '',
   }
 
@@ -42,10 +44,10 @@ class App extends PureComponent<{}, AppState> {
   }
 
   onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    // This is where you can set a PERCENT aspect crop since you
-    // now know the image dimentions:
     const { width, height } = e.currentTarget
 
+    // This is to demonstate how to make and center a % aspect crop
+    // which is a bit trickier so we use some helper functions.
     const crop = centerCrop(
       makeAspectCrop(
         {
@@ -86,16 +88,17 @@ class App extends PureComponent<{}, AppState> {
   getCroppedImg(image: HTMLImageElement, crop: PixelCrop): Promise<string> {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
-    const scaleX = image.naturalWidth / image.width
-    const scaleY = image.naturalHeight / image.height
-    const pixelRatio = window.devicePixelRatio || 1
-
     if (!ctx) {
       throw new Error('No 2d context')
     }
 
-    canvas.width = crop.width * pixelRatio * scaleX
-    canvas.height = crop.height * pixelRatio * scaleY
+    console.log(image.naturalWidth, image.width)
+    const scaleX = image.naturalWidth / image.width
+    const scaleY = image.naturalHeight / image.height
+    const pixelRatio = window.devicePixelRatio || 1
+
+    canvas.width = Math.floor(crop.width * pixelRatio * scaleX)
+    canvas.height = Math.floor(crop.height * pixelRatio * scaleY)
 
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
     ctx.imageSmoothingQuality = 'high'
@@ -129,7 +132,9 @@ class App extends PureComponent<{}, AppState> {
 
   makeClientCrop(crop: PixelCrop) {
     if (this.imageRef.current && crop.width && crop.height) {
-      this.getCroppedImg(this.imageRef.current, crop).then(croppedImageUrl => this.setState({ croppedImageUrl }))
+      this.getCroppedImg(this.imageRef.current, crop).then(croppedImageUrl =>
+        this.setState({ croppedImageUrl, completedCrop: crop })
+      )
     }
   }
 
@@ -142,7 +147,7 @@ class App extends PureComponent<{}, AppState> {
   renderSelectionAddon = () => <input placeholder="Type something" />
 
   render() {
-    const { croppedImageUrl, scale, rotate, src, crop } = this.state
+    const { croppedImageUrl, scale, rotate, src, crop, completedCrop } = this.state
 
     // console.log({ scale, rotate });
 
@@ -197,11 +202,11 @@ class App extends PureComponent<{}, AppState> {
             />
           </ReactCrop>
         )}
-        {croppedImageUrl && (
+        {Boolean(croppedImageUrl && completedCrop) && (
           <img
             alt="Crop preview"
             src={croppedImageUrl}
-            style={{ display: 'block', width: crop?.width || 0, height: crop?.height || 0 }}
+            style={{ display: 'block', width: completedCrop.width, height: completedCrop.height }}
           />
         )}
       </div>
