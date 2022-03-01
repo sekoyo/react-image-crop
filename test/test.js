@@ -21,7 +21,7 @@ class App extends PureComponent {
     crop: {
       // x: 200,
       // y: 200,
-      aspect: 16 / 9,
+      // aspect: 16 / 9,
     },
   }
 

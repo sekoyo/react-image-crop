@@ -2,16 +2,7 @@ import React, { PureComponent, createRef } from 'react'
 import clsx from 'clsx'
 
 import { Ords, XYOrds, Crop, PixelCrop } from './types'
-import {
-  defaultCrop,
-  clamp,
-  areCropsEqual,
-  convertToPercentCrop,
-  convertToPixelCrop,
-  getMaxCrop,
-  getMinCrop,
-  containCrop,
-} from './utils'
+import { defaultCrop, clamp, areCropsEqual, convertToPercentCrop, convertToPixelCrop, containCrop } from './utils'
 
 import './ReactCrop.scss'
 
@@ -211,8 +202,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     let startCropX = pixelCrop.x
     let startCropY = pixelCrop.y
 
-    // Set the starting coords as if the resize had started
-    // from the opposite corner.
+    // Set the starting coords to the opposite corner.
     if (ord) {
       if (ord === 'ne' || ord == 'e') {
         startCropX = pixelCrop.x
@@ -392,14 +382,10 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     e: React.KeyboardEvent<HTMLDivElement>,
     ord: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
   ) => {
-    const { crop, disabled, minWidth, minHeight, maxWidth, maxHeight, onChange, onComplete } = this.props
+    const { crop, disabled, minWidth = 0, minHeight = 0, maxWidth, maxHeight, onChange, onComplete } = this.props
     const { box } = this
 
-    if (disabled) {
-      return
-    }
-
-    if (!crop) {
+    if (disabled || !crop) {
       return
     }
 
@@ -411,9 +397,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return
     }
 
-    const nextCrop = convertToPixelCrop(crop, box.width, box.height)
-    const maxCrop = getMaxCrop(nextCrop, ord, box.width, box.height, maxWidth, maxHeight)
-    const minCrop = getMinCrop(nextCrop, ord, minWidth, minHeight)
+    const tmpCrop = convertToPixelCrop(crop, box.width, box.height)
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const offset = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
@@ -421,77 +405,113 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       ? ReactCrop.nudgeStepMedium
       : ReactCrop.nudgeStep
 
-    let widthChanged = false
-    let heightChanged = false
-
     if (e.key === 'ArrowLeft') {
-      if (ord === 'nw' || ord === 'w' || ord === 'sw') {
-        // Left side
-        widthChanged = true
-        nextCrop.x = Math.max(maxCrop.x, nextCrop.x - offset)
-        nextCrop.width = Math.min(maxCrop.width, nextCrop.width + offset)
-      } else if (ord === 'ne' || ord === 'e' || ord === 'se') {
-        // Right side
-        widthChanged = true
-        nextCrop.width = Math.max(minCrop.width, nextCrop.width - offset)
+      if (ord === 'nw') {
+        tmpCrop.x -= offset
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'w') {
+        tmpCrop.x -= offset
+        tmpCrop.width += offset
+      } else if (ord === 'sw') {
+        tmpCrop.x -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'ne') {
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'e') {
+        tmpCrop.width -= offset
+      } else if (ord === 'se') {
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
       }
     } else if (e.key === 'ArrowRight') {
-      if (ord === 'nw' || ord === 'w' || ord === 'sw') {
-        // Left side
-        widthChanged = true
-        nextCrop.x = Math.min(minCrop.x, nextCrop.x + offset)
-        nextCrop.width = Math.max(minCrop.width, nextCrop.width - offset)
-      } else if (ord === 'ne' || ord === 'e' || ord === 'se') {
-        // Right side
-        widthChanged = true
-        nextCrop.width = Math.min(maxCrop.width, nextCrop.width + offset)
+      if (ord === 'nw') {
+        tmpCrop.x += offset
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'w') {
+        // Niche: Will move to right if minWidth hit.
+        tmpCrop.x += offset
+        tmpCrop.width -= offset
+      } else if (ord === 'sw') {
+        tmpCrop.x += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'ne') {
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'e') {
+        tmpCrop.width += offset
+      } else if (ord === 'se') {
+        tmpCrop.width += offset
+        tmpCrop.height += offset
       }
     }
 
     if (e.key === 'ArrowUp') {
-      if (ord === 'nw' || ord === 'n' || ord === 'ne') {
-        // Top side
-        heightChanged = true
-        nextCrop.y = Math.max(maxCrop.y, Math.max(0, nextCrop.y - offset))
-        nextCrop.height = Math.min(maxCrop.height, nextCrop.height + offset)
-      } else if (ord === 'sw' || ord === 's' || ord === 'se') {
-        // Bottom side
-        heightChanged = true
-        nextCrop.height = Math.max(minCrop.height, nextCrop.height - offset)
+      if (ord === 'nw') {
+        tmpCrop.x -= offset
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'n') {
+        tmpCrop.y -= offset
+        tmpCrop.height += offset
+      } else if (ord === 'ne') {
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'sw') {
+        tmpCrop.x += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 's') {
+        tmpCrop.height -= offset
+      } else if (ord === 'se') {
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
       }
     } else if (e.key === 'ArrowDown') {
-      if (ord === 'nw' || ord === 'n' || ord === 'ne') {
-        // Top side
-        heightChanged = true
-        nextCrop.y = Math.min(minCrop.y, nextCrop.y + offset)
-        nextCrop.height = Math.max(minCrop.height, nextCrop.height - offset)
-      } else if (ord === 'sw' || ord === 's' || ord === 'se') {
-        // Bottom side
-        heightChanged = true
-        nextCrop.height = Math.min(maxCrop.height, nextCrop.height + offset)
+      if (ord === 'nw') {
+        tmpCrop.x += offset
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'n') {
+        // Niche: Will move to down if minHeight hit.
+        tmpCrop.y += offset
+        tmpCrop.height -= offset
+      } else if (ord === 'ne') {
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'sw') {
+        tmpCrop.x -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 's') {
+        tmpCrop.height += offset
+      } else if (ord === 'se') {
+        tmpCrop.width += offset
+        tmpCrop.height += offset
       }
     }
 
-    if (nextCrop.aspect) {
-      if (widthChanged) {
-        nextCrop.height = nextCrop.width / nextCrop.aspect
-      } else if (heightChanged) {
-        const prevWidth = nextCrop.width
-        nextCrop.width = nextCrop.height * nextCrop.aspect
-        // Need to offset x on subtractive ords to maintain
-        // staticness. Why does y not need this?
-        if (ord === 'nw' || ord === 'sw') {
-          nextCrop.x -= nextCrop.width - prevWidth
-        }
-      }
-    }
+    const containedCrop = containCrop(tmpCrop, ord, box.width, box.height, minWidth, minHeight, maxWidth, maxHeight)
+    console.log(tmpCrop, containedCrop)
 
-    if (!areCropsEqual(crop, nextCrop)) {
-      const percentCrop = convertToPercentCrop(nextCrop, box.width, box.height)
-      onChange(nextCrop, percentCrop)
+    if (!areCropsEqual(crop, containedCrop)) {
+      const percentCrop = convertToPercentCrop(containedCrop, box.width, box.height)
+      onChange(containedCrop, percentCrop)
 
       if (onComplete) {
-        onComplete(nextCrop, percentCrop)
+        onComplete(containedCrop, percentCrop)
       }
     }
   }
@@ -557,26 +577,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     const topHalf = relativeY < evData.startCropY
     const leftHalf = relativeX < evData.startCropX
 
-    // const xUnderflow = evData.clientX < box.x
-    // if (xUnderflow) {
-    //   return topHalf ? 'ne' : 'se'
-    // }
-
-    // const xOverflow = evData.clientX > box.x + box.width
-    // if (xOverflow) {
-    //   return topHalf ? 'nw' : 'sw'
-    // }
-
-    // const yUnderflow = evData.clientY < box.y
-    // if (yUnderflow) {
-    //   return leftHalf ? 'sw' : 'se'
-    // }
-
-    // const yOverflow = evData.clientY > box.y + box.height
-    // if (yOverflow) {
-    //   return leftHalf ? 'nw' : 'ne'
-    // }
-
     if (leftHalf) {
       return topHalf ? 'nw' : 'sw'
     } else {
@@ -604,7 +604,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     if (area === 'ne') {
       tmpCrop.x = evData.startCropX
-      tmpCrop.width = Math.max(minWidth, xDiff)
+      tmpCrop.width = xDiff
 
       if (tmpCrop.aspect) {
         tmpCrop.height = tmpCrop.width / tmpCrop.aspect
@@ -646,16 +646,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       }
     }
 
-    const containedCrop = containCrop(
-      tmpCrop,
-      area,
-      minWidth,
-      minHeight,
-      maxWidth || box.width,
-      maxHeight || box.height,
-      box.width,
-      box.height
-    )
+    const containedCrop = containCrop(tmpCrop, area, box.width, box.height, minWidth, minHeight, maxWidth, maxHeight)
 
     // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
     if (nextCrop.aspect || ReactCrop.xyOrds.indexOf(resolvedOrd) > -1) {
