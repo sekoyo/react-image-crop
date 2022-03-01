@@ -189,17 +189,6 @@ Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the
 
 Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
-<<<<<<< HEAD
-#### rotate (optional)
-
-Rotates the image, you should pass a value between `-180` and `180`. Defaults to `0`.
-
-#### scale (optional)
-
-Scales the image (zooms in or out). Defaults to 1 (normal scale). You can combine with something like [react-zoom-pan-pinch](https://www.npmjs.com/package/react-zoom-pan-pinch).
-
-=======
->>>>>>> unify-algo
 ## FAQ
 
 ### What about showing the crop on the client?
@@ -303,14 +292,14 @@ Centering an aspect ratio crop is trickier especially when dealing with `%`. How
 
 ```jsx
 <ReactCrop crop={crop} aspect={16 / 9}>
-  <img src={src} onLoad={onImageLoaded} />
+  <img src={src} onLoad={onImageLoad} />
 </ReactCrop>
 ```
 
 2. Use `makeAspectCrop` to create your desired aspect and then `centerCrop` to center it:
 
 ```js
-function onImageLoaded(e) {
+function onImageLoad(e) {
   const { width, height } = e.currentTarget
 
   const crop = centerCrop(

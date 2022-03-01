@@ -43,7 +43,7 @@ class App extends PureComponent<{}, AppState> {
     }
   }
 
-  onImageLoaded = (e: React.SyntheticEvent<HTMLImageElement>) => {
+  onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     // This is where you can set a PERCENT aspect crop since you
     // now know the image dimentions:
     const { width, height } = e.currentTarget
@@ -205,7 +205,7 @@ class App extends PureComponent<{}, AppState> {
               alt="Crop image"
               src={src}
               style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
-              onLoad={this.onImageLoaded}
+              onLoad={this.onImageLoad}
             />
           </ReactCrop>
         )}
