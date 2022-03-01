@@ -1,5 +1,5 @@
 import { PixelCrop } from '.'
-import { Crop, Ords } from './types'
+import { Crop, Ords, XYOrds } from './types'
 
 export const defaultCrop: Crop = {
   x: 0,
@@ -89,36 +89,119 @@ export function convertToPixelCrop(crop: Partial<Crop>, containerWidth: number, 
 
 export function containCrop(
   pixelCrop: PixelCrop,
-  ord: Ords,
+  ord: XYOrds,
   minWidth: number,
   minHeight: number,
   maxWidth: number,
-  maxHeight: number
+  maxHeight: number,
+  containerWidth: number,
+  containerHeight: number
 ) {
   const containedCrop = { ...pixelCrop }
+  let _minWidth = minWidth
+  let _minHeight = minHeight
+  let _maxWidth = maxWidth
+  let _maxHeight = maxHeight
 
-  // TODO: min dimensions
+  if (containedCrop.aspect) {
+    if (containedCrop.aspect > 1) {
+      // Landscape - increase width min + max.
+      _minWidth = minHeight * containedCrop.aspect
+      _maxWidth = maxWidth * containedCrop.aspect
+    } else {
+      // Portrait - increase height min + max.
+      _minHeight = minWidth / containedCrop.aspect
+      _maxHeight = maxHeight / containedCrop.aspect
+    }
+  }
+
+  // Stop underflow on top.
+  if (containedCrop.y < 0) {
+    containedCrop.height = Math.max(containedCrop.height + containedCrop.y, _minHeight)
+    containedCrop.y = 0
+  }
+
+  // Stop underflow on left.
   if (containedCrop.x < 0) {
-    containedCrop.width += containedCrop.x
+    containedCrop.width = Math.max(containedCrop.width + containedCrop.x, _minWidth)
     containedCrop.x = 0
-  } else if (containedCrop.x + containedCrop.width > maxWidth) {
-    containedCrop.width = maxWidth - containedCrop.x
   }
 
-  if (containedCrop.y + containedCrop.height > maxHeight) {
-    containedCrop.height = maxHeight - containedCrop.y
+  // Stop overflow on right.
+  const xOverflow = containerWidth - (containedCrop.x + containedCrop.width)
+  if (xOverflow < 0) {
+    containedCrop.x = Math.min(containedCrop.x, containerWidth - _minWidth)
+    containedCrop.width += xOverflow
   }
 
-  // const x = Math.max(0, pixelCrop.x)
-  // const y = Math.max(0, pixelCrop.y)
-  // const containedCrop = {
-  //   unit: 'px',
-  //   aspect: pixelCrop.aspect,
-  //   x,
-  //   y,
-  //   width: clamp(pixelCrop.width, minWidth, maxWidth - x),
-  //   height: clamp(pixelCrop.height, minHeight, maxHeight - y),
-  // }
+  // Stop overflow on bottom.
+  const yOverflow = containerHeight - (containedCrop.y + containedCrop.height)
+  if (yOverflow < 0) {
+    containedCrop.y = Math.min(containedCrop.y, containerHeight - _minHeight)
+    containedCrop.height += yOverflow
+  }
+
+  // Make crop respect min width generally.
+  if (containedCrop.width < _minWidth) {
+    if (ord === 'sw' || ord == 'nw') {
+      // Stops box moving when min is hit.
+      containedCrop.x -= _minWidth - containedCrop.width
+    }
+    containedCrop.width = _minWidth
+  }
+
+  // Make crop respect min height generally.
+  if (containedCrop.height < _minHeight) {
+    if (ord === 'nw' || ord == 'ne') {
+      // Stops box moving when min is hit.
+      containedCrop.y -= _minHeight - containedCrop.height
+    }
+    containedCrop.height = _minHeight
+  }
+
+  // Make crop respect max width generally.
+  if (containedCrop.width > _maxWidth) {
+    if (ord === 'sw' || ord == 'nw') {
+      // Stops box moving when max is hit.
+      containedCrop.x -= _maxWidth - containedCrop.width
+    }
+    containedCrop.width = _maxWidth
+  }
+
+  // Make crop respect max height generally.
+  if (containedCrop.height > _maxHeight) {
+    if (ord === 'nw' || ord == 'ne') {
+      // Stops box moving when min is hit.
+      containedCrop.y -= _maxHeight - containedCrop.height
+    }
+    containedCrop.height = _maxHeight
+  }
+
+  // Maintain aspect after size fixing.
+  if (containedCrop.aspect) {
+    const currAspect = containedCrop.width / containedCrop.height
+    if (currAspect < containedCrop.aspect) {
+      // Crop is shrunk on the x so adjust the y.
+      const newHeight = containedCrop.width / containedCrop.aspect
+
+      if (ord === 'nw' || ord == 'ne') {
+        // Stops box moving when min is hit.
+        containedCrop.y -= newHeight - containedCrop.height
+      }
+
+      containedCrop.height = newHeight
+    } else if (currAspect > containedCrop.aspect) {
+      // Crop is shrunk on the y so adjust the x.
+      const newWidth = containedCrop.height * containedCrop.aspect
+
+      if (ord === 'sw' || ord == 'nw') {
+        // Stops box moving when max is hit.
+        containedCrop.x -= newWidth - containedCrop.width
+      }
+
+      containedCrop.width = newWidth
+    }
+  }
 
   return containedCrop
 }

@@ -21,7 +21,7 @@ class App extends PureComponent {
     crop: {
       // x: 200,
       // y: 200,
-      // aspect: 16 / 9,
+      aspect: 16 / 9,
     },
   }
 
@@ -42,7 +42,7 @@ class App extends PureComponent {
   }
 
   onCropComplete = (crop, percentCrop) => {
-    // console.log('onCropComplete', crop, percentCrop)
+    console.log('onCropComplete', crop, percentCrop)
     this.makeClientCrop(crop)
   }
 
@@ -73,11 +73,16 @@ class App extends PureComponent {
   // codesandbox demo.
   getCroppedImg(image, crop, fileName) {
     const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
     const scaleX = image.naturalWidth / image.width
     const scaleY = image.naturalHeight / image.height
-    canvas.width = crop.width
-    canvas.height = crop.height
-    const ctx = canvas.getContext('2d')
+    const pixelRatio = window.devicePixelRatio
+
+    canvas.width = crop.width * pixelRatio * scaleX
+    canvas.height = crop.height * pixelRatio * scaleY
+
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    ctx.imageSmoothingQuality = 'high'
 
     ctx.drawImage(
       image,
@@ -87,8 +92,8 @@ class App extends PureComponent {
       crop.height * scaleY,
       0,
       0,
-      crop.width,
-      crop.height
+      crop.width * scaleX,
+      crop.height * scaleY
     )
 
     return new Promise(resolve => {
@@ -170,10 +175,10 @@ class App extends PureComponent {
             onDragStart={this.onDragStart}
             onDragEnd={this.onDragEnd}
             // renderSelectionAddon={this.renderSelectionAddon}
-            // minWidth={50}
-            // minHeight={50}
-            // maxWidth={200}
-            // maxHeight={200}
+            minWidth={50}
+            minHeight={50}
+            maxWidth={200}
+            maxHeight={200}
           >
             <img src={src} style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }} onLoad={this.onImageLoaded} />
           </ReactCrop>
@@ -183,7 +188,9 @@ class App extends PureComponent {
             Change to incomplete aspect crop
           </button>
         )}
-        {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} style={{ display: 'block' }} />}
+        {croppedImageUrl && (
+          <img alt="Crop" src={croppedImageUrl} style={{ display: 'block', width: crop.width, height: crop.height }} />
+        )}
       </div>
     )
   }

@@ -1,7 +1,7 @@
 import React, { PureComponent, createRef } from 'react'
 import clsx from 'clsx'
 
-import { Ords, Crop, PixelCrop } from './types'
+import { Ords, XYOrds, Crop, PixelCrop } from './types'
 import {
   defaultCrop,
   clamp,
@@ -414,7 +414,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     const nextCrop = convertToPixelCrop(crop, box.width, box.height)
     const maxCrop = getMaxCrop(nextCrop, ord, box.width, box.height, maxWidth, maxHeight)
     const minCrop = getMinCrop(nextCrop, ord, minWidth, minHeight)
-    console.log({ minCrop, maxCrop })
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const offset = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
@@ -551,15 +550,37 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     return nextCrop
   }
 
-  getPointRegion() {
+  getPointRegion(): XYOrds {
     const { box, evData } = this
     const relativeX = evData.clientX - box.x
     const relativeY = evData.clientY - box.y
+    const topHalf = relativeY < evData.startCropY
+    const leftHalf = relativeX < evData.startCropX
 
-    if (relativeX < evData.startCropX) {
-      return relativeY < evData.startCropY ? 'nw' : 'sw'
+    // const xUnderflow = evData.clientX < box.x
+    // if (xUnderflow) {
+    //   return topHalf ? 'ne' : 'se'
+    // }
+
+    // const xOverflow = evData.clientX > box.x + box.width
+    // if (xOverflow) {
+    //   return topHalf ? 'nw' : 'sw'
+    // }
+
+    // const yUnderflow = evData.clientY < box.y
+    // if (yUnderflow) {
+    //   return leftHalf ? 'sw' : 'se'
+    // }
+
+    // const yOverflow = evData.clientY > box.y + box.height
+    // if (yOverflow) {
+    //   return leftHalf ? 'nw' : 'ne'
+    // }
+
+    if (leftHalf) {
+      return topHalf ? 'nw' : 'sw'
     } else {
-      return relativeY < evData.startCropY ? 'ne' : 'se'
+      return topHalf ? 'ne' : 'se'
     }
   }
 
@@ -582,8 +603,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
 
     if (area === 'ne') {
-      tmpCrop.width = xDiff
       tmpCrop.x = evData.startCropX
+      tmpCrop.width = Math.max(minWidth, xDiff)
 
       if (tmpCrop.aspect) {
         tmpCrop.height = tmpCrop.width / tmpCrop.aspect
@@ -627,11 +648,13 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     const containedCrop = containCrop(
       tmpCrop,
-      resolvedOrd,
+      area,
       minWidth,
       minHeight,
       maxWidth || box.width,
-      maxHeight || box.height
+      maxHeight || box.height,
+      box.width,
+      box.height
     )
 
     // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
