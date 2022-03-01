@@ -1,7 +1,7 @@
-/* eslint-disable jsx-a11y/media-has-caption, class-methods-use-this */
-import React, { PureComponent } from 'react'
-import ReactDOM from 'react-dom' // eslint-disable-line
-import ReactCrop from '../src/ReactCrop'
+import React, { createRef, PureComponent } from 'react'
+import ReactDOM from 'react-dom'
+
+import ReactCrop, { Crop, makeAspectCrop, PercentCrop, PixelCrop, centerCrop } from '../src'
 import '../src/ReactCrop.scss'
 
 const mp4Url = 'http://techslides.com/demos/sample-videos/small.mp4'
@@ -11,41 +11,66 @@ const mp4Url = 'http://techslides.com/demos/sample-videos/small.mp4'
  */
 const cropEditor = document.querySelector('#crop-editor')
 
-class App extends PureComponent {
-  state = {
-    src: null,
+interface AppState {
+  src: string
+  scale: number
+  rotate: number
+  spin: number
+  crop?: Crop
+  croppedImageUrl: string
+}
+
+class App extends PureComponent<{}, AppState> {
+  state: AppState = {
+    src: '',
     scale: 1,
     rotate: 0,
     spin: 0,
-    crop: {
-      // x: 200,
-      // y: 200,
-      // aspect: 3 / 2,
-    },
+    crop: undefined,
+    croppedImageUrl: '',
   }
 
-  onSelectFile = e => {
+  fileUrl = ''
+  imageRef = createRef<HTMLImageElement>()
+
+  onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader()
       reader.addEventListener('load', () => {
-        this.setState({ src: reader.result })
+        this.setState({ src: reader.result?.toString() || '' })
       })
       reader.readAsDataURL(e.target.files[0])
     }
   }
 
-  onImageLoaded = image => {
-    this.imageRef = image
-    // this.setState({ crop: { unit: 'px', width: 50, height: 50 } });
-    // return false;
+  onImageLoaded = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // This is where you can set a PERCENT aspect crop since you
+    // now know the image dimentions:
+    const { width, height } = e.currentTarget
+
+    const crop = centerCrop(
+      makeAspectCrop(
+        {
+          unit: '%',
+          width: 100,
+        },
+        16 / 9,
+        width,
+        height
+      ),
+      width,
+      height
+    )
+
+    this.setState({ crop })
   }
 
-  onCropComplete = (crop, percentCrop) => {
-    // console.log('onCropComplete', crop, percentCrop)
+  onCropComplete = (crop: PixelCrop, percentCrop: PercentCrop) => {
+    console.log('onCropComplete', crop, percentCrop)
     this.makeClientCrop(crop)
   }
 
-  onCropChange = (crop, percentCrop) => {
+  onCropChange = (crop: PixelCrop, percentCrop: PercentCrop) => {
     // console.log('onCropChange', crop, percentCrop);
     this.setState({ crop })
   }
@@ -58,23 +83,24 @@ class App extends PureComponent {
     // console.log('onDragEnd');
   }
 
-  onChangeToIncompleteCropClick = () => {
-    this.setState({
-      crop: {
-        aspect: 16 / 9,
-        unit: '%',
-        width: 100,
-      },
-    })
-  }
-
-  getCroppedImg(image, crop, fileName) {
+  // Todo: apply scaling and rotation + update against
+  // codesandbox demo.
+  getCroppedImg(image: HTMLImageElement, crop: PixelCrop): Promise<string> {
     const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
     const scaleX = image.naturalWidth / image.width
     const scaleY = image.naturalHeight / image.height
-    canvas.width = crop.width
-    canvas.height = crop.height
-    const ctx = canvas.getContext('2d')
+    const pixelRatio = window.devicePixelRatio || 1
+
+    if (!ctx) {
+      throw new Error('No 2d context')
+    }
+
+    canvas.width = crop.width * pixelRatio * scaleX
+    canvas.height = crop.height * pixelRatio * scaleY
+
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    ctx.imageSmoothingQuality = 'high'
 
     ctx.drawImage(
       image,
@@ -84,38 +110,33 @@ class App extends PureComponent {
       crop.height * scaleY,
       0,
       0,
-      crop.width,
-      crop.height
+      crop.width * scaleX,
+      crop.height * scaleY
     )
 
     return new Promise(resolve => {
-      canvas.toBlob(blob => {
-        blob.name = fileName // eslint-disable-line no-param-reassign
-        window.URL.revokeObjectURL(this.fileUrl)
-        this.fileUrl = window.URL.createObjectURL(blob)
-        resolve(this.fileUrl)
-      }, 'image/jpeg')
+      canvas.toBlob(
+        blob => {
+          if (blob) {
+            window.URL.revokeObjectURL(this.fileUrl)
+            this.fileUrl = window.URL.createObjectURL(blob)
+            resolve(this.fileUrl)
+          }
+        },
+        'image/jpeg',
+        1
+      )
     })
   }
 
-  makeClientCrop(crop) {
-    if (this.imageRef && crop.width && crop.height) {
-      this.getCroppedImg(this.imageRef, crop, 'newFile.jpeg').then(croppedImageUrl =>
-        this.setState({ croppedImageUrl })
-      )
+  makeClientCrop(crop: PixelCrop) {
+    if (this.imageRef.current && crop.width && crop.height) {
+      this.getCroppedImg(this.imageRef.current, crop).then(croppedImageUrl => this.setState({ croppedImageUrl }))
     }
   }
 
   renderVideo = () => (
-    <video
-      autoPlay
-      loop
-      style={{ display: 'block', maxWidth: '100%' }}
-      onLoadStart={e => {
-        // You must inform ReactCrop when your media has loaded.
-        e.target.dispatchEvent(new Event('medialoaded', { bubbles: true }))
-      }}
-    >
+    <video autoPlay loop>
       <source src={mp4Url} type="video/mp4" />
     </video>
   )
@@ -165,14 +186,10 @@ class App extends PureComponent {
         </div>
         {src && (
           <ReactCrop
-            // renderComponent={this.renderVideo()}
-            src={src}
             crop={crop}
-            scale={scale}
-            rotate={rotate}
+            aspect={16 / 9}
             ruleOfThirds
             // circularCrop
-            onImageLoaded={this.onImageLoaded}
             onComplete={this.onCropComplete}
             onChange={this.onCropChange}
             onDragStart={this.onDragStart}
@@ -180,16 +197,25 @@ class App extends PureComponent {
             // renderSelectionAddon={this.renderSelectionAddon}
             // minWidth={50}
             // minHeight={50}
-            // maxWidth={200}
-            // maxHeight={200}
+            // maxWidth={250}
+            // maxHeight={250}
+          >
+            <img
+              ref={this.imageRef}
+              alt="Crop image"
+              src={src}
+              style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
+              onLoad={this.onImageLoaded}
+            />
+          </ReactCrop>
+        )}
+        {croppedImageUrl && (
+          <img
+            alt="Crop preview"
+            src={croppedImageUrl}
+            style={{ display: 'block', width: crop?.width || 0, height: crop?.height || 0 }}
           />
         )}
-        {src && (
-          <button style={{ display: 'block' }} onClick={this.onChangeToIncompleteCropClick}>
-            Change to incomplete aspect crop
-          </button>
-        )}
-        {croppedImageUrl && <img alt="Crop" src={croppedImageUrl} style={{ display: 'block' }} />}
       </div>
     )
   }

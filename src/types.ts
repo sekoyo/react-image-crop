@@ -4,7 +4,6 @@ export type XYOrds = 'nw' | 'ne' | 'se' | 'sw'
 export type Ords = XOrds | YOrds | XYOrds
 
 export interface Crop {
-  aspect?: number
   x: number
   y: number
   width: number

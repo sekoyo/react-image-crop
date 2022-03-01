@@ -1,141 +1,52 @@
 import React, { PureComponent, createRef } from 'react'
 import clsx from 'clsx'
 
-import { Ords, Crop } from './types'
-import {
-  defaultCrop,
-  clamp,
-  isCropValid,
-  areCropsEqual,
-  makeAspectCrop,
-  convertToPercentCrop,
-  convertToPixelCrop,
-  resolveCrop,
-  getMaxCrop,
-  getMinCrop,
-} from './utils'
+import { Ords, XYOrds, Crop, PixelCrop, PercentCrop } from './types'
+import { defaultCrop, clamp, areCropsEqual, convertToPercentCrop, convertToPixelCrop, containCrop } from './utils'
 
 import './ReactCrop.scss'
 
 interface EVData {
-  clientStartX: number
-  clientStartY: number
-  cropStartWidth: number
-  cropStartHeight: number
-  cropStartX: number
-  cropStartY: number
-  xDiff: number
-  yDiff: number
-  xInversed: boolean
-  yInversed: boolean
-  xCrossOver: boolean
-  yCrossOver: boolean
-  lastYCrossover: boolean
-  startXCrossOver: boolean
-  startYCrossOver: boolean
+  startClientX: number
+  startClientY: number
+  startCropX: number
+  startCropY: number
+  clientX: number
+  clientY: number
   isResize: boolean
-  ord: Ords
+  ord?: Ords
 }
 
 const DOC_MOVE_OPTS = { capture: true, passive: false }
 
-// NOTE: This function will be refactored out.
-function containCrop(prevCrop: Partial<Crop>, crop: Partial<Crop>, imageWidth: number, imageHeight: number) {
-  const pixelCrop = convertToPixelCrop(crop, imageWidth, imageHeight)
-  const prevPixelCrop = convertToPixelCrop(prevCrop, imageWidth, imageHeight)
-
-  // Non-aspects are simple
-  if (!pixelCrop.aspect) {
-    if (pixelCrop.x < 0) {
-      pixelCrop.width += pixelCrop.x
-      pixelCrop.x = 0
-    } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
-      pixelCrop.width = imageWidth - pixelCrop.x
-    }
-
-    if (pixelCrop.y + pixelCrop.height > imageHeight) {
-      pixelCrop.height = imageHeight - pixelCrop.y
-    }
-
-    return pixelCrop
-  }
-
-  // Contain crop if overflowing on X.
-  if (pixelCrop.x < 0) {
-    pixelCrop.width = pixelCrop.x + pixelCrop.width
-    pixelCrop.x = 0
-    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
-  } else if (pixelCrop.x + pixelCrop.width > imageWidth) {
-    pixelCrop.width = imageWidth - pixelCrop.x
-    pixelCrop.height = pixelCrop.width / pixelCrop.aspect
-  }
-
-  // If sizing in up direction...
-  if (prevPixelCrop.y > pixelCrop.y) {
-    if (pixelCrop.x + pixelCrop.width >= imageWidth) {
-      // ...and we've hit the right border, don't adjust Y.
-      // Adjust height so crop selection doesn't move if Y is adjusted.
-      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
-      pixelCrop.y = prevPixelCrop.y
-    } else if (pixelCrop.x <= 0) {
-      // ...and we've hit the left border, don't adjust Y.
-      // Adjust height so crop selection doesn't move if Y is adjusted.
-      pixelCrop.height += prevPixelCrop.height - pixelCrop.height
-      pixelCrop.y = prevPixelCrop.y
-    }
-  }
-
-  // Contain crop if overflowing on Y.
-  if (pixelCrop.y < 0) {
-    pixelCrop.height = pixelCrop.y + pixelCrop.height
-    pixelCrop.y = 0
-    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
-  } else if (pixelCrop.y + pixelCrop.height > imageHeight) {
-    pixelCrop.height = imageHeight - pixelCrop.y
-    pixelCrop.width = pixelCrop.height * pixelCrop.aspect
-  }
-
-  // If sizing in left direction and we've hit the bottom border, don't adjust X.
-  if (pixelCrop.x < prevPixelCrop.x && pixelCrop.y + pixelCrop.height >= imageHeight) {
-    // Adjust width so crop selection doesn't move if X is adjusted.
-    pixelCrop.width += prevPixelCrop.width - pixelCrop.width
-    pixelCrop.x = prevPixelCrop.x
-  }
-
-  return pixelCrop
-}
-
 export interface ReactCropProps {
   /** An object of labels to override the built-in English ones */
   ariaLabels?: {
-    cropArea?: string
-    nwDragHandle?: string
-    nDragHandle?: string
-    neDragHandle?: string
-    eDragHandle?: string
-    seDragHandle?: string
-    sDragHandle?: string
-    swDragHandle?: string
-    wDragHandle?: string
+    cropArea: string
+    nwDragHandle: string
+    nDragHandle: string
+    neDragHandle: string
+    eDragHandle: string
+    seDragHandle: string
+    sDragHandle: string
+    swDragHandle: string
+    wDragHandle: string
   }
-  /** A string of classes to add to the main `ReactCrop` element. */
+  /** The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape. */
+  aspect?: number
+  /** Classes to pass to the `ReactCrop` element. */
   className?: string
-  /** A React Node that will be inserted into the `ReactCrop` element */
+  /** The elements that you want to perform a crop on. For example
+   * an image or video. */
   children?: React.ReactNode
   /** Show the crop area as a circle. If your aspect is not 1 (a square) then the circle will be warped into an oval shape. Defaults to false. */
   circularCrop?: boolean
-  /** All crop params are initially optional. See README.md for more info. */
-  crop: Partial<Crop>
-  /** Allows setting the crossorigin attribute on the image. */
-  crossorigin?: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>['crossOrigin']
+  /** Since v10 all crop params are required except for aspect. Omit the entire crop object if you don't want a crop. See README on how to create an aspect crop with a % crop. */
+  crop?: Crop
   /** If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling. */
   disabled?: boolean
   /** If true then the user cannot create or resize a crop, but can still drag the existing crop around. A class of `ReactCrop--locked` is also added to the container for user styling. */
   locked?: boolean
-  /** Add an alt attribute to the image element. */
-  imageAlt?: string
-  /** Inline styles object to be passed to the image element. */
-  imageStyle?: React.CSSProperties
   /** If true is passed then selection can't be disabled if the user clicks outside the selection area. */
   keepSelection?: boolean
   /** A minimum crop width, in pixels. */
@@ -147,35 +58,19 @@ export interface ReactCropProps {
   /** A maximum crop height, in pixels. */
   maxHeight?: number
   /** A callback which happens for every change of the crop. You should set the crop to state and pass it back into the library via the `crop` prop. */
-  onChange: (crop: Crop, percentageCrop: Crop) => void
+  onChange: (crop: PixelCrop, percentageCrop: PercentCrop) => void
   /** A callback which happens after a resize, drag, or nudge. Passes the current crop state object in pixels and percent. */
-  onComplete?: (crop: Crop, percentageCrop: Crop) => void
-  /** This event is called if the image had an error loading. */
-  onImageError?: React.DOMAttributes<HTMLImageElement>['onError']
-  /** A callback which happens when the image is loaded. Passes the image DOM element. Return false if you set the crop with setState in there as otherwise the subsequent onChange + onComplete will not have your updated crop. */
-  onImageLoaded?: (image: HTMLImageElement) => void | boolean
+  onComplete?: (crop: PixelCrop, percentageCrop: PercentCrop) => void
   /** A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component. */
   onDragStart?: (e: PointerEvent) => void
   /** A callback which happens when a user releases the cursor or touch after dragging or resizing. */
   onDragEnd?: (e: PointerEvent) => void
-  /** Render a custom HTML element in place of an image. Useful if you want to support videos. */
-  renderComponent?: React.ReactNode
   /** Render a custom element in crop selection. */
   renderSelectionAddon?: (state: ReactCropState) => React.ReactNode
-  /** Rotates the image, you should pass a value between -180 and 180. Defaults to 0. */
-  rotate?: number
   /** Show rule of thirds lines in the cropped area. Defaults to false. */
   ruleOfThirds?: boolean
-  /** Scales the image. Defaults to 1 (normal scale). */
-  scale?: number
-  /** The image source (can be base64 or a blob just like a normal image). */
-  src: string
-  /** Inline styles object to be passed to the image wrapper element. */
+  /** Inline styles object to be passed to the `ReactCrop` element. */
   style?: React.CSSProperties
-  /** A non-visual prop to keep pointer coords accurate when a parent element is scaled. Not to be confused with the `scale` prop which scales the image itself. Defaults to 1. */
-  zoom?: number
-  /** A non-visual prop to keep pointer coords accurate when a parent element is rotated. Not to be confused with the `rotate` prop which rotates the image itself. Defaults to 0, range is from -180 to 180. */
-  spin?: number
 }
 
 export interface ReactCropState {
@@ -192,34 +87,42 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   static nudgeStepMedium = 10
   static nudgeStepLarge = 100
 
+  static defaultProps = {
+    ariaLabels: {
+      cropArea: 'Use the arrow keys to move the crop selection area',
+      nwDragHandle: 'Use the arrow keys to move the north west drag handle to change the crop selection area',
+      nDragHandle: 'Use the up and down arrow keys to move the north drag handle to change the crop selection area',
+      neDragHandle: 'Use the arrow keys to move the north east drag handle to change the crop selection area',
+      eDragHandle: 'Use the up and down arrow keys to move the east drag handle to change the crop selection area',
+      seDragHandle: 'Use the arrow keys to move the south east drag handle to change the crop selection area',
+      sDragHandle: 'Use the up and down arrow keys to move the south drag handle to change the crop selection area',
+      swDragHandle: 'Use the arrow keys to move the south west drag handle to change the crop selection area',
+      wDragHandle: 'Use the up and down arrow keys to move the west drag handle to change the crop selection area',
+    },
+  }
+
   keysDown = new Set<string>()
   docMoveBound = false
   mouseDownOnCrop = false
   dragStarted = false
   evData: EVData = {
-    clientStartX: 0,
-    clientStartY: 0,
-    cropStartWidth: 0,
-    cropStartHeight: 0,
-    cropStartX: 0,
-    cropStartY: 0,
-    xDiff: 0,
-    yDiff: 0,
-    xInversed: false,
-    yInversed: false,
-    xCrossOver: false,
-    yCrossOver: false,
-    lastYCrossover: false,
-    startXCrossOver: false,
-    startYCrossOver: false,
+    startClientX: 0,
+    startClientY: 0,
+    startCropX: 0,
+    startCropY: 0,
+    clientX: 0,
+    clientY: 0,
     isResize: true,
-    ord: 'nw',
   }
 
   componentRef = createRef<HTMLDivElement>()
-  mediaWrapperRef = createRef<HTMLDivElement>()
-  imageRef = createRef<HTMLImageElement>()
-  cropSelectRef = createRef<HTMLDivElement>()
+  resizeObserver?: ResizeObserver
+  box = {
+    width: 0,
+    height: 0,
+    x: 0,
+    y: 0,
+  }
 
   state: ReactCropState = {
     cropIsActive: false,
@@ -228,37 +131,23 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   componentDidMount() {
     if (this.componentRef.current) {
-      this.componentRef.current.addEventListener('medialoaded', this.onMediaLoaded)
+      this.resizeObserver = new ResizeObserver(([entry]) => {
+        this.box.width = entry.contentRect.width
+        this.box.height = entry.contentRect.height
+
+        // Unfortunately top/left/x/y is useless from entry.
+        const rect = entry.target.getBoundingClientRect()
+        this.box.x = rect.left
+        this.box.y = rect.top
+      })
+
+      this.resizeObserver.observe(this.componentRef.current)
     }
   }
 
   componentWillUnmount() {
-    if (this.componentRef.current) {
-      this.componentRef.current.removeEventListener('medialoaded', this.onMediaLoaded)
-    }
-  }
-
-  componentDidUpdate(prevProps: ReactCropProps) {
-    const { crop, onChange, onComplete } = this.props
-
-    if (
-      this.imageRef.current &&
-      crop &&
-      prevProps.crop !== crop &&
-      crop.aspect &&
-      ((crop.width && !crop.height) || (!crop.width && crop.height))
-    ) {
-      const { width, height } = this.imageRef.current
-      const newCrop = this.makeNewCrop()
-      const completedCrop = makeAspectCrop(newCrop, width, height)
-
-      const pixelCrop = convertToPixelCrop(completedCrop, width, height)
-      const percentCrop = convertToPercentCrop(completedCrop, width, height)
-      onChange(pixelCrop, percentCrop)
-
-      if (onComplete) {
-        onComplete(pixelCrop, percentCrop)
-      }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
     }
   }
 
@@ -288,8 +177,13 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onCropPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const { crop, disabled } = this.props
-    const { width, height } = this.mediaDimensions
-    const pixelCrop = convertToPixelCrop(crop, width, height)
+
+    if (!crop) {
+      return
+    }
+
+    const { box } = this
+    const pixelCrop = convertToPixelCrop(crop, box.width, box.height)
 
     if (disabled) {
       return
@@ -301,30 +195,44 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     this.bindDocMove()
 
     // Focus for detecting keypress.
-    ;(this.componentRef.current as HTMLDivElement).focus({ preventScroll: true }) // All other browsers
+    ;(this.componentRef.current as HTMLDivElement).focus({ preventScroll: true })
 
-    const { ord } = (e.target as HTMLElement).dataset
-    const xInversed = ord === 'nw' || ord === 'w' || ord === 'sw'
-    const yInversed = ord === 'nw' || ord === 'n' || ord === 'ne'
+    const ord = (e.target as HTMLElement).dataset.ord as Ords
+    const isResize = Boolean(ord)
+    let startClientX = e.clientX
+    let startClientY = e.clientY
+    let startCropX = pixelCrop.x
+    let startCropY = pixelCrop.y
+
+    // Set the starting coords to the opposite corner.
+    if (ord) {
+      if (ord === 'ne' || ord == 'e') {
+        startCropX = pixelCrop.x
+        startCropY = pixelCrop.y + pixelCrop.height
+      } else if (ord === 'se' || ord === 's') {
+        startCropX = pixelCrop.x
+        startCropY = pixelCrop.y
+      } else if (ord === 'sw' || ord == 'w') {
+        startCropX = pixelCrop.x + pixelCrop.width
+        startCropY = pixelCrop.y
+      } else if (ord === 'nw' || ord == 'n') {
+        startCropX = pixelCrop.x + pixelCrop.width
+        startCropY = pixelCrop.y + pixelCrop.height
+      }
+
+      startClientX = startCropX + box.x
+      startClientY = startCropY + box.y
+    }
 
     this.evData = {
-      clientStartX: e.clientX,
-      clientStartY: e.clientY,
-      cropStartWidth: pixelCrop.width,
-      cropStartHeight: pixelCrop.height,
-      cropStartX: xInversed ? pixelCrop.x + pixelCrop.width : pixelCrop.x,
-      cropStartY: yInversed ? pixelCrop.y + pixelCrop.height : pixelCrop.y,
-      xDiff: 0,
-      yDiff: 0,
-      xInversed,
-      yInversed,
-      xCrossOver: xInversed,
-      yCrossOver: yInversed,
-      lastYCrossover: yInversed,
-      startXCrossOver: xInversed,
-      startYCrossOver: yInversed,
-      isResize: Boolean(ord),
-      ord: (ord || 'ne') as Ords,
+      startClientX,
+      startClientY,
+      startCropX,
+      startCropY,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      isResize,
+      ord,
     }
 
     this.mouseDownOnCrop = true
@@ -332,15 +240,9 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   onComponentPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const { crop, disabled, locked, keepSelection, onChange, zoom = 1, spin = 0 } = this.props
+    const { crop, disabled, locked, keepSelection, onChange } = this.props
 
-    const componentEl = (this.mediaWrapperRef.current as HTMLDivElement).firstChild
-
-    if (e.target !== componentEl || !componentEl.contains(e.target as Node)) {
-      return
-    }
-
-    if (disabled || locked || (keepSelection && isCropValid(crop))) {
+    if (disabled || locked || (keepSelection && crop)) {
       return
     }
 
@@ -350,79 +252,45 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     this.bindDocMove()
 
     // Focus for detecting keypress.
-    ;(this.componentRef.current as HTMLDivElement).focus({ preventScroll: true }) // All other browsers
+    ;(this.componentRef.current as HTMLDivElement).focus({ preventScroll: true })
 
-    const rect = (this.mediaWrapperRef.current as HTMLDivElement).getBoundingClientRect()
-    let x = 0
-    let y = 0
-    let scaledX = (e.clientX - rect.left) / zoom
-    let scaledY = (e.clientY - rect.top) / zoom
-    let degrees = spin
-    let radians = Math.abs((degrees * Math.PI) / 180.0)
-    if ((degrees > -45 && degrees <= 45) || (Math.abs(degrees) > 135 && Math.abs(degrees) <= 180)) {
-      // Top and Bottom
-      x = scaledX * Math.cos(radians)
-      y = scaledY * Math.cos(radians)
-    } else if (degrees > 45 && degrees <= 135) {
-      // Left
-      x = scaledY * Math.sin(radians)
-      y = scaledX * Math.sin(radians) * -1
-    } else if (degrees > -135 && degrees <= -45) {
-      // Right
-      x = scaledY * Math.sin(radians) * -1
-      y = scaledX * Math.sin(radians)
-    }
-
-    const nextCrop: Crop = {
+    const { box } = this
+    const cropX = e.clientX - box.x
+    const cropY = e.clientY - box.y
+    const nextCrop: PixelCrop = {
       unit: 'px',
-      aspect: crop ? crop.aspect : undefined,
-      x,
-      y,
+      x: cropX,
+      y: cropY,
       width: 0,
       height: 0,
     }
 
-    const { width, height } = this.mediaDimensions
-
     this.evData = {
-      clientStartX: e.clientX,
-      clientStartY: e.clientY,
-      cropStartWidth: nextCrop.width,
-      cropStartHeight: nextCrop.height,
-      cropStartX: nextCrop.x,
-      cropStartY: nextCrop.y,
-      xDiff: 0,
-      yDiff: 0,
-      xInversed: false,
-      yInversed: false,
-      xCrossOver: false,
-      yCrossOver: false,
-      lastYCrossover: false,
-      startXCrossOver: false,
-      startYCrossOver: false,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      startCropX: cropX,
+      startCropY: cropY,
+      clientX: e.clientX,
+      clientY: e.clientY,
       isResize: true,
-      ord: 'nw',
     }
 
     this.mouseDownOnCrop = true
 
-    onChange(convertToPixelCrop(nextCrop, width, height), convertToPercentCrop(nextCrop, width, height))
+    onChange(convertToPixelCrop(nextCrop, box.width, box.height), convertToPercentCrop(nextCrop, box.width, box.height))
 
     this.setState({ cropIsActive: true, newCropIsBeingDrawn: true })
   }
 
   onDocPointerMove = (e: PointerEvent) => {
-    const { crop, disabled, onChange, onDragStart, zoom = 1, spin = 0 } = this.props
+    const { crop, disabled, onChange, onDragStart } = this.props
 
-    if (disabled) {
+    if (disabled || !crop || !this.mouseDownOnCrop) {
       return
     }
 
-    if (!this.mouseDownOnCrop) {
-      return
-    }
-
-    if (e.cancelable) e.preventDefault() // Stop drag selection.
+    // Stop drag selection.
+    if (e.cancelable) e.preventDefault()
 
     if (!this.dragStarted) {
       this.dragStarted = true
@@ -431,25 +299,10 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       }
     }
 
+    // Update pointer position.
     const { evData } = this
-
-    let scaledX = (e.clientX - evData.clientStartX) / zoom
-    let scaledY = (e.clientY - evData.clientStartY) / zoom
-    let degrees = spin
-    let radians = Math.abs((degrees * Math.PI) / 180.0)
-    if ((degrees > -45 && degrees <= 45) || (Math.abs(degrees) > 135 && Math.abs(degrees) <= 180)) {
-      // Top and Bottom
-      evData.xDiff = scaledX * Math.cos(radians)
-      evData.yDiff = scaledY * Math.cos(radians)
-    } else if (degrees > 45 && degrees <= 135) {
-      // Left
-      evData.xDiff = scaledY * Math.sin(radians)
-      evData.yDiff = scaledX * Math.sin(radians) * -1
-    } else if (degrees > -135 && degrees <= -45) {
-      // Right
-      evData.xDiff = scaledY * Math.sin(radians) * -1
-      evData.yDiff = scaledX * Math.sin(radians)
-    }
+    evData.clientX = e.clientX
+    evData.clientY = e.clientY
 
     let nextCrop
 
@@ -459,9 +312,12 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       nextCrop = this.dragCrop()
     }
 
-    if (nextCrop !== crop) {
-      const { width, height } = this.mediaDimensions
-      onChange(convertToPixelCrop(nextCrop, width, height), convertToPercentCrop(nextCrop, width, height))
+    if (!areCropsEqual(crop, nextCrop)) {
+      const { box } = this
+      onChange(
+        convertToPixelCrop(nextCrop, box.width, box.height),
+        convertToPercentCrop(nextCrop, box.width, box.height)
+      )
     }
   }
 
@@ -475,11 +331,11 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     this.keysDown.add(e.key)
     let nudged = false
 
-    if (!isCropValid(crop)) {
+    if (!crop) {
       return
     }
 
-    const nextCrop = this.makeNewCrop()
+    const nextCrop = this.makePixelCrop()
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const nudgeStep = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
@@ -509,13 +365,13 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     if (nudged) {
       if (e.cancelable) e.preventDefault() // Stop drag selection.
-      const { width, height } = this.mediaDimensions
+      const { box } = this
 
-      nextCrop.x = clamp(nextCrop.x, 0, width - nextCrop.width)
-      nextCrop.y = clamp(nextCrop.y, 0, height - nextCrop.height)
+      nextCrop.x = clamp(nextCrop.x, 0, box.width - nextCrop.width)
+      nextCrop.y = clamp(nextCrop.y, 0, box.height - nextCrop.height)
 
-      const pixelCrop = convertToPixelCrop(nextCrop, width, height)
-      const percentCrop = convertToPercentCrop(nextCrop, width, height)
+      const pixelCrop = convertToPixelCrop(nextCrop, box.width, box.height)
+      const percentCrop = convertToPercentCrop(nextCrop, box.width, box.height)
 
       onChange(pixelCrop, percentCrop)
       if (onComplete) {
@@ -528,14 +384,20 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     e: React.KeyboardEvent<HTMLDivElement>,
     ord: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
   ) => {
-    const { crop, disabled, minWidth, minHeight, maxWidth, maxHeight, onChange, onComplete } = this.props
-    const { width: mediaWidth, height: mediaHeight } = this.mediaDimensions
+    const {
+      aspect = 0,
+      crop,
+      disabled,
+      minWidth = 0,
+      minHeight = 0,
+      maxWidth,
+      maxHeight,
+      onChange,
+      onComplete,
+    } = this.props
+    const { box } = this
 
-    if (disabled) {
-      return
-    }
-
-    if (!isCropValid(crop)) {
+    if (disabled || !crop) {
       return
     }
 
@@ -547,9 +409,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return
     }
 
-    const nextCrop = convertToPixelCrop(crop, mediaWidth, mediaHeight)
-    const maxCrop = getMaxCrop(nextCrop, ord, mediaWidth, mediaHeight, maxWidth, maxHeight)
-    const minCrop = getMinCrop(nextCrop, ord, minWidth, minHeight)
+    const tmpCrop = convertToPixelCrop(crop, box.width, box.height)
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const offset = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
@@ -557,77 +417,122 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       ? ReactCrop.nudgeStepMedium
       : ReactCrop.nudgeStep
 
-    let widthChanged = false
-    let heightChanged = false
-
     if (e.key === 'ArrowLeft') {
-      if (ord === 'nw' || ord === 'w' || ord === 'sw') {
-        // Left side
-        widthChanged = true
-        nextCrop.x = Math.max(maxCrop.x, nextCrop.x - offset)
-        nextCrop.width = Math.min(maxCrop.width, nextCrop.width + offset)
-      } else if (ord === 'ne' || ord === 'e' || ord === 'se') {
-        // Right side
-        widthChanged = true
-        nextCrop.width = Math.max(minCrop.width, nextCrop.width - offset)
+      if (ord === 'nw') {
+        tmpCrop.x -= offset
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'w') {
+        tmpCrop.x -= offset
+        tmpCrop.width += offset
+      } else if (ord === 'sw') {
+        tmpCrop.x -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'ne') {
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'e') {
+        tmpCrop.width -= offset
+      } else if (ord === 'se') {
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
       }
     } else if (e.key === 'ArrowRight') {
-      if (ord === 'nw' || ord === 'w' || ord === 'sw') {
-        // Left side
-        widthChanged = true
-        nextCrop.x = Math.min(minCrop.x, nextCrop.x + offset)
-        nextCrop.width = Math.max(minCrop.width, nextCrop.width - offset)
-      } else if (ord === 'ne' || ord === 'e' || ord === 'se') {
-        // Right side
-        widthChanged = true
-        nextCrop.width = Math.min(maxCrop.width, nextCrop.width + offset)
+      if (ord === 'nw') {
+        tmpCrop.x += offset
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'w') {
+        // Niche: Will move right if minWidth hit.
+        tmpCrop.x += offset
+        tmpCrop.width -= offset
+      } else if (ord === 'sw') {
+        tmpCrop.x += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'ne') {
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'e') {
+        tmpCrop.width += offset
+      } else if (ord === 'se') {
+        tmpCrop.width += offset
+        tmpCrop.height += offset
       }
     }
 
     if (e.key === 'ArrowUp') {
-      if (ord === 'nw' || ord === 'n' || ord === 'ne') {
-        // Top side
-        heightChanged = true
-        nextCrop.y = Math.max(maxCrop.y, Math.max(0, nextCrop.y - offset))
-        nextCrop.height = Math.min(maxCrop.height, nextCrop.height + offset)
-      } else if (ord === 'sw' || ord === 's' || ord === 'se') {
-        // Bottom side
-        heightChanged = true
-        nextCrop.height = Math.max(minCrop.height, nextCrop.height - offset)
+      if (ord === 'nw') {
+        tmpCrop.x -= offset
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'n') {
+        tmpCrop.y -= offset
+        tmpCrop.height += offset
+      } else if (ord === 'ne') {
+        tmpCrop.y -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 'sw') {
+        tmpCrop.x += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 's') {
+        tmpCrop.height -= offset
+      } else if (ord === 'se') {
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
       }
     } else if (e.key === 'ArrowDown') {
-      if (ord === 'nw' || ord === 'n' || ord === 'ne') {
-        // Top side
-        heightChanged = true
-        nextCrop.y = Math.min(minCrop.y, nextCrop.y + offset)
-        nextCrop.height = Math.max(minCrop.height, nextCrop.height - offset)
-      } else if (ord === 'sw' || ord === 's' || ord === 'se') {
-        // Bottom side
-        heightChanged = true
-        nextCrop.height = Math.min(maxCrop.height, nextCrop.height + offset)
+      if (ord === 'nw') {
+        tmpCrop.x += offset
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'n') {
+        // Niche: Will move down if minHeight hit.
+        tmpCrop.y += offset
+        tmpCrop.height -= offset
+      } else if (ord === 'ne') {
+        tmpCrop.y += offset
+        tmpCrop.width -= offset
+        tmpCrop.height -= offset
+      } else if (ord === 'sw') {
+        tmpCrop.x -= offset
+        tmpCrop.width += offset
+        tmpCrop.height += offset
+      } else if (ord === 's') {
+        tmpCrop.height += offset
+      } else if (ord === 'se') {
+        tmpCrop.width += offset
+        tmpCrop.height += offset
       }
     }
 
-    if (nextCrop.aspect) {
-      if (widthChanged) {
-        nextCrop.height = nextCrop.width / nextCrop.aspect
-      } else if (heightChanged) {
-        const prevWidth = nextCrop.width
-        nextCrop.width = nextCrop.height * nextCrop.aspect
-        // Need to offset x on subtractive ords to maintain
-        // staticness. Why does y not need this?
-        if (ord === 'nw' || ord === 'sw') {
-          nextCrop.x -= nextCrop.width - prevWidth
-        }
-      }
-    }
+    const containedCrop = containCrop(
+      tmpCrop,
+      aspect,
+      ord,
+      box.width,
+      box.height,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight
+    )
 
-    if (!areCropsEqual(crop, nextCrop)) {
-      const percentCrop = convertToPercentCrop(nextCrop, mediaWidth, mediaHeight)
-      onChange(nextCrop, percentCrop)
+    if (!areCropsEqual(crop, containedCrop)) {
+      const percentCrop = convertToPercentCrop(containedCrop, box.width, box.height)
+      onChange(containedCrop, percentCrop)
 
       if (onComplete) {
-        onComplete(nextCrop, percentCrop)
+        onComplete(containedCrop, percentCrop)
       }
     }
   }
@@ -641,7 +546,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     this.unbindDocMove()
 
-    if (disabled) {
+    if (disabled || !crop) {
       return
     }
 
@@ -649,61 +554,22 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       this.mouseDownOnCrop = false
       this.dragStarted = false
 
-      const { width, height } = this.mediaDimensions
+      const { box } = this
 
       onDragEnd && onDragEnd(e)
-      onComplete && onComplete(convertToPixelCrop(crop, width, height), convertToPercentCrop(crop, width, height))
+      onComplete &&
+        onComplete(convertToPixelCrop(crop, box.width, box.height), convertToPercentCrop(crop, box.width, box.height))
 
       this.setState({ cropIsActive: false, newCropIsBeingDrawn: false })
     }
   }
 
-  // TODO: Confusing to have this and makeNewCrop.
-  // When the image is loaded or when a custom component via `renderComponent` prop fires
-  // a custom "medialoaded" event.
-  createNewCrop() {
-    const { width, height } = this.mediaDimensions
-    const crop = this.makeNewCrop()
-    const resolvedCrop = resolveCrop(crop, width, height)
-    const pixelCrop = convertToPixelCrop(resolvedCrop, width, height)
-    const percentCrop = convertToPercentCrop(resolvedCrop, width, height)
-    return { pixelCrop, percentCrop }
-  }
-
-  // Custom components (using `renderComponent`) should fire a custom event
-  // called "medialoaded" when they are loaded.
-  onMediaLoaded = () => {
-    const { onComplete, onChange } = this.props
-    const { pixelCrop, percentCrop } = this.createNewCrop()
-    onChange(pixelCrop, percentCrop)
-    onComplete && onComplete(pixelCrop, percentCrop)
-  }
-
-  onImageLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    const { onComplete, onChange, onImageLoaded } = this.props
-
-    // Return false from onImageLoaded if you set the crop with setState in there as otherwise
-    // the subsequent onChange + onComplete will not have your updated crop.
-    const res = onImageLoaded ? onImageLoaded(e.currentTarget) : true
-
-    if (res !== false) {
-      const { pixelCrop, percentCrop } = this.createNewCrop()
-      onChange(pixelCrop, percentCrop)
-      onComplete && onComplete(pixelCrop, percentCrop)
-    }
-  }
-
-  get mediaDimensions() {
-    const el = this.mediaWrapperRef.current
-    if (el) {
-      const { width, height } = el.getBoundingClientRect()
-      return { width, height }
-    }
-    return { width: 0, height: 0 }
-  }
-
   getCropStyle() {
-    const crop = this.makeNewCrop(this.props.crop ? this.props.crop.unit : 'px')
+    const { crop } = this.props
+
+    if (!crop) {
+      return undefined
+    }
 
     return {
       top: `${crop.y}${crop.unit}`,
@@ -713,179 +579,137 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
-  getNewSize() {
-    const { crop, minWidth = 0, maxWidth, minHeight = 0, maxHeight } = this.props
-    const { evData } = this
-    const { width, height } = this.mediaDimensions
-
-    // New width.
-    let newWidth = evData.cropStartWidth + evData.xDiff
-
-    if (evData.xCrossOver) {
-      newWidth = Math.abs(newWidth)
-    }
-
-    newWidth = clamp(newWidth, minWidth, maxWidth || width)
-
-    // New height.
-    let newHeight
-
-    if (crop.aspect) {
-      newHeight = newWidth / crop.aspect
-    } else {
-      newHeight = evData.cropStartHeight + evData.yDiff
-    }
-
-    if (evData.yCrossOver) {
-      // Cap if polarity is inversed and the height fills the y space.
-      newHeight = Math.min(Math.abs(newHeight), evData.cropStartY)
-    }
-
-    newHeight = clamp(newHeight, minHeight, maxHeight || height)
-
-    if (crop.aspect) {
-      newWidth = clamp(newHeight * crop.aspect, 0, width)
-    }
-
-    return {
-      width: newWidth,
-      height: newHeight,
-    }
-  }
-
   dragCrop() {
-    const nextCrop = this.makeNewCrop()
-    const { evData } = this
-    const { width, height } = this.mediaDimensions
+    const nextCrop = this.makePixelCrop()
+    const { box, evData } = this
+    const xDiff = evData.clientX - evData.startClientX
+    const yDiff = evData.clientY - evData.startClientY
 
-    nextCrop.x = clamp(evData.cropStartX + evData.xDiff, 0, width - nextCrop.width)
-    nextCrop.y = clamp(evData.cropStartY + evData.yDiff, 0, height - nextCrop.height)
+    nextCrop.x = clamp(evData.startCropX + xDiff, 0, box.width - nextCrop.width)
+    nextCrop.y = clamp(evData.startCropY + yDiff, 0, box.height - nextCrop.height)
 
     return nextCrop
+  }
+
+  getPointRegion(): XYOrds {
+    const { box, evData } = this
+    const relativeX = evData.clientX - box.x
+    const relativeY = evData.clientY - box.y
+    const topHalf = relativeY < evData.startCropY
+    const leftHalf = relativeX < evData.startCropX
+
+    if (leftHalf) {
+      return topHalf ? 'nw' : 'sw'
+    } else {
+      return topHalf ? 'ne' : 'se'
+    }
   }
 
   resizeCrop() {
-    const { evData } = this
-    const { crop, minWidth = 0, minHeight = 0 } = this.props
-    const nextCrop = this.makeNewCrop()
-    const { ord } = evData
+    const { box, evData } = this
+    const { aspect = 0, minWidth = 0, minHeight = 0, maxWidth, maxHeight } = this.props
+    const area = this.getPointRegion()
+    const nextCrop = this.makePixelCrop()
+    const resolvedOrd: Ords = evData.ord ? evData.ord : area
+    const xDiff = evData.clientX - evData.startClientX
+    const yDiff = evData.clientY - evData.startClientY
 
-    // On the inverse change the diff so it's the same and
-    // the same algo applies.
-    if (evData.xInversed) {
-      evData.xDiff -= evData.cropStartWidth * 2
-    }
-    if (evData.yInversed) {
-      evData.yDiff -= evData.cropStartHeight * 2
-    }
-
-    // New size.
-    const newSize = this.getNewSize()
-
-    // Adjust x/y to give illusion of 'staticness' as width/height is increased
-    // when polarity is inversed.
-    let newX = evData.cropStartX
-    let newY = evData.cropStartY
-
-    if (evData.xCrossOver) {
-      newX = nextCrop.x + (nextCrop.width - newSize.width)
+    const tmpCrop: PixelCrop = {
+      unit: 'px',
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
     }
 
-    if (evData.yCrossOver) {
-      // This has a more favorable behavior for aspect crops crossing over on the
-      // diagonal, else it flips over from the bottom corner and looks jumpy.
-      if (evData.lastYCrossover === false) {
-        newY = nextCrop.y - newSize.height
+    if (area === 'ne') {
+      tmpCrop.x = evData.startCropX
+      tmpCrop.width = xDiff
+
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
+        tmpCrop.y = evData.startCropY - tmpCrop.height
       } else {
-        newY = nextCrop.y + (nextCrop.height - newSize.height)
+        tmpCrop.height = Math.abs(yDiff)
+        tmpCrop.y = evData.startCropY - tmpCrop.height
+      }
+    } else if (area === 'se') {
+      tmpCrop.x = evData.startCropX
+      tmpCrop.y = evData.startCropY
+      tmpCrop.width = xDiff
+
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
+      } else {
+        tmpCrop.height = yDiff
+      }
+    } else if (area === 'sw') {
+      tmpCrop.x = evData.startCropX + xDiff
+      tmpCrop.y = evData.startCropY
+      tmpCrop.width = Math.abs(xDiff)
+
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
+      } else {
+        tmpCrop.height = yDiff
+      }
+    } else if (area === 'nw') {
+      tmpCrop.x = evData.startCropX + xDiff
+      tmpCrop.width = Math.abs(xDiff)
+
+      if (aspect) {
+        tmpCrop.height = tmpCrop.width / aspect
+        tmpCrop.y = evData.startCropY - tmpCrop.height
+      } else {
+        tmpCrop.height = Math.abs(yDiff)
+        tmpCrop.y = evData.startCropY + yDiff
       }
     }
 
-    const { width, height } = this.mediaDimensions
-
     const containedCrop = containCrop(
-      this.props.crop,
-      {
-        unit: nextCrop.unit,
-        x: newX,
-        y: newY,
-        width: newSize.width,
-        height: newSize.height,
-        aspect: nextCrop.aspect,
-      },
-      width,
-      height
+      tmpCrop,
+      aspect,
+      area,
+      box.width,
+      box.height,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight
     )
 
-    // Apply x/y/width/height changes depending on ordinate (fixed aspect always applies both).
-    if (nextCrop.aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
+    // Apply x/y/width/height changes depending on ordinate
+    // (fixed aspect always applies both).
+    if (aspect || ReactCrop.xyOrds.indexOf(resolvedOrd) > -1) {
       nextCrop.x = containedCrop.x
       nextCrop.y = containedCrop.y
       nextCrop.width = containedCrop.width
       nextCrop.height = containedCrop.height
-    } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
+    } else if (ReactCrop.xOrds.indexOf(resolvedOrd) > -1) {
       nextCrop.x = containedCrop.x
       nextCrop.width = containedCrop.width
-    } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
+    } else if (ReactCrop.yOrds.indexOf(resolvedOrd) > -1) {
       nextCrop.y = containedCrop.y
       nextCrop.height = containedCrop.height
-    }
-
-    evData.lastYCrossover = evData.yCrossOver
-    this.crossOverCheck()
-
-    // Improve: This should go to the min box not
-    // the last one.
-    // Contain crop can result in crops that are too
-    // small to meet minimums. Fixes #425.
-    if (nextCrop.width < minWidth) {
-      return crop
-    }
-    if (nextCrop.height < minHeight) {
-      return crop
     }
 
     return nextCrop
   }
 
-  getRotatedCursor(handle: string, degrees: number) {
-    if ((degrees > -135 && degrees <= -45) || (degrees > 45 && degrees <= 135)) {
-      // Left and Right
-      switch (handle) {
-        case 'nw':
-          return { cursor: 'ne-resize' }
-        case 'n':
-          return { cursor: 'w-resize' }
-        case 'ne':
-          return { cursor: 'nw-resize' }
-        case 'e':
-          return { cursor: 's-resize' }
-        case 'se':
-          return { cursor: 'sw-resize' }
-        case 's':
-          return { cursor: 'e-resize' }
-        case 'sw':
-          return { cursor: 'se-resize' }
-        case 'w':
-          return { cursor: 'n-resize' }
-      }
-    }
-  }
-
   createCropSelection() {
-    const { ariaLabels, disabled, locked, renderSelectionAddon, ruleOfThirds, crop, spin = 0 } = this.props
+    const { ariaLabels, disabled, locked, renderSelectionAddon, ruleOfThirds, crop } = this.props
     const style = this.getCropStyle()
+
+    if (!crop) {
+      return undefined
+    }
 
     return (
       <div
         style={style}
         className="ReactCrop__crop-selection"
         onPointerDown={this.onCropPointerDown}
-        aria-label={
-          this.props.ariaLabels && this.props.ariaLabels.cropArea
-            ? this.props.ariaLabels.cropArea
-            : 'Use the arrow keys to move the crop selection area'
-        }
+        aria-label={ariaLabels?.cropArea}
         tabIndex={0}
         onKeyDown={this.onComponentKeyDown}
         onKeyUp={this.onComponentKeyUp}
@@ -900,110 +724,62 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
             <div
               className="ReactCrop__drag-handle ord-nw"
               data-ord="nw"
-              style={this.getRotatedCursor('nw', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.nwDragHandle ||
-                'Use the arrow keys to move the north west drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'nw')
-              }}
+              aria-label={ariaLabels?.nwDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 'nw')}
             />
             <div
               className="ReactCrop__drag-handle ord-n"
               data-ord="n"
-              style={this.getRotatedCursor('n', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.nDragHandle ||
-                'Use the up and down arrow keys to move the north drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'n')
-              }}
+              aria-label={ariaLabels?.nDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 'n')}
             />
             <div
               className="ReactCrop__drag-handle ord-ne"
               data-ord="ne"
-              style={this.getRotatedCursor('ne', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.neDragHandle ||
-                'Use the arrow keys to move the north east drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'ne')
-              }}
+              aria-label={ariaLabels?.neDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 'ne')}
             />
             <div
               className="ReactCrop__drag-handle ord-e"
               data-ord="e"
-              style={this.getRotatedCursor('e', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.eDragHandle ||
-                'Use the up and down arrow keys to move the east drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'e')
-              }}
+              aria-label={ariaLabels?.eDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 'e')}
             />
             <div
               className="ReactCrop__drag-handle ord-se"
               data-ord="se"
-              style={this.getRotatedCursor('se', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.seDragHandle ||
-                'Use the arrow keys to move the south east drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'se')
-              }}
+              aria-label={ariaLabels?.seDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 'se')}
             />
             <div
               className="ReactCrop__drag-handle ord-s"
               data-ord="s"
-              style={this.getRotatedCursor('s', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.sDragHandle ||
-                'Use the up and down arrow keys to move the south drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 's')
-              }}
+              aria-label={ariaLabels?.sDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 's')}
             />
             <div
               className="ReactCrop__drag-handle ord-sw"
               data-ord="sw"
-              style={this.getRotatedCursor('sw', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.swDragHandle ||
-                'Use the arrow keys to move the south west drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'sw')
-              }}
+              aria-label={ariaLabels?.swDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 'sw')}
             />
             <div
               className="ReactCrop__drag-handle ord-w"
               data-ord="w"
-              style={this.getRotatedCursor('w', spin)}
               tabIndex={0}
-              aria-label={
-                ariaLabels?.wDragHandle ||
-                'Use the up and down arrow keys to move the west drag handle to change the crop selection area'
-              }
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                this.onHandlerKeyDown(e, 'w')
-              }}
+              aria-label={ariaLabels?.wDragHandle}
+              onKeyDown={e => this.onHandlerKeyDown(e, 'w')}
             />
           </div>
         )}
-        {renderSelectionAddon && isCropValid(crop) && (
+        {renderSelectionAddon && (
           <div className="ReactCrop__selection-addon" onMouseDown={e => e.stopPropagation()}>
             {renderSelectionAddon(this.state)}
           </div>
@@ -1018,90 +794,34 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     )
   }
 
-  makeNewCrop(unit = 'px') {
+  makePixelCrop() {
     const crop = { ...defaultCrop, ...(this.props.crop || {}) }
-    const { width, height } = this.mediaDimensions
-
-    return unit === 'px' ? convertToPixelCrop(crop, width, height) : convertToPercentCrop(crop, width, height)
-  }
-
-  crossOverCheck() {
-    const { evData } = this
-    const { minWidth, minHeight } = this.props
-
-    if (
-      !minWidth &&
-      ((!evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiff >= 0) ||
-        (evData.xCrossOver && -Math.abs(evData.cropStartWidth) - evData.xDiff <= 0))
-    ) {
-      evData.xCrossOver = !evData.xCrossOver
-    }
-
-    if (
-      !minHeight &&
-      ((!evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiff >= 0) ||
-        (evData.yCrossOver && -Math.abs(evData.cropStartHeight) - evData.yDiff <= 0))
-    ) {
-      evData.yCrossOver = !evData.yCrossOver
-    }
+    const { box } = this
+    return convertToPixelCrop(crop, box.width, box.height)
   }
 
   render() {
-    const {
-      children,
-      circularCrop,
-      className,
-      crossorigin,
-      crop,
-      disabled,
-      imageStyle,
-      locked,
-      imageAlt,
-      onImageError,
-      renderComponent,
-      scale = 1,
-      src,
-      style,
-      rotate = 0,
-      ruleOfThirds,
-    } = this.props
+    const { aspect, children, circularCrop, className, crop, disabled, locked, style, ruleOfThirds } = this.props
 
     const { cropIsActive, newCropIsBeingDrawn } = this.state
-    const cropSelection = isCropValid(crop) && this.componentRef ? this.createCropSelection() : null
+    const cropSelection = crop && this.componentRef ? this.createCropSelection() : null
 
     const componentClasses = clsx('ReactCrop', className, {
       'ReactCrop--active': cropIsActive,
       'ReactCrop--disabled': disabled,
       'ReactCrop--locked': locked,
       'ReactCrop--new-crop': newCropIsBeingDrawn,
-      'ReactCrop--fixed-aspect': crop && crop.aspect,
+      'ReactCrop--fixed-aspect': crop && aspect,
       'ReactCrop--circular-crop': crop && circularCrop,
       'ReactCrop--rule-of-thirds': crop && ruleOfThirds,
       'ReactCrop--invisible-crop': !this.dragStarted && crop && !crop.width && !crop.height,
     })
 
     return (
-      <div
-        ref={this.componentRef}
-        className={componentClasses}
-        style={style}
-        onPointerDown={this.onComponentPointerDown}
-      >
-        <div ref={this.mediaWrapperRef} style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}>
-          {renderComponent || (
-            <img
-              ref={this.imageRef}
-              crossOrigin={crossorigin}
-              className="ReactCrop__image"
-              style={imageStyle}
-              src={src}
-              onLoad={this.onImageLoad}
-              onError={onImageError}
-              alt={imageAlt}
-            />
-          )}
+      <div ref={this.componentRef} className={componentClasses} style={style}>
+        <div className="ReactCrop__child-wrapper" onPointerDown={this.onComponentPointerDown}>
+          {children}
         </div>
-        {children}
         {cropSelection}
       </div>
     )

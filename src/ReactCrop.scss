@@ -42,7 +42,8 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     cursor: inherit;
   }
 
-  &__image {
+  &__child-wrapper > img,
+  &__child-wrapper > video {
     display: block;
     max-width: 100%;
     touch-action: none;
