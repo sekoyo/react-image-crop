@@ -50,7 +50,7 @@ export function makeAspectCrop(crop: Partial<Crop>, aspect: number, containerWid
   return pixelCrop
 }
 
-export function centerCrop(crop: Crop, containerWidth: number, containerHeight: number) {
+export function centerCrop(crop: Partial<Crop>, containerWidth: number, containerHeight: number) {
   const pixelCrop = convertToPixelCrop(crop, containerWidth, containerHeight)
 
   pixelCrop.x = (containerWidth - pixelCrop.width) / 2

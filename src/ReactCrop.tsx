@@ -152,7 +152,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     // rendered which is helpful for things like crop previews.
     if (onComplete && !prevProps.crop && crop) {
       const { box } = this
-      console.log({ box })
       onComplete(convertToPixelCrop(crop, box.width, box.height), convertToPercentCrop(crop, box.width, box.height))
     }
   }
