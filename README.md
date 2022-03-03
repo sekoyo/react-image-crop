@@ -192,68 +192,15 @@ Show the crop area as a circle. If your `aspect` is not `1` (a square) then the 
 
 ### How can I generate a crop preview in the browser?
 
-I wanted to keep this component focused so I didn't provide this. Normally a cropped image will be rendered and cached by a backend.
+This isn't part of the library but there is an example over here [CodeSandbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o).
 
-However here's a function that returns a image URL for the cropped part after providing some parameters you already have when using this package:
+Some things to note:
 
-```js
-/**
- * @param {HTMLImageElement} image - Image File Object
- * @param {Object} crop - crop Object
- */
-export function getCroppedImg(image, crop) {
-  const canvas = document.createElement("canvas");
-  const scaleX = image.naturalWidth / image.width;
-  const scaleY = image.naturalHeight / image.height;
-  const ctx = canvas.getContext("2d");
+- I haven't implemented `scale` and `rotate` to the crop preview yet.
 
-  const pixelRatio = window.devicePixelRatio || 1;
+- You can crop from an off-screen image if your image is sized down
 
-  canvas.width = crop.width * pixelRatio;
-  canvas.height = crop.height * pixelRatio;
-
-  ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-  ctx.imageSmoothingQuality = "high";
-
-  ctx.drawImage(
-    image,
-    crop.x * scaleX,
-    crop.y * scaleY,
-    crop.width * scaleX,
-    crop.height * scaleY,
-    0,
-    0,
-    crop.width,
-    crop.height
-  );
-
-  return new Promise(resolve => {
-    canvas.toBlob(blob => {
-        // fileUrlRef.current or whatever variable you use.
-        // The point is to release previous memory.
-        window.URL.revokeObjectURL(fileUrlRef.current)
-        fileUrlRef.current = window.URL.createObjectURL(blob)
-
-        resolve(fileUrlRef.current);
-      },
-      "image/jpeg",
-      1
-    );
-  });
-}
-
-async test() {
-  const croppedImg = await getCroppedImg(image, crop, fileName);
-}
-```
-
-For a more advanced example check out the [react hook demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o).
-
-Some things to consider:
-
-- Cropping from an off-screen image if your image is sized down
-
-- Scaling down during conversion to reduce upload size (e.g. from a phone camera)
+- You can scale down during conversion to reduce upload size (e.g. from a phone camera)
 
 ### How to correct image EXIF orientation/rotation?
 
