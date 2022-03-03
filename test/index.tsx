@@ -156,9 +156,9 @@ class App extends PureComponent<{}, AppState> {
         <div>
           <input type="file" onChange={this.onSelectFile} />
           <div>
-            <label htmlFor="scaleInput">Scale: </label>
+            <label htmlFor="scale-input">Scale: </label>
             <input
-              id="scaleInput"
+              id="scale-input"
               type="number"
               step="0.1"
               value={scale}
@@ -167,9 +167,9 @@ class App extends PureComponent<{}, AppState> {
             />
           </div>
           <div>
-            <label htmlFor="RotateInput">Rotate: </label>
+            <label htmlFor="rotate-input">Rotate: </label>
             <input
-              id="RotateInput"
+              id="rotate-input"
               type="number"
               value={rotate}
               disabled={!src}
@@ -206,7 +206,7 @@ class App extends PureComponent<{}, AppState> {
           <img
             alt="Crop preview"
             src={croppedImageUrl}
-            style={{ display: 'block', width: completedCrop.width, height: completedCrop.height }}
+            style={{ display: 'block', width: completedCrop?.width, height: completedCrop?.height }}
           />
         )}
       </div>
