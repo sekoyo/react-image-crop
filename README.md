@@ -315,14 +315,14 @@ function onImageLoad(e) {
     height
   )
 
-  this.setState({ crop })
+  setCrop(crop)
 }
 ```
 
 Also remember to set your crop using the percentCrop on changes:
 
 ```js
-const onCropChange = (crop, percentCrop) => this.setState({ crop: percentCrop })
+const onCropChange = (crop, percentCrop) => setCrop(percentCrop)
 ```
 
 ## Contributing / Developing
