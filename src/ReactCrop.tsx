@@ -2,7 +2,15 @@ import React, { PureComponent, createRef } from 'react'
 import clsx from 'clsx'
 
 import { Ords, XYOrds, Crop, PixelCrop, PercentCrop } from './types'
-import { defaultCrop, clamp, areCropsEqual, convertToPercentCrop, convertToPixelCrop, containCrop } from './utils'
+import {
+  defaultCrop,
+  clamp,
+  areCropsEqual,
+  convertToPercentCrop,
+  convertToPixelCrop,
+  containCrop,
+  throttle,
+} from './utils'
 
 import './ReactCrop.scss'
 
@@ -76,6 +84,12 @@ export interface ReactCropProps {
 export interface ReactCropState {
   cropIsActive: boolean
   newCropIsBeingDrawn: boolean
+  box: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
 }
 
 class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
@@ -117,41 +131,50 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   componentRef = createRef<HTMLDivElement>()
   resizeObserver?: ResizeObserver
-  box = {
-    width: 0,
-    height: 0,
-    x: 0,
-    y: 0,
-  }
+  initChangeCalled = false
 
   state: ReactCropState = {
     cropIsActive: false,
     newCropIsBeingDrawn: false,
+    box: {
+      width: 0,
+      height: 0,
+      x: 0,
+      y: 0,
+    },
   }
+
+  onResize = throttle((entries: ResizeObserverEntry[]) => {
+    const entry = entries[0]
+    // Unfortunately top/left/x/y is useless from entry.
+    const rect = entry.target.getBoundingClientRect()
+
+    const x = rect.left
+    const y = rect.top
+    const { width, height } = entry.contentRect
+
+    this.setState({ box: { x, y, width, height } })
+  }, 100)
 
   componentDidMount() {
     if (this.componentRef.current) {
-      this.resizeObserver = new ResizeObserver(([entry]) => {
-        this.box.width = entry.contentRect.width
-        this.box.height = entry.contentRect.height
-
-        // Unfortunately top/left/x/y is useless from entry.
-        const rect = entry.target.getBoundingClientRect()
-        this.box.x = rect.left
-        this.box.y = rect.top
-      })
-
+      this.resizeObserver = new ResizeObserver(this.onResize)
       this.resizeObserver.observe(this.componentRef.current)
     }
   }
 
-  componentDidUpdate(prevProps: ReactCropProps) {
+  componentDidUpdate() {
     const { crop, onComplete } = this.props
+    const { box } = this.state
+
+    if (!crop) {
+      this.initChangeCalled = false
+    }
 
     // Manually trigger a onComplete when a new crop is
     // rendered which is helpful for things like crop previews.
-    if (onComplete && !prevProps.crop && crop) {
-      const { box } = this
+    if (onComplete && !this.initChangeCalled && crop && box.width && box.height) {
+      this.initChangeCalled = true
       onComplete(convertToPixelCrop(crop, box.width, box.height), convertToPercentCrop(crop, box.width, box.height))
     }
   }
@@ -188,12 +211,12 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onCropPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const { crop, disabled } = this.props
+    const { box } = this.state
 
     if (!crop) {
       return
     }
 
-    const { box } = this
     const pixelCrop = convertToPixelCrop(crop, box.width, box.height)
 
     if (disabled) {
@@ -252,6 +275,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onComponentPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const { crop, disabled, locked, keepSelection, onChange } = this.props
+    const { box } = this.state
 
     if (disabled || locked || (keepSelection && crop)) {
       return
@@ -265,7 +289,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     // Focus for detecting keypress.
     ;(this.componentRef.current as HTMLDivElement).focus({ preventScroll: true })
 
-    const { box } = this
     const cropX = e.clientX - box.x
     const cropY = e.clientY - box.y
     const nextCrop: PixelCrop = {
@@ -295,6 +318,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onDocPointerMove = (e: PointerEvent) => {
     const { crop, disabled, onChange, onDragStart } = this.props
+    const { box } = this.state
 
     if (disabled || !crop || !this.mouseDownOnCrop) {
       return
@@ -324,7 +348,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
 
     if (!areCropsEqual(crop, nextCrop)) {
-      const { box } = this
       onChange(
         convertToPixelCrop(nextCrop, box.width, box.height),
         convertToPercentCrop(nextCrop, box.width, box.height)
@@ -334,6 +357,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onComponentKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const { crop, disabled, onChange, onComplete } = this.props
+    const { box } = this.state
 
     if (disabled) {
       return
@@ -376,7 +400,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     if (nudged) {
       if (e.cancelable) e.preventDefault() // Stop drag selection.
-      const { box } = this
 
       nextCrop.x = clamp(nextCrop.x, 0, box.width - nextCrop.width)
       nextCrop.y = clamp(nextCrop.y, 0, box.height - nextCrop.height)
@@ -406,7 +429,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       onChange,
       onComplete,
     } = this.props
-    const { box } = this
+    const { box } = this.state
 
     if (disabled || !crop) {
       return
@@ -554,6 +577,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onDocPointerDone = (e: PointerEvent) => {
     const { crop, disabled, onComplete, onDragEnd } = this.props
+    const { box } = this.state
 
     this.unbindDocMove()
 
@@ -564,8 +588,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     if (this.mouseDownOnCrop) {
       this.mouseDownOnCrop = false
       this.dragStarted = false
-
-      const { box } = this
 
       onDragEnd && onDragEnd(e)
       onComplete &&
@@ -591,8 +613,9 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   dragCrop() {
+    const { evData } = this
+    const { box } = this.state
     const nextCrop = this.makePixelCrop()
-    const { box, evData } = this
     const xDiff = evData.clientX - evData.startClientX
     const yDiff = evData.clientY - evData.startClientY
 
@@ -603,7 +626,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   getPointRegion(): XYOrds {
-    const { box, evData } = this
+    const { evData } = this
+    const { box } = this.state
     const relativeX = evData.clientX - box.x
     const relativeY = evData.clientY - box.y
     const topHalf = relativeY < evData.startCropY
@@ -617,8 +641,9 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   resizeCrop() {
-    const { box, evData } = this
+    const { evData } = this
     const { aspect = 0, minWidth = 0, minHeight = 0, maxWidth, maxHeight } = this.props
+    const { box } = this.state
     const area = this.getPointRegion()
     const nextCrop = this.makePixelCrop()
     const resolvedOrd: Ords = evData.ord ? evData.ord : area
@@ -814,13 +839,12 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   makePixelCrop() {
     const crop = { ...defaultCrop, ...(this.props.crop || {}) }
-    const { box } = this
+    const { box } = this.state
     return convertToPixelCrop(crop, box.width, box.height)
   }
 
   render() {
     const { aspect, children, circularCrop, className, crop, disabled, locked, style, ruleOfThirds } = this.props
-
     const { cropIsActive, newCropIsBeingDrawn } = this.state
     const cropSelection = crop && this.componentRef ? this.createCropSelection() : null
 

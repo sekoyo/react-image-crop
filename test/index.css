@@ -6,3 +6,7 @@ body {
 .App {
   margin: 100px;
 }
+
+img {
+  max-width: 100%;
+}

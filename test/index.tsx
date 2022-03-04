@@ -92,7 +92,6 @@ class App extends PureComponent<{}, AppState> {
       throw new Error('No 2d context')
     }
 
-    console.log(image.naturalWidth, image.width)
     const scaleX = image.naturalWidth / image.width
     const scaleY = image.naturalHeight / image.height
     const pixelRatio = window.devicePixelRatio || 1
