@@ -1,14 +1,16 @@
 import { PixelCrop } from '../src'
 
 const TO_RADIANS = Math.PI / 180
+let previewUrl = ''
 
-export async function cropPreview(
-  image: HTMLImageElement,
-  canvas: HTMLCanvasElement,
-  crop: PixelCrop,
-  scale = 1,
-  rotate = 0
-) {
+function toBlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
+  return new Promise(resolve => {
+    canvas.toBlob(resolve)
+  })
+}
+
+export async function cropPreview(image: HTMLImageElement, crop: PixelCrop, scale = 1, rotate = 0) {
+  const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
 
   if (!ctx) {
@@ -20,20 +22,18 @@ export async function cropPreview(
   // const pixelRatio = window.devicePixelRatio || 1
   const pixelRatio = 1
 
-  canvas.width = Math.floor(crop.width * pixelRatio * scaleX)
-  canvas.height = Math.floor(crop.height * pixelRatio * scaleY)
+  canvas.width = Math.floor(crop.width * scaleX * pixelRatio)
+  canvas.height = Math.floor(crop.height * scaleY * pixelRatio)
 
   ctx.scale(pixelRatio, pixelRatio)
   ctx.imageSmoothingQuality = 'high'
 
   const cropX = crop.x * scaleX
   const cropY = crop.y * scaleY
-  // const cropWidth = crop.width * scaleX
-  // const cropHeight = crop.height * scaleY
 
   const rotateRads = rotate * TO_RADIANS
-  const centerX = image.width / 2
-  const centerY = image.height / 2
+  const centerX = image.naturalWidth / 2
+  const centerY = image.naturalHeight / 2
 
   ctx.save()
 
@@ -47,7 +47,24 @@ export async function cropPreview(
   ctx.scale(scale, scale)
   // 1) Move the center of the image to the origin (0,0)
   ctx.translate(-centerX, -centerY)
-  ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, image.width, image.height)
+  ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, image.naturalWidth, image.naturalHeight)
 
   ctx.restore()
+
+  // It's quicker to render out the canvas but the image resizes
+  // nicely to aspect (might be poss with CSS aspect-ratio)
+  // and is easily downloaded if desired.
+  if (previewUrl) {
+    URL.revokeObjectURL(previewUrl)
+  }
+
+  const blob = await toBlob(canvas)
+
+  if (!blob) {
+    previewUrl = ''
+    return ''
+  }
+
+  previewUrl = URL.createObjectURL(blob)
+  return previewUrl
 }

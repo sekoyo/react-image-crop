@@ -2,13 +2,14 @@ import ReactDOM from 'react-dom'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from '../src'
 import { cropPreview } from './cropPreview'
+import { debounce } from './debounce'
 
 import '../src/ReactCrop.scss'
 
 function App() {
   const [imgSrc, setImgSrc] = useState('')
+  const [previewSrc, setPreviewSrc] = useState('')
   const imgRef = useRef<HTMLImageElement | null>(null)
-  const previewCanvasRef = useRef(null)
   const [crop, setCrop] = useState<Crop>()
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
   const [scale, setScale] = useState(1)
@@ -24,8 +25,11 @@ function App() {
   }
 
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
-    imgRef.current = e.currentTarget
+    if (!e.currentTarget) {
+      return
+    }
 
+    imgRef.current = e.currentTarget
     const { width, height } = e.currentTarget
 
     // This is to demonstate how to make and center a % aspect crop
@@ -47,11 +51,16 @@ function App() {
     setCrop(crop)
   }
 
-  const updateCropPreview = useCallback(() => {
-    if (completedCrop && previewCanvasRef.current && imgRef.current) {
-      cropPreview(imgRef.current, previewCanvasRef.current, completedCrop, scale, rotate)
-    }
-  }, [completedCrop, scale, rotate])
+  const updateCropPreview = React.useMemo(
+    () =>
+      debounce(async () => {
+        if (completedCrop?.width && completedCrop?.height && imgRef.current) {
+          const previewSrc = await cropPreview(imgRef.current, completedCrop, scale, rotate)
+          setPreviewSrc(previewSrc)
+        }
+      }, 100),
+    [completedCrop, scale, rotate]
+  )
 
   useEffect(() => {
     updateCropPreview()
@@ -98,17 +107,18 @@ function App() {
           />
         </ReactCrop>
       )}
-      <div>
-        <canvas
-          ref={previewCanvasRef}
-          style={{
-            border: '1px solid black',
-            // Rounding is important for sharpness.
-            width: Math.floor(completedCrop?.width ?? 0),
-            height: Math.floor(completedCrop?.height ?? 0),
-          }}
-        />
-      </div>
+      {Boolean(previewSrc && completedCrop) && (
+        <div>
+          <img
+            src={previewSrc}
+            style={{
+              border: '1px solid black',
+              maxWidth: `min(100%, ${completedCrop?.width || 0}px)`,
+            }}
+            alt="Crop preview"
+          />
+        </div>
+      )}
     </div>
   )
 }

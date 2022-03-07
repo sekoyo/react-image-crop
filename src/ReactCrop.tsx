@@ -2,15 +2,7 @@ import React, { PureComponent, createRef } from 'react'
 import clsx from 'clsx'
 
 import { Ords, XYOrds, Crop, PixelCrop, PercentCrop } from './types'
-import {
-  defaultCrop,
-  clamp,
-  areCropsEqual,
-  convertToPercentCrop,
-  convertToPixelCrop,
-  containCrop,
-  throttle,
-} from './utils'
+import { defaultCrop, clamp, areCropsEqual, convertToPercentCrop, convertToPixelCrop, containCrop } from './utils'
 
 import './ReactCrop.scss'
 
@@ -91,7 +83,6 @@ export interface ReactCropProps {
 export interface ReactCropState {
   cropIsActive: boolean
   newCropIsBeingDrawn: boolean
-  hasDimensions: boolean
 }
 
 class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
@@ -139,14 +130,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   state: ReactCropState = {
     cropIsActive: false,
     newCropIsBeingDrawn: false,
-    hasDimensions: false,
   }
-
-  onResize = throttle((entries: ResizeObserverEntry[]) => {
-    const entry = entries[0]
-    const { width, height } = entry.contentRect
-    this.setState({ hasDimensions: Boolean(width && height) })
-  }, 100)
 
   // We unfortunately get the bounding box every time as x+y changes
   // due to scrolling.
@@ -159,25 +143,14 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     return { x, y, width, height }
   }
 
-  componentDidMount() {
-    if (this.mediaRef.current) {
-      this.resizeObserver = new ResizeObserver(this.onResize)
-      this.resizeObserver.observe(this.mediaRef.current)
-    }
-  }
-
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: ReactCropProps) {
     const { crop, onComplete } = this.props
 
-    // Manually trigger a onComplete for crop previews. Bit of
-    // an awkward race condition between media getting width +
-    // height and crop being set by user so this also get's called
-    // by the resize observer. Is there are better way to do this
-    // other than the user manually telling us when the crop is ready?
-    if (onComplete && !this.initChangeCalled && crop) {
+    // Useful for when programatically setting a new
+    // crop and wanting to show a preview.
+    if (onComplete && !prevProps.crop && crop) {
       const { width, height } = this.getBox()
       if (width && height) {
-        this.initChangeCalled = true
         onComplete(convertToPixelCrop(crop, width, height), convertToPercentCrop(crop, width, height))
       }
     }
