@@ -77,7 +77,7 @@ function CropDemo({ src }) {
 }
 ```
 
-See the [sandbox demo](https://codesandbox.io/s/72py4jlll6) for a more complete example.
+See the [sandbox demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o) for a more complete example.
 
 ## CDN
 
