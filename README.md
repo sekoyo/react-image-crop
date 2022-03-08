@@ -93,11 +93,8 @@ A callback which happens for every change of the crop (i.e. many times as you ar
 
 Note you _must_ implement this callback and update your crop state, otherwise nothing will change!
 
-```js
-onChange = (crop, percentCrop) => {
-  this.setState({ crop })
-  // or this.setState({ crop: percentCrop })
-}
+```tsx
+<ReactCrop crop={crop} onChange={(crop, percentCrop) => setCrop(crop)} />
 ```
 
 `crop` and `percentCrop` are interchangeable. `crop` uses pixels and `percentCrop` uses percentages to position and size itself. Percent crops are resistant to image/media resizing.
