@@ -258,6 +258,8 @@ function onImageLoad(e) {
   const crop = centerCrop(
     makeAspectCrop(
       {
+        // You don't need to pass a complete crop into
+        // makeAspectCrop or centerCrop.
         unit: '%',
         width: 90,
       },
