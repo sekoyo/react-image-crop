@@ -259,7 +259,7 @@ function onImageLoad(e) {
     makeAspectCrop(
       {
         unit: '%',
-        width: 100,
+        width: 90,
       },
       16 / 9,
       width,
