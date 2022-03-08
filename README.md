@@ -1,3 +1,5 @@
+This documentation refers to v10. Go to [9.1.1 tag](https://github.com/DominicTobias/react-image-crop/tree/9.1.1) for v9 docs.
+
 # React Image Crop
 
 An image cropping tool for React with no dependencies.
@@ -101,23 +103,31 @@ Note you _must_ implement this callback and update your crop state, otherwise no
 
 #### crop
 
-\* _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` and passed into the component._
+Starting with no crop:
+
+```tsx
+const [crop, setCrop] = useState<Crop>()
+
+<ReactCrop crop={crop} onChange={c => setCrop(c)} />
+```
+
+Starting with a preselected crop:
 
 ```tsx
 const [crop, setCrop] = useState<Crop>({
-  unit: 'px', // default, can be 'px' or '%'
-  x: 130,
-  y: 50,
-  width: 200,
-  height: 200
+  unit: '%', // Can be 'px' or '%'
+  x: 25,
+  y: 25,
+  width: 50,
+  height: 50
 })
 
 <ReactCrop crop={crop} onChange={c => setCrop(c)} />
 ```
 
-Crops that you set are not corrected so you must ensure that they are in bounds (easy with percentage crops) and adhere to your aspect ratio if set (harder with percentage crops).
+You must ensure the crop is in bounds, percentage crops make that easier.
 
-Since percentage crops with fixed aspect ratios are tricky you can use the helper method `makeAspectCrop`. See [How can I center the crop?](#how-can-i-center-the-crop) for an example.
+It's common to wait until the image has loaded to set the crop so the dimensions are known. This makes % aspect crops possible. See [How can I center the crop?](#how-can-i-center-the-crop).
 
 #### aspect
 
