@@ -87,7 +87,7 @@ Note when importing the script globally using a `<script>` tag access the compon
 
 ## Props
 
-#### 🎚 onChange(crop, percentCrop) **(required)**
+#### onChange(crop, percentCrop) **(required)**
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
 
@@ -102,7 +102,7 @@ onChange = (crop, percentCrop) => {
 
 `crop` and `percentCrop` are interchangeable. `crop` uses pixels and `percentCrop` uses percentages to position and size itself. Percent crops are resistant to image/media resizing.
 
-#### 🎚 crop
+#### crop
 
 \* _While you can initially omit the crop object, any subsequent change will need to be saved to state in the `onChange` and passed into the component._
 
@@ -122,69 +122,69 @@ Crops that you set are not corrected so you must ensure that they are in bounds 
 
 Since percentage crops with fixed aspect ratios are tricky you can use the helper method `makeAspectCrop`. See [How can I center the crop?](#how-can-i-center-the-crop) for an example.
 
-#### 🎚 aspect
+#### aspect
 
 The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape.
 
-#### 🎚 minWidth
+#### minWidth
 
 A minimum crop width, in pixels.
 
-#### 🎚 minHeight
+#### minHeight
 
 A minimum crop height, in pixels.
 
-#### 🎚 maxWidth
+#### maxWidth
 
 A maximum crop width, in pixels.
 
-#### 🎚 maxHeight
+#### maxHeight
 
 A maximum crop height, in pixels.
 
-#### 🎚 keepSelection
+#### keepSelection
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.
 
-#### 🎚 disabled
+#### disabled
 
 If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-#### 🎚 locked
+#### locked
 
 If true then the user cannot create or resize a crop, but can still drag the existing crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
 
-#### 🎚 className
+#### className
 
 A string of classes to add to the main `ReactCrop` element.
 
-#### 🎚 style
+#### style
 
 Inline styles object to be passed to the image wrapper element.
 
-#### 🎚 onComplete(crop, percentCrop)
+#### onComplete(crop, percentCrop)
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
 
 `percentCrop` is the crop as a percentage. A typical use case for it would be to save it so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image is smaller).
 
-#### 🎚 onDragStart(event)
+#### onDragStart(event)
 
 A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
 
-#### 🎚 onDragEnd(event)
+#### onDragEnd(event)
 
 A callback which happens when a user releases the cursor or touch after dragging or resizing.
 
-#### 🎚 renderSelectionAddon(state)
+#### renderSelectionAddon(state)
 
 Render a custom element inside crop the selection.
 
-#### 🎚 ruleOfThirds
+#### ruleOfThirds
 
 Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the cropped area. Defaults to `false`.
 
-#### 🎚 circularCrop
+#### circularCrop
 
 Show the crop area as a circle. If your `aspect` is not `1` (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
