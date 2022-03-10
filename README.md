@@ -201,6 +201,37 @@ Show the crop area as a circle. If your `aspect` is not `1` (a square) then the 
 
 This isn't part of the library but there is an example over here [CodeSandbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o).
 
+Cropping an image using percentCrop:
+
+```js
+function cropImage({
+  // the image
+  image,
+  
+  // the height and width the resulting image
+  height,
+  width,
+  
+  // options for canvas.toDataURL
+  type,
+  encoderOptions,
+  
+  // the second argument passed to the onComplete callback
+  percentCrop,
+}){
+  const sx = image.naturalWidth * (percentCrop.x / 100)
+  const sy = image.naturalHeight * (percentCrop.y / 100)
+  const sWidth = image.naturalWidth * (percentCrop.width / 100)
+  const sHeight = image.naturalHeight * (percentCrop.height / 100)
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(image, sx, sy, sWidth, sHeight, 0, 0, width, height)
+  return canvas.toDataURL(type, encoderOptions)
+}
+```
+
 Some things to note:
 
 - I haven't implemented `scale` and `rotate` to the crop preview yet.
