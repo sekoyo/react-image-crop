@@ -203,8 +203,6 @@ This isn't part of the library but there is an example over here [CodeSandbox De
 
 Some things to note:
 
-- I haven't implemented `scale` and `rotate` to the crop preview yet.
-
 - You can crop from an off-screen image if your image is sized down
 
 - You can scale down during conversion to reduce upload size (e.g. from a phone camera)
