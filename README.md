@@ -201,12 +201,6 @@ Show the crop area as a circle. If your `aspect` is not `1` (a square) then the 
 
 This isn't part of the library but there is an example over here [CodeSandbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o).
 
-Some things to note:
-
-- You can crop from an off-screen image if your image is sized down
-
-- You can scale down during conversion to reduce upload size (e.g. from a phone camera)
-
 ### How to correct image EXIF orientation/rotation?
 
 You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
