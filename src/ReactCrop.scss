@@ -42,11 +42,16 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     cursor: inherit;
   }
 
-  &__child-wrapper > img,
-  &__child-wrapper > video {
-    display: block;
-    max-width: 100%;
-    touch-action: none;
+  &__child-wrapper {
+    max-height: inherit;
+
+    & > img,
+    & > video {
+      display: block;
+      max-width: 100%;
+      max-height: inherit;
+      touch-action: none;
+    }
   }
 
   &__crop-selection {

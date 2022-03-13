@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from '../src'
 import { cropPreview } from './cropPreview'
-import { debounce } from './debounce'
+import { useDebounceEffect } from './useDebounceEffect'
 
 import '../src/ReactCrop.scss'
 
@@ -51,20 +51,16 @@ function App() {
     setCrop(crop)
   }
 
-  const updateCropPreview = React.useMemo(
-    () =>
-      debounce(async () => {
-        if (completedCrop?.width && completedCrop?.height && imgRef.current) {
-          const previewSrc = await cropPreview(imgRef.current, completedCrop, scale, rotate)
-          setPreviewSrc(previewSrc)
-        }
-      }, 100),
+  useDebounceEffect(
+    async () => {
+      if (completedCrop?.width && completedCrop?.height && imgRef.current) {
+        // We use canvasPreview as it's much faster than imgPreview.
+        cropPreview(imgRef.current, completedCrop, scale, rotate)
+      }
+    },
+    100,
     [completedCrop, scale, rotate]
   )
-
-  useEffect(() => {
-    updateCropPreview()
-  }, [updateCropPreview])
 
   return (
     <div className="App">
