@@ -8,7 +8,7 @@ An image cropping tool for React with no dependencies.
 
 [CodeSanbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
 
-![ReactCrop Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
+![ReactCrop GIF](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
 
 ## Table of Contents
 
@@ -125,9 +125,7 @@ const [crop, setCrop] = useState<Crop>({
 <ReactCrop crop={crop} onChange={c => setCrop(c)} />
 ```
 
-You must ensure the crop is in bounds, percentage crops make that easier.
-
-It's common to wait until the image has loaded to set the crop so the dimensions are known. This makes % aspect crops possible. See [How can I center the crop?](#how-can-i-center-the-crop).
+⚠️ You must ensure the crop is in bounds and correct to the aspect ratio if manually setting. Aspect ratios can be tricky when using %. You can make use of `centerCrop` and `makeAspectCrop` helpers.  See [How can I center the crop?](#how-can-i-center-the-crop) or the [CodeSanbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o) for examples.
 
 #### aspect
 
