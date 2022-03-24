@@ -129,7 +129,7 @@ const [crop, setCrop] = useState<Crop>({
 
 #### aspect
 
-The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape.
+The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape. Omit/pass undefined for a free-form crop.
 
 #### minWidth
 
