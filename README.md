@@ -189,7 +189,7 @@ Render a custom element inside crop the selection.
 
 Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the cropped area. Defaults to `false`.
 
-**`circularCrop: boolean`**
+**`circularCrop?: boolean`**
 
 Show the crop area as a circle. If your `aspect` is not `1` (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
