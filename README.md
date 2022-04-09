@@ -89,7 +89,7 @@ Note when importing the script globally using a `<script>` tag access the compon
 
 ## Props
 
-#### onChange(crop, percentCrop) **(required)**
+**`onChange: (crop: PixelCrop, percentCrop: PercentCrop) => void`**
 
 A callback which happens for every change of the crop (i.e. many times as you are dragging/resizing). Passes the current crop state object.
 
@@ -101,7 +101,7 @@ Note you _must_ implement this callback and update your crop state, otherwise no
 
 `crop` and `percentCrop` are interchangeable. `crop` uses pixels and `percentCrop` uses percentages to position and size itself. Percent crops are resistant to image/media resizing.
 
-#### crop
+**`crop?: Crop`**
 
 Starting with no crop:
 
@@ -125,71 +125,71 @@ const [crop, setCrop] = useState<Crop>({
 <ReactCrop crop={crop} onChange={c => setCrop(c)} />
 ```
 
-⚠️ You must ensure the crop is in bounds and correct to the aspect ratio if manually setting. Aspect ratios can be tricky when using %. You can make use of `centerCrop` and `makeAspectCrop` helpers.  See [How can I center the crop?](#how-can-i-center-the-crop) or the [CodeSanbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o) for examples.
+⚠️ You must ensure the crop is in bounds and correct to the aspect ratio if manually setting. Aspect ratios can be tricky when using %. You can make use of `centerCrop` and `makeAspectCrop` helpers. See [How can I center the crop?](#how-can-i-center-the-crop) or the [CodeSanbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o) for examples.
 
-#### aspect
+**`aspect?: number`**
 
 The aspect ratio of the crop, e.g. `1` for a square or `16 / 9` for landscape. Omit/pass undefined for a free-form crop.
 
-#### minWidth
+**`minWidth?: number`**
 
 A minimum crop width, in pixels.
 
-#### minHeight
+**`minHeight?: number`**
 
 A minimum crop height, in pixels.
 
-#### maxWidth
+**`maxWidth?: number`**
 
 A maximum crop width, in pixels.
 
-#### maxHeight
+**`maxHeight?: number`**
 
 A maximum crop height, in pixels.
 
-#### keepSelection
+**`keepSelection?: booleam`**
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.
 
-#### disabled
+**`disabled?: booleam`**
 
 If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-#### locked
+**`locked?: booleam`**
 
 If true then the user cannot create or resize a crop, but can still drag the existing crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
 
-#### className
+**`className?: string`**
 
 A string of classes to add to the main `ReactCrop` element.
 
-#### style
+**`style?: React.CSSProperties`**
 
 Inline styles object to be passed to the image wrapper element.
 
-#### onComplete(crop, percentCrop)
+**`onComplete?: (crop: PixelCrop, percentCrop: PercentCrop) => void`**
 
 A callback which happens after a resize, drag, or nudge. Passes the current crop state object.
 
 `percentCrop` is the crop as a percentage. A typical use case for it would be to save it so that the user's crop can be restored regardless of the size of the image (for example saving it on desktop, and then using it on a mobile where the image is smaller).
 
-#### onDragStart(event)
+**`onDragStart?: (e: PointerEvent) => void`**
 
 A callback which happens when a user starts dragging or resizing. It is convenient to manipulate elements outside this component.
 
-#### onDragEnd(event)
+**`onDragEnd?: (e: PointerEvent) => void`**
 
 A callback which happens when a user releases the cursor or touch after dragging or resizing.
 
-#### renderSelectionAddon(state)
+**`renderSelectionAddon?: (state: ReactCropState) => React.ReactNode`**
 
 Render a custom element inside crop the selection.
 
-#### ruleOfThirds
+**`ruleOfThirds?: boolean`**
 
 Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the cropped area. Defaults to `false`.
 
-#### circularCrop
+**`circularCrop: boolean`**
 
 Show the crop area as a circle. If your `aspect` is not `1` (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
