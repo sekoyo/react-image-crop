@@ -108,7 +108,9 @@ Starting with no crop:
 ```tsx
 const [crop, setCrop] = useState<Crop>()
 
-<ReactCrop crop={crop} onChange={c => setCrop(c)} />
+<ReactCrop crop={crop} onChange={c => setCrop(c)}>
+  <img src={src} />
+</ReactCrop>
 ```
 
 Starting with a preselected crop:
@@ -122,7 +124,9 @@ const [crop, setCrop] = useState<Crop>({
   height: 50
 })
 
-<ReactCrop crop={crop} onChange={c => setCrop(c)} />
+<ReactCrop crop={crop} onChange={c => setCrop(c)}>
+  <img src={src} />
+</ReactCrop>
 ```
 
 ⚠️ You must ensure the crop is in bounds and correct to the aspect ratio if manually setting. Aspect ratios can be tricky when using %. You can make use of `centerCrop` and `makeAspectCrop` helpers. See [How can I center the crop?](#how-can-i-center-the-crop) or the [CodeSanbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o) for examples.
