@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef } from 'react'
 import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from '../src'
 import { cropPreview } from './cropPreview'
 import { useDebounceEffect } from './useDebounceEffect'

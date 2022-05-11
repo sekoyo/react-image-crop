@@ -108,6 +108,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     },
   }
 
+  document = document
   keysDown = new Set<string>()
   docMoveBound = false
   mouseDownOnCrop = false
@@ -167,9 +168,9 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return
     }
 
-    document.addEventListener('pointermove', this.onDocPointerMove, DOC_MOVE_OPTS)
-    document.addEventListener('pointerup', this.onDocPointerDone, DOC_MOVE_OPTS)
-    document.addEventListener('pointercancel', this.onDocPointerDone, DOC_MOVE_OPTS)
+    this.document.addEventListener('pointermove', this.onDocPointerMove, DOC_MOVE_OPTS)
+    this.document.addEventListener('pointerup', this.onDocPointerDone, DOC_MOVE_OPTS)
+    this.document.addEventListener('pointercancel', this.onDocPointerDone, DOC_MOVE_OPTS)
 
     this.docMoveBound = true
   }
@@ -179,9 +180,9 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return
     }
 
-    document.removeEventListener('pointermove', this.onDocPointerMove, DOC_MOVE_OPTS)
-    document.removeEventListener('pointerup', this.onDocPointerDone, DOC_MOVE_OPTS)
-    document.removeEventListener('pointercancel', this.onDocPointerDone, DOC_MOVE_OPTS)
+    this.document.removeEventListener('pointermove', this.onDocPointerMove, DOC_MOVE_OPTS)
+    this.document.removeEventListener('pointerup', this.onDocPointerDone, DOC_MOVE_OPTS)
+    this.document.removeEventListener('pointercancel', this.onDocPointerDone, DOC_MOVE_OPTS)
 
     this.docMoveBound = false
   }
