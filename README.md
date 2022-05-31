@@ -247,7 +247,7 @@ Centering an aspect ratio crop is trickier especially when dealing with `%`. How
 
 ```js
 function onImageLoad(e) {
-  const { width, height } = e.currentTarget
+  const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
 
   const crop = centerCrop(
     makeAspectCrop(
