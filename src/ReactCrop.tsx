@@ -108,7 +108,10 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     },
   }
 
-  document = document
+  get document() {
+    return document
+  }
+
   keysDown = new Set<string>()
   docMoveBound = false
   mouseDownOnCrop = false
