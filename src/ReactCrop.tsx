@@ -578,6 +578,13 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
+  onDragFocus = (e: React.FocusEvent<HTMLDivElement, Element>) => {
+    // Fixes #491
+    if (this.componentRef.current?.scrollTop) {
+      this.componentRef.current.scrollTop = 0
+    }
+  }
+
   getCropStyle() {
     const { crop } = this.props
 
@@ -738,7 +745,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         onKeyUp={this.onComponentKeyUp}
       >
         {!disabled && !locked && (
-          <div className="ReactCrop__drag-elements">
+          <div className="ReactCrop__drag-elements" onFocus={this.onDragFocus}>
             <div className="ReactCrop__drag-bar ord-n" data-ord="n" />
             <div className="ReactCrop__drag-bar ord-e" data-ord="e" />
             <div className="ReactCrop__drag-bar ord-s" data-ord="s" />
