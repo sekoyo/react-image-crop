@@ -151,15 +151,15 @@ A maximum crop width, in pixels.
 
 A maximum crop height, in pixels.
 
-**`keepSelection?: booleam`**
+**`keepSelection?: boolean`**
 
 If true is passed then selection can't be disabled if the user clicks outside the selection area.
 
-**`disabled?: booleam`**
+**`disabled?: boolean`**
 
 If true then the user cannot resize or draw a new crop. A class of `ReactCrop--disabled` is also added to the container for user styling.
 
-**`locked?: booleam`**
+**`locked?: boolean`**
 
 If true then the user cannot create or resize a crop, but can still drag the existing crop around. A class of `ReactCrop--locked` is also added to the container for user styling.
 
