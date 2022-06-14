@@ -580,8 +580,8 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onDragFocus = (e: React.FocusEvent<HTMLDivElement, Element>) => {
     // Fixes #491
-    if (this.componentRef.current?.scrollTop) {
-      this.componentRef.current.scrollTop = 0
+    if (this.componentRef.current) {
+      this.componentRef.current.scrollTo(0, 0)
     }
   }
 
