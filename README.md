@@ -1,14 +1,6 @@
-This documentation refers to v10. Go to [9.1.1 tag](https://github.com/DominicTobias/react-image-crop/tree/9.1.1) for v9 docs.
+# React Annotated Image
 
-# React Image Crop
-
-An image cropping tool for React with no dependencies.
-
-[![React Image Crop on NPM](https://img.shields.io/npm/v/react-image-crop.svg)](https://www.npmjs.com/package/react-image-crop)
-
-[CodeSanbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o)
-
-![ReactCrop GIF](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/crop-demo.gif)
+An image component that supports drawing annotations 
 
 ## Table of Contents
 
@@ -27,23 +19,17 @@ An image cropping tool for React with no dependencies.
 
 ## Features
 
-- Responsive (you can use pixels or percentages).
-- Touch enabled.
-- Free-form or fixed aspect crops.
-- Fully keyboard accessible (a11y).
-- No dependencies/small footprint (5KB gzip).
-- Min/max crop size.
-- Crop anything, not just images.
-
-If React Crop doesn't cover your requirements then take a look at [Pintura](https://gumroad.com/a/611955827). It features cropping, rotating, filtering, annotation, and lots more.
-
-[Learn more about Pintura here](https://gumroad.com/a/611955827)
+- Controlled component 
+- Draw rectangles 
+- Draw lines 
+- Create, select, edit and delete objects 
+- Hotkey support 
 
 ## Installation
 
 ```
-npm i react-image-crop --save
-yarn add react-image-crop
+npm i react-annotated-image --save
+yarn add react-annotated-image
 ```
 
 This library works with all modern browsers. It does not work with IE.
@@ -53,39 +39,19 @@ This library works with all modern browsers. It does not work with IE.
 Include the main js module:
 
 ```js
-import ReactCrop from 'react-image-crop'
-```
-
-Include either `dist/ReactCrop.css` or `ReactCrop.scss`.
-
-```js
-import 'react-image-crop/dist/ReactCrop.css'
-// or scss:
-import 'react-image-crop/src/ReactCrop.scss'
+import AnnotatedImage from 'react-annotated-image'
 ```
 
 ## Example
 
 ```tsx
-function CropDemo({ src }) {
-  const [crop, setCrop] = useState<Crop>()
+function Demo({ src }) {
+  const [zoom, setZoom] = useState<Zoom>()
   return (
-    <ReactCrop crop={crop} onChange={c => setCrop(c)}>
-      <img src={src} />
-    </ReactCrop>
+    <AnnotatedImage src={src} zoom={zoom} setZoom={setZoom} />
   )
 }
 ```
-
-See the [sandbox demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o) for a more complete example.
-
-## CDN
-
-```html
-<script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
-```
-
-Note when importing the script globally using a `<script>` tag access the component with `ReactCrop.Component`.
 
 ## Props
 
@@ -197,83 +163,6 @@ Show [rule of thirds](https://en.wikipedia.org/wiki/Rule_of_thirds) lines in the
 
 Show the crop area as a circle. If your `aspect` is not `1` (a square) then the circle will be warped into an oval shape. Defaults to `false`.
 
-## FAQ
-
-### How can I generate a crop preview in the browser?
-
-This isn't part of the library but there is an example over here [CodeSandbox Demo](https://codesandbox.io/s/react-image-crop-demo-with-react-hooks-y831o).
-
-### How to correct image EXIF orientation/rotation?
-
-You might find that some images are rotated incorrectly. Unfortunately this is a browser wide issue not related to this library. You need to fix your image before passing it in.
-
-You can use the following library to load images, which will correct the rotation for you: https://github.com/blueimp/JavaScript-Load-Image/
-
-You can read an issue on this subject here: https://github.com/DominicTobias/react-image-crop/issues/181
-
-If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Pintura](https://gumroad.com/a/611955827).
-
-<h3>How to filter, rotate and annotate?</h3>
-
-This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then consider using [Pintura](https://gumroad.com/a/611955827).
-
-![Pintura Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/doka-demo.gif)
-
-### How can I center the crop?
-
-The easiest way is to use the percentage unit:
-
-```js
-crop: {
-  unit: '%',
-  width: 50,
-  height: 50,
-  x: 25,
-  y: 25
-}
-```
-
-Centering an aspect ratio crop is trickier especially when dealing with `%`. However two helper functions are provided:
-
-1. Listen to the load event of your media to get its size:
-
-```jsx
-<ReactCrop crop={crop} aspect={16 / 9}>
-  <img src={src} onLoad={onImageLoad} />
-</ReactCrop>
-```
-
-2. Use `makeAspectCrop` to create your desired aspect and then `centerCrop` to center it:
-
-```js
-function onImageLoad(e) {
-  const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
-
-  const crop = centerCrop(
-    makeAspectCrop(
-      {
-        // You don't need to pass a complete crop into
-        // makeAspectCrop or centerCrop.
-        unit: '%',
-        width: 90,
-      },
-      16 / 9,
-      width,
-      height
-    ),
-    width,
-    height
-  )
-
-  setCrop(crop)
-}
-```
-
-Also remember to set your crop using the percentCrop on changes:
-
-```js
-const onCropChange = (crop, percentCrop) => setCrop(percentCrop)
-```
 
 ## Contributing / Developing
 
