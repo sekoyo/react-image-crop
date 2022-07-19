@@ -1,11 +1,10 @@
 {
-  "name": "react-image-crop",
-  "version": "10.0.4",
-  "description": "A responsive image cropping tool for React",
-  "repository": "https://github.com/DominicTobias/react-image-crop",
-  "main": "dist/ReactCrop.min.js",
+  "name": "react-annotated-image",
+  "version": "0.0.1",
+  "description": "React component for annotated images",
+  "repository": "https://github.com/brmscheiner/react-annotated-image",
+  "main": "dist/AnnotatedImage.min.js",
   "types": "dist/index.d.ts",
-  "style": "dist/ReactCrop.css",
   "files": [
     "dist",
     "src"
@@ -17,12 +16,14 @@
     "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Dominic Tobias (https://github.com/DominicTobias/)",
+  "author": "Ben Scheiner",
   "keywords": [
     "react",
     "reactjs",
     "image",
-    "crop",
+    "annotation",
+    "label",
+    "drawing",
     "react-component"
   ],
   "license": "ISC",
