@@ -8,13 +8,7 @@ An image component that supports drawing annotations
 2. [Installation](#installation)
 3. [Usage](#usage)
 4. [Example](#example)
-5. [CDN](#cdn)
 6. [Props](#props)
-7. [FAQ](#faq)
-   1. [How can I generate a crop preview in the browser?](#how-can-i-generate-a-crop-preview-in-the-browser)
-   2. [How to correct image EXIF orientation/rotation?](#how-to-correct-image-exif-orientationrotation)
-   3. [How to filter, rotate and annotate?](#how-to-filter-rotate-and-annotate)
-   4. [How can I center the crop?](#how-can-i-center-the-crop)
 8. [Contributing / Developing](#contributing--developing)
 
 ## Features

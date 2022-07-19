@@ -5,6 +5,7 @@
   "repository": "https://github.com/brmscheiner/react-annotated-image",
   "main": "dist/AnnotatedImage.min.js",
   "types": "dist/index.d.ts",
+  "style": "dist/ReactCrop.css",
   "files": [
     "dist",
     "src"
