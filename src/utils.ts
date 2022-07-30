@@ -218,3 +218,107 @@ export function containCrop(
 
   return containedCrop
 }
+
+export function nudgeCrop(pixelCrop: PixelCrop, key: string, offset: number, ord: Ords) {
+  const nextCrop = { ...pixelCrop }
+
+  if (key === 'ArrowLeft') {
+    if (ord === 'nw') {
+      nextCrop.x -= offset
+      nextCrop.y -= offset
+      nextCrop.width += offset
+      nextCrop.height += offset
+    } else if (ord === 'w') {
+      nextCrop.x -= offset
+      nextCrop.width += offset
+    } else if (ord === 'sw') {
+      nextCrop.x -= offset
+      nextCrop.width += offset
+      nextCrop.height += offset
+    } else if (ord === 'ne') {
+      nextCrop.y += offset
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    } else if (ord === 'e') {
+      nextCrop.width -= offset
+    } else if (ord === 'se') {
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    }
+  } else if (key === 'ArrowRight') {
+    if (ord === 'nw') {
+      nextCrop.x += offset
+      nextCrop.y += offset
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    } else if (ord === 'w') {
+      // Niche: Will move right if minWidth hit.
+      nextCrop.x += offset
+      nextCrop.width -= offset
+    } else if (ord === 'sw') {
+      nextCrop.x += offset
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    } else if (ord === 'ne') {
+      nextCrop.y -= offset
+      nextCrop.width += offset
+      nextCrop.height += offset
+    } else if (ord === 'e') {
+      nextCrop.width += offset
+    } else if (ord === 'se') {
+      nextCrop.width += offset
+      nextCrop.height += offset
+    }
+  }
+
+  if (key === 'ArrowUp') {
+    if (ord === 'nw') {
+      nextCrop.x -= offset
+      nextCrop.y -= offset
+      nextCrop.width += offset
+      nextCrop.height += offset
+    } else if (ord === 'n') {
+      nextCrop.y -= offset
+      nextCrop.height += offset
+    } else if (ord === 'ne') {
+      nextCrop.y -= offset
+      nextCrop.width += offset
+      nextCrop.height += offset
+    } else if (ord === 'sw') {
+      nextCrop.x += offset
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    } else if (ord === 's') {
+      nextCrop.height -= offset
+    } else if (ord === 'se') {
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    }
+  } else if (key === 'ArrowDown') {
+    if (ord === 'nw') {
+      nextCrop.x += offset
+      nextCrop.y += offset
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    } else if (ord === 'n') {
+      // Niche: Will move down if minHeight hit.
+      nextCrop.y += offset
+      nextCrop.height -= offset
+    } else if (ord === 'ne') {
+      nextCrop.y += offset
+      nextCrop.width -= offset
+      nextCrop.height -= offset
+    } else if (ord === 'sw') {
+      nextCrop.x -= offset
+      nextCrop.width += offset
+      nextCrop.height += offset
+    } else if (ord === 's') {
+      nextCrop.height += offset
+    } else if (ord === 'se') {
+      nextCrop.width += offset
+      nextCrop.height += offset
+    }
+  }
+
+  return nextCrop
+}

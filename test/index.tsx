@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import React, { useState, useRef } from 'react'
 import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from '../src'
 import { cropPreview } from './cropPreview'
@@ -119,4 +119,5 @@ function App() {
   )
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
+const root = createRoot(document.getElementById('root')!)
+root.render(<App />)

@@ -2,7 +2,15 @@ import React, { PureComponent, createRef } from 'react'
 import clsx from 'clsx'
 
 import { Ords, XYOrds, Crop, PixelCrop, PercentCrop } from './types'
-import { defaultCrop, clamp, areCropsEqual, convertToPercentCrop, convertToPixelCrop, containCrop } from './utils'
+import {
+  defaultCrop,
+  clamp,
+  areCropsEqual,
+  convertToPercentCrop,
+  convertToPixelCrop,
+  containCrop,
+  nudgeCrop,
+} from './utils'
 
 import './ReactCrop.scss'
 
@@ -234,7 +242,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         startCropX = pixelCrop.x + pixelCrop.width
         startCropY = pixelCrop.y + pixelCrop.height
       }
-
       startClientX = startCropX + box.x
       startClientY = startCropY + box.y
     }
@@ -395,10 +402,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
-  onHandlerKeyDown = (
-    e: React.KeyboardEvent<HTMLDivElement>,
-    ord: 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
-  ) => {
+  onHandlerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, ord: Ords) => {
     const {
       aspect = 0,
       crop,
@@ -424,7 +428,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return
     }
 
-    const tmpCrop = convertToPixelCrop(crop, box.width, box.height)
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const offset = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
@@ -432,106 +435,10 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       ? ReactCrop.nudgeStepMedium
       : ReactCrop.nudgeStep
 
-    if (e.key === 'ArrowLeft') {
-      if (ord === 'nw') {
-        tmpCrop.x -= offset
-        tmpCrop.y -= offset
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      } else if (ord === 'w') {
-        tmpCrop.x -= offset
-        tmpCrop.width += offset
-      } else if (ord === 'sw') {
-        tmpCrop.x -= offset
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      } else if (ord === 'ne') {
-        tmpCrop.y += offset
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      } else if (ord === 'e') {
-        tmpCrop.width -= offset
-      } else if (ord === 'se') {
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      }
-    } else if (e.key === 'ArrowRight') {
-      if (ord === 'nw') {
-        tmpCrop.x += offset
-        tmpCrop.y += offset
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      } else if (ord === 'w') {
-        // Niche: Will move right if minWidth hit.
-        tmpCrop.x += offset
-        tmpCrop.width -= offset
-      } else if (ord === 'sw') {
-        tmpCrop.x += offset
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      } else if (ord === 'ne') {
-        tmpCrop.y -= offset
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      } else if (ord === 'e') {
-        tmpCrop.width += offset
-      } else if (ord === 'se') {
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      }
-    }
-
-    if (e.key === 'ArrowUp') {
-      if (ord === 'nw') {
-        tmpCrop.x -= offset
-        tmpCrop.y -= offset
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      } else if (ord === 'n') {
-        tmpCrop.y -= offset
-        tmpCrop.height += offset
-      } else if (ord === 'ne') {
-        tmpCrop.y -= offset
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      } else if (ord === 'sw') {
-        tmpCrop.x += offset
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      } else if (ord === 's') {
-        tmpCrop.height -= offset
-      } else if (ord === 'se') {
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      }
-    } else if (e.key === 'ArrowDown') {
-      if (ord === 'nw') {
-        tmpCrop.x += offset
-        tmpCrop.y += offset
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      } else if (ord === 'n') {
-        // Niche: Will move down if minHeight hit.
-        tmpCrop.y += offset
-        tmpCrop.height -= offset
-      } else if (ord === 'ne') {
-        tmpCrop.y += offset
-        tmpCrop.width -= offset
-        tmpCrop.height -= offset
-      } else if (ord === 'sw') {
-        tmpCrop.x -= offset
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      } else if (ord === 's') {
-        tmpCrop.height += offset
-      } else if (ord === 'se') {
-        tmpCrop.width += offset
-        tmpCrop.height += offset
-      }
-    }
-
+    const pixelCrop = convertToPixelCrop(crop, box.width, box.height)
+    const nudgedCrop = nudgeCrop(pixelCrop, e.key, offset, ord)
     const containedCrop = containCrop(
-      tmpCrop,
+      nudgedCrop,
       aspect,
       ord,
       box.width,
@@ -580,9 +487,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onDragFocus = (e: React.FocusEvent<HTMLDivElement, Element>) => {
     // Fixes #491
-    if (this.componentRef.current) {
-      this.componentRef.current.scrollTo(0, 0)
-    }
+    this.componentRef.current?.scrollTo(0, 0)
   }
 
   getCropStyle() {
