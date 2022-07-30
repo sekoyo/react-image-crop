@@ -229,21 +229,35 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     // Set the starting coords to the opposite corner.
     if (ord) {
+      const relativeX = e.clientX - box.x
+      const relativeY = e.clientY - box.y
+      let fromCornerX = 0
+      let fromCornerY = 0
+
       if (ord === 'ne' || ord == 'e') {
+        fromCornerX = relativeX - (pixelCrop.x + pixelCrop.width)
+        fromCornerY = relativeY - pixelCrop.y
         startCropX = pixelCrop.x
         startCropY = pixelCrop.y + pixelCrop.height
       } else if (ord === 'se' || ord === 's') {
+        fromCornerX = relativeX - (pixelCrop.x + pixelCrop.width)
+        fromCornerY = relativeY - (pixelCrop.y + pixelCrop.height)
         startCropX = pixelCrop.x
         startCropY = pixelCrop.y
       } else if (ord === 'sw' || ord == 'w') {
+        fromCornerX = relativeX - pixelCrop.x
+        fromCornerY = relativeY - (pixelCrop.y + pixelCrop.height)
         startCropX = pixelCrop.x + pixelCrop.width
         startCropY = pixelCrop.y
       } else if (ord === 'nw' || ord == 'n') {
+        fromCornerX = relativeX - pixelCrop.x
+        fromCornerY = relativeY - pixelCrop.y
         startCropX = pixelCrop.x + pixelCrop.width
         startCropY = pixelCrop.y + pixelCrop.height
       }
-      startClientX = startCropX + box.x
-      startClientY = startCropY + box.y
+
+      startClientX = startCropX + box.x + fromCornerX
+      startClientY = startCropY + box.y + fromCornerY
     }
 
     this.evData = {
