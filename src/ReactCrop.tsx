@@ -676,6 +676,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.nwDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'nw')}
+              role="button"
             />
             <div
               className="ReactCrop__drag-handle ord-n"
@@ -683,6 +684,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.nDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'n')}
+              role="button"
             />
             <div
               className="ReactCrop__drag-handle ord-ne"
@@ -690,6 +692,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.neDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'ne')}
+              role="button"
             />
             <div
               className="ReactCrop__drag-handle ord-e"
@@ -697,6 +700,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.eDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'e')}
+              role="button"
             />
             <div
               className="ReactCrop__drag-handle ord-se"
@@ -704,6 +708,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.seDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'se')}
+              role="button"
             />
             <div
               className="ReactCrop__drag-handle ord-s"
@@ -711,6 +716,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.sDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 's')}
+              role="button"
             />
             <div
               className="ReactCrop__drag-handle ord-sw"
@@ -718,6 +724,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.swDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'sw')}
+              role="button"
             />
             <div
               className="ReactCrop__drag-handle ord-w"
@@ -725,6 +732,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
               tabIndex={0}
               aria-label={ariaLabels.wDragHandle}
               onKeyDown={e => this.onHandlerKeyDown(e, 'w')}
+              role="button"
             />
           </div>
         )}
