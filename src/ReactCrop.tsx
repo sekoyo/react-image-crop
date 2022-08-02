@@ -120,7 +120,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     return document
   }
 
-  keysDown = new Set<string>()
   docMoveBound = false
   mouseDownOnCrop = false
   dragStarted = false
@@ -365,7 +364,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return
     }
 
-    this.keysDown.add(e.key)
+    const keyCode = e.key
     let nudged = false
 
     if (!crop) {
@@ -380,22 +379,16 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       ? ReactCrop.nudgeStepMedium
       : ReactCrop.nudgeStep
 
-    if (this.keysDown.has('ArrowLeft')) {
+    if (keyCode === 'ArrowLeft') {
       nextCrop.x -= nudgeStep
       nudged = true
-    }
-
-    if (this.keysDown.has('ArrowRight')) {
+    } else if (keyCode === 'ArrowRight') {
       nextCrop.x += nudgeStep
       nudged = true
-    }
-
-    if (this.keysDown.has('ArrowUp')) {
+    } else if (keyCode === 'ArrowUp') {
       nextCrop.y -= nudgeStep
       nudged = true
-    }
-
-    if (this.keysDown.has('ArrowDown')) {
+    } else if (keyCode === 'ArrowDown') {
       nextCrop.y += nudgeStep
       nudged = true
     }
@@ -471,10 +464,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         onComplete(containedCrop, percentCrop)
       }
     }
-  }
-
-  onComponentKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    this.keysDown.delete(e.key)
   }
 
   onDocPointerDone = (e: PointerEvent) => {
@@ -661,7 +650,6 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         aria-label={ariaLabels.cropArea}
         tabIndex={0}
         onKeyDown={this.onComponentKeyDown}
-        onKeyUp={this.onComponentKeyUp}
       >
         {!disabled && !locked && (
           <div className="ReactCrop__drag-elements" onFocus={this.onDragFocus}>
