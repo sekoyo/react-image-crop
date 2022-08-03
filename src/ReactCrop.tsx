@@ -662,6 +662,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         tabIndex={0}
         onKeyDown={this.onComponentKeyDown}
         onKeyUp={this.onComponentKeyUp}
+        role="group"
       >
         {!disabled && !locked && (
           <div className="ReactCrop__drag-elements" onFocus={this.onDragFocus}>
