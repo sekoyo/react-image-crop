@@ -93,9 +93,10 @@ function App() {
       {Boolean(imgSrc) && (
         <ReactCrop
           crop={crop}
+          aspect={16 / 9}
+          minHeight={200}
           onChange={(_, percentCrop) => setCrop(percentCrop)}
           onComplete={c => setCompletedCrop(c)}
-          aspect={16 / 9}
         >
           <img
             alt="Crop me"

@@ -22,6 +22,18 @@ export function areCropsEqual(cropA: Partial<Crop>, cropB: Partial<Crop>) {
   )
 }
 
+export function makeAspectCrop(
+  crop: Pick<PercentCrop, 'unit'> & Partial<Omit<PercentCrop, 'unit'>>,
+  aspect: number,
+  containerWidth: number,
+  containerHeight: number
+): PercentCrop
+export function makeAspectCrop(
+  crop: Pick<PixelCrop, 'unit'> & Partial<Omit<PixelCrop, 'unit'>>,
+  aspect: number,
+  containerWidth: number,
+  containerHeight: number
+): PixelCrop
 export function makeAspectCrop(crop: Partial<Crop>, aspect: number, containerWidth: number, containerHeight: number) {
   const pixelCrop = convertToPixelCrop(crop, containerWidth, containerHeight)
 
@@ -50,6 +62,16 @@ export function makeAspectCrop(crop: Partial<Crop>, aspect: number, containerWid
   return pixelCrop
 }
 
+export function centerCrop(
+  crop: Pick<PercentCrop, 'unit'> & Partial<Omit<PercentCrop, 'unit'>>,
+  containerWidth: number,
+  containerHeight: number
+): PercentCrop
+export function centerCrop(
+  crop: Pick<PixelCrop, 'unit'> & Partial<Omit<PixelCrop, 'unit'>>,
+  containerWidth: number,
+  containerHeight: number
+): PixelCrop
 export function centerCrop(crop: Partial<Crop>, containerWidth: number, containerHeight: number) {
   const pixelCrop = convertToPixelCrop(crop, containerWidth, containerHeight)
 
@@ -99,6 +121,7 @@ export function convertToPixelCrop(crop: Partial<Crop>, containerWidth: number, 
   }
 }
 
+// Sorry.
 export function containCrop(
   pixelCrop: PixelCrop,
   aspect: number,
@@ -111,19 +134,21 @@ export function containCrop(
   maxHeight = containerHeight
 ) {
   const containedCrop = { ...pixelCrop }
-  let _minWidth = minWidth
-  let _minHeight = minHeight
-  let _maxWidth = maxWidth
-  let _maxHeight = maxHeight
+  let _minWidth = Math.min(minWidth, containerWidth)
+  let _minHeight = Math.min(minHeight, containerHeight)
+  let _maxWidth = Math.min(maxWidth, containerWidth)
+  let _maxHeight = Math.min(maxHeight, containerHeight)
 
   if (aspect) {
     if (aspect > 1) {
       // Landscape - increase width min + max.
-      _minWidth = minHeight * aspect
+      _minWidth = minHeight ? minHeight * aspect : _minWidth
+      _minHeight = _minWidth / aspect
       _maxWidth = maxWidth * aspect
     } else {
       // Portrait - increase height min + max.
-      _minHeight = minWidth / aspect
+      _minHeight = minWidth ? minWidth / aspect : _minHeight
+      _minWidth = _minHeight * aspect
       _maxHeight = maxHeight / aspect
     }
   }
@@ -195,7 +220,7 @@ export function containCrop(
     const currAspect = containedCrop.width / containedCrop.height
     if (currAspect < aspect) {
       // Crop is shrunk on the width so adjust the height.
-      const newHeight = containedCrop.width / aspect
+      const newHeight = Math.max(containedCrop.width / aspect, _minHeight)
 
       if (ord === 'nw' || ord == 'ne') {
         // Stops box moving when min is hit.
@@ -205,7 +230,7 @@ export function containCrop(
       containedCrop.height = newHeight
     } else if (currAspect > aspect) {
       // Crop is shrunk on the height so adjust the width.
-      const newWidth = containedCrop.height * aspect
+      const newWidth = Math.max(containedCrop.height * aspect, _minWidth)
 
       if (ord === 'sw' || ord == 'nw') {
         // Stops box moving when max is hit.
