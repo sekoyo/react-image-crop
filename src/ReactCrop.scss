@@ -25,6 +25,8 @@ $half-drag-handle-width: math.div($drag-handle-width, 2);
 $half-drag-bar-size: math.div($drag-bar-size, 2);
 
 .ReactCrop {
+  $root: &;
+
   position: relative;
   display: inline-block;
   cursor: crosshair;
@@ -50,6 +52,17 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
       display: block;
       max-width: 100%;
       max-height: inherit;
+    }
+  }
+
+  &:not(#{$root}--disabled) {
+    #{$root}__child-wrapper {
+      & > img,
+      & > video {
+        touch-action: none;
+      }
+    }
+    #{$root}__crop-selection {
       touch-action: none;
     }
   }
@@ -61,7 +74,6 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     transform: translate3d(0, 0, 0);
     cursor: move;
     box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.5);
-    touch-action: none;
 
     .ReactCrop--disabled & {
       cursor: inherit;

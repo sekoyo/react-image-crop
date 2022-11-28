@@ -10,7 +10,8 @@ body {
 }
 
 .App {
-  margin: 100px;
+  /* margin: 100px; */
+  height: 4000px;
 }
 
 img {
