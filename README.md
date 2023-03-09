@@ -68,6 +68,8 @@ import 'react-image-crop/src/ReactCrop.scss'
 ## Example
 
 ```tsx
+import ReactCrop, { type Crop } from 'react-image-crop'
+
 function CropDemo({ src }) {
   const [crop, setCrop] = useState<Crop>()
   return (
