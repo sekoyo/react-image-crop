@@ -44,6 +44,7 @@ If React Crop doesn't cover your requirements then take a look at [Pintura](http
 ```
 npm i react-image-crop --save
 yarn add react-image-crop
+pnpm add react-image-crop
 ```
 
 This library works with all modern browsers. It does not work with IE.
@@ -247,7 +248,7 @@ Centering an aspect ratio crop is trickier especially when dealing with `%`. How
 
 ```js
 function onImageLoad(e) {
-  const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
+  const { naturalWidth: width, naturalHeight: height } = e.currentTarget
 
   const crop = centerCrop(
     makeAspectCrop(
