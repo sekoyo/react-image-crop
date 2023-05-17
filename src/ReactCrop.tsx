@@ -767,6 +767,7 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         <div ref={this.mediaRef} className="ReactCrop__child-wrapper" onPointerDown={this.onComponentPointerDown}>
           {children}
         </div>
+        <div className="ReactCrop__crop-mask">{cropSelection}</div>
         {cropSelection}
       </div>
     )
