@@ -107,7 +107,6 @@ export default function App() {
           onChange={(_, percentCrop) => setCrop(percentCrop)}
           onComplete={c => setCompletedCrop(c)}
           aspect={aspect}
-          circularCrop
         >
           <img
             ref={imgRef}
