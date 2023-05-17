@@ -30,6 +30,7 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
   position: relative;
   display: inline-block;
   cursor: crosshair;
+  overflow: hidden;
   max-width: 100%;
 
   & *,
@@ -72,6 +73,7 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     left: 0;
     transform: translate3d(0, 0, 0);
     cursor: move;
+    box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.5);
 
     .ReactCrop--disabled & {
       cursor: inherit;
@@ -92,14 +94,6 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
   }
   &--invisible-crop &__crop-selection {
     display: none;
-  }
-
-  &__crop-mask {
-    position: absolute;
-    inset: 0;
-  }
-  &__crop-mask &__crop-selection {
-    box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.5);
   }
 
   &__rule-of-thirds-vt::before,
