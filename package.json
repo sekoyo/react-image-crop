@@ -3,9 +3,18 @@
   "version": "10.0.11",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
-  "main": "dist/ReactCrop.min.js",
-  "types": "dist/index.d.ts",
-  "style": "dist/ReactCrop.css",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs"
+    },
+    "./dist/ReactCrop.css": "./dist/index.css",
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist",
     "src"
@@ -13,7 +22,7 @@
   "browserslist": "last 3 versions, not IE > 0",
   "scripts": {
     "start": "webpack --watch --config test/webpack.config.js",
-    "build": "webpack",
+    "build": "tsup",
     "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -31,6 +40,7 @@
     "@types/react-dom": "^18.0.11",
     "babel-eslint": "^10.1.0",
     "css-loader": "^6.7.3",
+    "esbuild-sass-plugin": "^2.9.0",
     "eslint": "^8.35.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.7.1",
@@ -42,6 +52,7 @@
     "sass-loader": "^13.2.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
+    "tsup": "^6.7.0",
     "typescript": "^4.9.5",
     "webpack": "^5.76.0",
     "webpack-cli": "^5.0.1"
