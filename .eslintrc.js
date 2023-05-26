@@ -1,17 +1,10 @@
 module.exports = {
-  extends: ['eslint:recommended', 'plugin:react/recommended'],
-  parser: 'babel-eslint',
-  env: {
-    browser: true,
-  },
-  plugins: ['react', 'jsx-a11y', 'import'],
+  env: { browser: true, es2020: true },
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:react-hooks/recommended'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  plugins: ['react-refresh'],
   rules: {
-    'operator-linebreak': 0,
-    'no-restricted-globals': 0,
-    'max-len': ['error', { code: 160 }],
-    'arrow-parens': 0,
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
-    'react/destructuring-assignment': 0,
-    'react/jsx-wrap-multilines': 0,
+    'react-refresh/only-export-components': 'warn',
   },
-};
+}

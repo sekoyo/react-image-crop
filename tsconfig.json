@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "target": "ES2019",
-    "module": "ES2020",
+    "target": "es2020",
+    "module": "es2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -17,5 +17,6 @@
     "allowJs": true,
     "jsx": "react"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

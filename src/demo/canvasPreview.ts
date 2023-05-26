@@ -1,4 +1,4 @@
-import { PixelCrop } from '../src'
+import { PixelCrop } from '..'
 
 const TO_RADIANS = Math.PI / 180
 

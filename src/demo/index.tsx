@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from '../src'
+import ReactCrop, { centerCrop, makeAspectCrop, Crop, PixelCrop } from '..'
 import { canvasPreview } from './canvasPreview'
 import { useDebounceEffect } from './useDebounceEffect'
 
-import '../src/ReactCrop.scss'
+import './index.scss'
+import '../ReactCrop.scss'
 
 // This is to demonstate how to make and center a % aspect crop
 // which is a bit trickier so we use some helper functions.
@@ -107,7 +108,6 @@ export default function App() {
           onChange={(_, percentCrop) => setCrop(percentCrop)}
           onComplete={c => setCompletedCrop(c)}
           aspect={aspect}
-          circularCrop
         >
           <img
             ref={imgRef}

@@ -1,4 +1,4 @@
-import { PixelCrop } from '../src'
+import { PixelCrop } from '..'
 import { canvasPreview } from './canvasPreview'
 
 let previewUrl = ''

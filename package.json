@@ -1,21 +1,30 @@
 {
   "name": "react-image-crop",
-  "version": "10.0.11",
+  "version": "10.1.0",
   "description": "A responsive image cropping tool for React",
   "repository": "https://github.com/DominicTobias/react-image-crop",
-  "main": "dist/ReactCrop.min.js",
+  "type": "module",
   "types": "dist/index.d.ts",
-  "style": "dist/ReactCrop.css",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
   "files": [
     "dist",
     "src"
   ],
   "browserslist": "last 3 versions, not IE > 0",
+  "style": "dist/ReactCrop.css",
   "scripts": {
-    "start": "webpack --watch --config test/webpack.config.js",
-    "build": "webpack",
-    "prepare": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "prepare": "npm run build"
   },
   "author": "Dominic Tobias (https://github.com/DominicTobias/)",
   "keywords": [
@@ -27,24 +36,19 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "babel-eslint": "^10.1.0",
-    "css-loader": "^6.7.3",
-    "eslint": "^8.35.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-react": "^7.32.2",
-    "mini-css-extract-plugin": "^2.7.3",
+    "@types/react": "^18.2.7",
+    "@types/react-dom": "^18.2.4",
+    "@typescript-eslint/eslint-plugin": "^5.59.7",
+    "@typescript-eslint/parser": "^5.59.7",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.41.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.58.3",
-    "sass-loader": "^13.2.0",
-    "style-loader": "^3.3.1",
-    "ts-loader": "^9.4.2",
+    "sass": "^1.62.1",
     "typescript": "^4.9.5",
-    "webpack": "^5.76.0",
-    "webpack-cli": "^5.0.1"
+    "vite": "^4.3.9"
   },
   "peerDependencies": {
     "react": ">=16.13.1"
