@@ -93,7 +93,7 @@ export interface ReactCropState {
   newCropIsBeingDrawn: boolean
 }
 
-class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
+export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   static xOrds = ['e', 'w']
   static yOrds = ['n', 's']
   static xyOrds = ['nw', 'ne', 'se', 'sw']
@@ -772,5 +772,3 @@ class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     )
   }
 }
-
-export { ReactCrop as default, ReactCrop as Component }
