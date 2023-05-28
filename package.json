@@ -13,6 +13,7 @@
       "require": "./dist/index.umd.cjs"
     },
     "./dist/ReactCrop.css": "./dist/ReactCrop.css",
+    "./src/ReactCrop.scss": "./src/ReactCrop.scss",
     "./package.json": "./package.json"
   },
   "files": [
