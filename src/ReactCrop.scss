@@ -84,7 +84,30 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
       box-shadow: 0px 0px 1px 1px white, 0 0 0 9999em rgba(0, 0, 0, 0.5);
     }
 
-    border: 1px dashed white;
+    .ReactCrop--no-animate & {
+      border: 1px dashed white;
+    }
+    &:not(.ReactCrop--no-animate &) {
+      @keyframes marching-ants {
+        0% {
+          background-position: 0 0, 0 100%, 0 0, 100% 0;
+        }
+        100% {
+          background-position: 40px 0, -40px 100%, 0 -40px, 100% 40px;
+        }
+      }
+
+      animation: marching-ants 1.5s;
+      background-image: linear-gradient(to right, #fff 50%, #444 50%), linear-gradient(to right, #fff 50%, #444 50%),
+        linear-gradient(to bottom, #fff 50%, #444 50%), linear-gradient(to bottom, #fff 50%, #444 50%);
+      background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
+      background-position: 0 0, 0 100%, 0 0, 100% 0;
+      background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+      color: #fff;
+      animation-play-state: running;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
 
     &:focus {
       outline: none;
