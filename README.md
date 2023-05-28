@@ -280,6 +280,4 @@ const onCropChange = (crop, percentCrop) => setCrop(percentCrop)
 
 ## Contributing / Developing
 
-To develop run `yarn start`, this will recompile your JS and SCSS on changes.
-
-You can test your changes by opening `test/index.html` in a browser (you don't need to be running a server).
+To develop run `yarn dev` and open the localhost server in your browser. Update code and it will reload. When you're ready open a pull request.
