@@ -35,9 +35,9 @@ An image cropping tool for React with no dependencies.
 - Min/max crop size.
 - Crop anything, not just images.
 
-If React Crop doesn't cover your requirements then take a look at [Pintura](https://gumroad.com/a/611955827). It features cropping, rotating, filtering, annotation, and lots more.
+If React Crop doesn't cover your requirements then take a look at [Pintura](https://pqina.nl/pintura/?aff=xw0RQ). It features cropping, rotating, filtering, annotation, and lots more.
 
-[Learn more about Pintura here](https://gumroad.com/a/611955827)
+[Learn more about Pintura here](https://pqina.nl/pintura/?aff=xw0RQ)
 
 ## Installation
 
@@ -214,11 +214,11 @@ You can use the following library to load images, which will correct the rotatio
 
 You can read an issue on this subject here: https://github.com/DominicTobias/react-image-crop/issues/181
 
-If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Pintura](https://gumroad.com/a/611955827).
+If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Pintura](https://pqina.nl/pintura/?aff=xw0RQ).
 
 <h3>How to filter, rotate and annotate?</h3>
 
-This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then consider using [Pintura](https://gumroad.com/a/611955827).
+This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then consider using [Pintura](https://pqina.nl/pintura/?aff=xw0RQ).
 
 ![Pintura Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/doka-demo.gif)
 
