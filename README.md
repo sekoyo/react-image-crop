@@ -280,4 +280,4 @@ const onCropChange = (crop, percentCrop) => setCrop(percentCrop)
 
 ## Contributing / Developing
 
-To develop run `yarn dev` and open the localhost server in your browser. Update code and it will reload. When you're ready open a pull request.
+To develop run `pnpm install && pnpm dev` and open the localhost server in your browser. Update code and it will reload. When you're ready open a pull request.

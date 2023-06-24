@@ -760,6 +760,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       'ReactCrop--circular-crop': crop && circularCrop,
       'ReactCrop--rule-of-thirds': crop && ruleOfThirds,
       'ReactCrop--invisible-crop': !this.dragStarted && crop && !crop.width && !crop.height,
+      'ReactCrop--no-animate': circularCrop,
     })
 
     return (
