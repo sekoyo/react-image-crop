@@ -1,5 +1,3 @@
-@use 'sass:math';
-
 // Query to kick us into "mobile" mode with larger drag handles/bars.
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
 $mobile-media-query: '(pointer: coarse)' !default;
@@ -20,9 +18,9 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
 $drag-handle-active-border-color: blue !default;
 $drag-handle-active-bg-color: #2dbfff !default;
 
-$half-drag-handle-height: math.div($drag-handle-height, 2);
-$half-drag-handle-width: math.div($drag-handle-width, 2);
-$half-drag-bar-size: math.div($drag-bar-size, 2);
+$half-drag-handle-height: $drag-handle-height / 2;
+$half-drag-handle-width: $drag-handle-width / 2;
+$half-drag-bar-size: $drag-bar-size / 2;
 
 .ReactCrop {
   $root: &;
