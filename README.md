@@ -85,7 +85,8 @@ See the [sandbox demo](https://codesandbox.io/s/react-image-crop-demo-with-react
 ## CDN
 
 ```html
-<script src="https://unpkg.com/react-image-crop/dist/ReactCrop.min.js"></script>
+<link href="https://unpkg.com/react-image-crop/dist/ReactCrop.css" rel="stylesheet">
+<script src="https://unpkg.com/react-image-crop/dist/index.umd.cjs"></script>
 ```
 
 Note when importing the script globally using a `<script>` tag access the component with `ReactCrop.Component`.
