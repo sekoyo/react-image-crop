@@ -191,7 +191,7 @@ A callback which happens when a user releases the cursor or touch after dragging
 
 **`renderSelectionAddon?: (state: ReactCropState) => React.ReactNode`**
 
-Render a custom element inside crop the selection.
+Render a custom element inside the crop selection.
 
 **`ruleOfThirds?: boolean`**
 
