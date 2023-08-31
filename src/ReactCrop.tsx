@@ -552,7 +552,6 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
-  // This algo works but is messy. If anyone wants to re-write it be my guest ;)
   resizeCrop() {
     const { evData } = this
     const { aspect = 0, maxWidth, maxHeight } = this.props
@@ -564,8 +563,8 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     let xDiff = evData.clientX - evData.startClientX
     let yDiff = evData.clientY - evData.startClientY
 
-    // When min dimensions set, ensure crop isn't flipped (retain origin area)
-    // and not dragged when going beyond the other side (Math.min/max) #554
+    // When min dimensions are set, ensure crop isn't flipped (retain origin ord/
+    // area) and not dragged when going beyond the other side (Math.min/max) #554
     if (aspect) {
       if (minWidth) {
         if (['nw', 'sw'].includes(ord)) {
