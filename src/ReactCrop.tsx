@@ -559,13 +559,10 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return [mw, mh]
     }
 
-    const longestSide = Math.max(mw, mh)
-
-    // Use the larger side and infer the other
     if (aspect > 1) {
-      return [longestSide, longestSide / aspect]
+      return mw ? [mw, mw / aspect] : [mh * aspect, mh]
     } else {
-      return [longestSide * aspect, longestSide]
+      return mh ? [mh * aspect, mh] : [mw, mw / aspect]
     }
   }
 
