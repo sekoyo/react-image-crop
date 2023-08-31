@@ -522,14 +522,27 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     return nextCrop
   }
 
-  getPointRegion(box: Rectangle): XYOrds {
+  getPointRegion(box: Rectangle, origOrd: Ords | undefined, minWidth: number, minHeight: number): XYOrds {
     const { evData } = this
 
     const relativeX = evData.clientX - box.x
     const relativeY = evData.clientY - box.y
 
-    const topHalf = relativeY < evData.startCropY
-    const leftHalf = relativeX < evData.startCropX
+    let topHalf: boolean
+    if (minHeight && origOrd) {
+      // Uses orig ord (never flip when minHeight != 0)
+      topHalf = origOrd === 'nw' || origOrd === 'n' || origOrd === 'ne'
+    } else {
+      topHalf = relativeY < evData.startCropY
+    }
+
+    let leftHalf: boolean
+    if (minWidth && origOrd) {
+      // Uses orig ord (never flip when minWidth != 0)
+      leftHalf = origOrd === 'nw' || origOrd === 'w' || origOrd === 'sw'
+    } else {
+      leftHalf = relativeX < evData.startCropX
+    }
 
     if (leftHalf) {
       return topHalf ? 'nw' : 'sw'
@@ -538,69 +551,43 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
-  resolveMinDimensions(aspect = 0, minWidth = 0, minHeight = 0) {
-    if (!aspect) {
-      return [minWidth, minHeight]
+  resolveMinDimensions(box: Rectangle, aspect: number, minWidth = 0, minHeight = 0) {
+    let mw = Math.min(minWidth, box.width)
+    let mh = Math.min(minHeight, box.height)
+
+    if (!aspect || (!mw && !mh)) {
+      return [mw, mh]
     }
 
+    const longestSide = Math.max(mw, mh)
+
+    // Use the larger side and infer the other
     if (aspect > 1) {
-      // Landscape, respect minWidth and infer minHeight
-      return [minWidth, minWidth / aspect]
+      return [longestSide, longestSide / aspect]
     } else {
-      // Portrait, respect minHeight and infer minWidth
-      return [minHeight * aspect, minHeight]
+      return [longestSide * aspect, longestSide]
     }
   }
 
   resizeCrop() {
     const { evData } = this
     const { aspect = 0, maxWidth, maxHeight } = this.props
-    const [minWidth, minHeight] = this.resolveMinDimensions(aspect, this.props.minWidth, this.props.minHeight)
     const box = this.getBox()
+    const [minWidth, minHeight] = this.resolveMinDimensions(box, aspect, this.props.minWidth, this.props.minHeight)
     let nextCrop = this.makePixelCrop(box)
-    let area = this.getPointRegion(box)
+    let area = this.getPointRegion(box, evData.ord, minWidth, minHeight)
     const ord = evData.ord || area
     let xDiff = evData.clientX - evData.startClientX
     let yDiff = evData.clientY - evData.startClientY
 
-    // When min dimensions are set, ensure crop isn't flipped (retain origin ord/
-    // area) and not dragged when going beyond the other side (Math.min/max) #554
-    if (aspect) {
-      if (minWidth) {
-        if (['nw', 'sw'].includes(ord)) {
-          area = ord as XYOrds
-          xDiff = Math.min(xDiff, -minWidth)
-        } else if (['ne', 'se'].includes(ord)) {
-          area = ord as XYOrds
-        }
-      }
+    // When min dimensions are set, ensure crop isn't dragged when going
+    // beyond the other side #554
+    if ((minWidth && ord === 'nw') || ord === 'w' || ord === 'sw') {
+      xDiff = Math.min(xDiff, -minWidth)
+    }
 
-      if (minHeight) {
-        if (['nw', 'ne'].includes(ord)) {
-          area = ord as XYOrds
-          yDiff = Math.min(yDiff, -minHeight)
-        } else if (['sw', 'se'].includes(ord)) {
-          area = ord as XYOrds
-        }
-      }
-    } else {
-      if (minWidth) {
-        if (['nw', 'w', 'sw'].includes(ord)) {
-          area = 'nw'
-          xDiff = Math.min(xDiff, -minWidth)
-        } else if (['ne', 'e', 'se'].includes(ord)) {
-          area = 'ne'
-        }
-      }
-
-      if (minHeight) {
-        if (['nw', 'n', 'ne'].includes(ord)) {
-          area = 'nw'
-          yDiff = Math.min(yDiff, -minHeight)
-        } else if (['sw', 's', 'se'].includes(ord)) {
-          area = 'sw'
-        }
-      }
+    if ((minHeight && ord === 'nw') || ord === 'n' || ord === 'ne') {
+      yDiff = Math.min(yDiff, -minHeight)
     }
 
     const tmpCrop: PixelCrop = {
@@ -678,6 +665,11 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       nextCrop.y = containedCrop.y
       nextCrop.height = containedCrop.height
     }
+
+    // When drawing a new crop with min dimensions we allow flipping, but
+    // ensure we don't flip outside the crop area, just ignore those.
+    nextCrop.x = clamp(nextCrop.x, 0, box.width - nextCrop.width)
+    nextCrop.y = clamp(nextCrop.y, 0, box.height - nextCrop.height)
 
     return nextCrop
   }

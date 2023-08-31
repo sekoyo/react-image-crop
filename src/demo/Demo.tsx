@@ -25,6 +25,9 @@ function centerAspectCrop(mediaWidth: number, mediaHeight: number, aspect: numbe
   )
 }
 
+// const defaultAspect = 9 / 16
+const defaultAspect = 16 / 9
+
 export function Demo() {
   const [imgSrc, setImgSrc] = useState('')
   const previewCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -33,7 +36,7 @@ export function Demo() {
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
-  const [aspect, setAspect] = useState<number | undefined>(16 / 9)
+  const [aspect, setAspect] = useState<number | undefined>(defaultAspect)
 
   function onSelectFile(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
@@ -66,10 +69,10 @@ export function Demo() {
     if (aspect) {
       setAspect(undefined)
     } else {
-      setAspect(16 / 9)
+      setAspect(defaultAspect)
       if (imgRef.current) {
         const { width, height } = imgRef.current
-        setCrop(centerAspectCrop(width, height, 16 / 9))
+        setCrop(centerAspectCrop(width, height, defaultAspect))
       }
     }
   }
