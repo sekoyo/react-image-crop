@@ -1,10 +1,10 @@
 import React, { PureComponent, createRef } from 'react'
-import clsx from 'clsx'
 
 import { Ords, XYOrds, Crop, PixelCrop, PercentCrop } from './types'
 import {
   defaultCrop,
   clamp,
+  cls,
   areCropsEqual,
   convertToPercentCrop,
   convertToPixelCrop,
@@ -337,6 +337,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     // Update pointer position.
     const { evData } = this
+
     evData.clientX = e.clientX
     evData.clientY = e.clientY
 
@@ -358,7 +359,6 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   onComponentKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const { crop, disabled, onChange, onComplete } = this.props
-    const box = this.getBox()
 
     if (disabled) {
       return
@@ -371,7 +371,8 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       return
     }
 
-    const nextCrop = this.makePixelCrop()
+    const box = this.getBox()
+    const nextCrop = this.makePixelCrop(box)
     const ctrlCmdPressed = navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey
     const nudgeStep = ctrlCmdPressed
       ? ReactCrop.nudgeStepLarge
@@ -511,7 +512,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   dragCrop() {
     const { evData } = this
     const box = this.getBox()
-    const nextCrop = this.makePixelCrop()
+    const nextCrop = this.makePixelCrop(box)
     const xDiff = evData.clientX - evData.startClientX
     const yDiff = evData.clientY - evData.startClientY
 
@@ -523,8 +524,10 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
   getPointRegion(box: Rectangle): XYOrds {
     const { evData } = this
+
     const relativeX = evData.clientX - box.x
     const relativeY = evData.clientY - box.y
+
     const topHalf = relativeY < evData.startCropY
     const leftHalf = relativeX < evData.startCropX
 
@@ -535,15 +538,71 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
+  resolveMinDimensions(aspect = 0, minWidth = 0, minHeight = 0) {
+    if (!aspect) {
+      return [minWidth, minHeight]
+    }
+
+    if (aspect > 1) {
+      // Landscape, respect minWidth and infer minHeight
+      return [minWidth, minWidth / aspect]
+    } else {
+      // Portrait, respect minHeight and infer minWidth
+      return [minHeight * aspect, minHeight]
+    }
+  }
+
+  // This algo works but is messy. If anyone wants to re-write it be my guest ;)
   resizeCrop() {
     const { evData } = this
+    const { aspect = 0, maxWidth, maxHeight } = this.props
+    const [minWidth, minHeight] = this.resolveMinDimensions(aspect, this.props.minWidth, this.props.minHeight)
     const box = this.getBox()
-    const { aspect = 0, minWidth = 0, minHeight = 0, maxWidth, maxHeight } = this.props
-    const area = this.getPointRegion(box)
-    const nextCrop = this.makePixelCrop()
-    const resolvedOrd: Ords = evData.ord ? evData.ord : area
-    const xDiff = evData.clientX - evData.startClientX
-    const yDiff = evData.clientY - evData.startClientY
+    let nextCrop = this.makePixelCrop(box)
+    let area = this.getPointRegion(box)
+    const ord = evData.ord || area
+    let xDiff = evData.clientX - evData.startClientX
+    let yDiff = evData.clientY - evData.startClientY
+
+    // When min dimensions set, ensure crop isn't flipped (retain origin area)
+    // and not dragged when going beyond the other side (Math.min/max) #554
+    if (aspect) {
+      if (minWidth) {
+        if (['nw', 'sw'].includes(ord)) {
+          area = ord as XYOrds
+          xDiff = Math.min(xDiff, -minWidth)
+        } else if (['ne', 'se'].includes(ord)) {
+          area = ord as XYOrds
+        }
+      }
+
+      if (minHeight) {
+        if (['nw', 'ne'].includes(ord)) {
+          area = ord as XYOrds
+          yDiff = Math.min(yDiff, -minHeight)
+        } else if (['sw', 'se'].includes(ord)) {
+          area = ord as XYOrds
+        }
+      }
+    } else {
+      if (minWidth) {
+        if (['nw', 'w', 'sw'].includes(ord)) {
+          area = 'nw'
+          xDiff = Math.min(xDiff, -minWidth)
+        } else if (['ne', 'e', 'se'].includes(ord)) {
+          area = 'ne'
+        }
+      }
+
+      if (minHeight) {
+        if (['nw', 'n', 'ne'].includes(ord)) {
+          area = 'nw'
+          yDiff = Math.min(yDiff, -minHeight)
+        } else if (['sw', 's', 'se'].includes(ord)) {
+          area = 'sw'
+        }
+      }
+    }
 
     const tmpCrop: PixelCrop = {
       unit: 'px',
@@ -611,15 +670,12 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
 
     // Apply x/y/width/height changes depending on ordinate
     // (fixed aspect always applies both).
-    if (aspect || ReactCrop.xyOrds.indexOf(resolvedOrd) > -1) {
-      nextCrop.x = containedCrop.x
-      nextCrop.y = containedCrop.y
-      nextCrop.width = containedCrop.width
-      nextCrop.height = containedCrop.height
-    } else if (ReactCrop.xOrds.indexOf(resolvedOrd) > -1) {
+    if (aspect || ReactCrop.xyOrds.indexOf(ord) > -1) {
+      nextCrop = containedCrop
+    } else if (ReactCrop.xOrds.indexOf(ord) > -1) {
       nextCrop.x = containedCrop.x
       nextCrop.width = containedCrop.width
-    } else if (ReactCrop.yOrds.indexOf(resolvedOrd) > -1) {
+    } else if (ReactCrop.yOrds.indexOf(ord) > -1) {
       nextCrop.y = containedCrop.y
       nextCrop.height = containedCrop.height
     }
@@ -740,9 +796,8 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     )
   }
 
-  makePixelCrop() {
+  makePixelCrop(box: Rectangle) {
     const crop = { ...defaultCrop, ...(this.props.crop || {}) }
-    const box = this.getBox()
     return convertToPixelCrop(crop, box.width, box.height)
   }
 
@@ -751,17 +806,19 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     const { cropIsActive, newCropIsBeingDrawn } = this.state
     const cropSelection = crop ? this.createCropSelection() : null
 
-    const componentClasses = clsx('ReactCrop', className, {
-      'ReactCrop--active': cropIsActive,
-      'ReactCrop--disabled': disabled,
-      'ReactCrop--locked': locked,
-      'ReactCrop--new-crop': newCropIsBeingDrawn,
-      'ReactCrop--fixed-aspect': crop && aspect,
-      'ReactCrop--circular-crop': crop && circularCrop,
-      'ReactCrop--rule-of-thirds': crop && ruleOfThirds,
-      'ReactCrop--invisible-crop': !this.dragStarted && crop && !crop.width && !crop.height,
-      'ReactCrop--no-animate': circularCrop,
-    })
+    const componentClasses = cls(
+      'ReactCrop',
+      className,
+      cropIsActive && 'ReactCrop--active',
+      disabled && 'ReactCrop--disabled',
+      locked && 'ReactCrop--locked',
+      newCropIsBeingDrawn && 'ReactCrop--new-crop',
+      crop && aspect && 'ReactCrop--fixed-aspect',
+      crop && circularCrop && 'ReactCrop--circular-crop',
+      crop && ruleOfThirds && 'ReactCrop--rule-of-thirds',
+      !this.dragStarted && crop && !crop.width && !crop.height && 'ReactCrop--invisible-crop',
+      circularCrop && 'ReactCrop--no-animate'
+    )
 
     return (
       <div ref={this.componentRef} className={componentClasses} style={style}>
