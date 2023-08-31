@@ -8,19 +8,17 @@ export const defaultCrop: PixelCrop = {
   unit: 'px',
 }
 
-export function clamp(num: number, min: number, max: number) {
-  return Math.min(Math.max(num, min), max)
-}
+export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max)
 
-export function areCropsEqual(cropA: Partial<Crop>, cropB: Partial<Crop>) {
-  return (
-    cropA.width === cropB.width &&
+export const cls = (...args: unknown[]) => args.filter(v => v && typeof v === 'string').join(' ')
+
+export const areCropsEqual = (cropA: Partial<Crop>, cropB: Partial<Crop>) =>
+  cropA === cropB ||
+  (cropA.width === cropB.width &&
     cropA.height === cropB.height &&
     cropA.x === cropB.x &&
     cropA.y === cropB.y &&
-    cropA.unit === cropB.unit
-  )
-}
+    cropA.unit === cropB.unit)
 
 export function makeAspectCrop(
   crop: Pick<PercentCrop, 'unit'> & Partial<Omit<PercentCrop, 'unit'>>,

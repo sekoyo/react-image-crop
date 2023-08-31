@@ -85,7 +85,7 @@ See the [sandbox demo](https://codesandbox.io/s/react-image-crop-demo-with-react
 ## CDN
 
 ```html
-<link href="https://unpkg.com/react-image-crop/dist/ReactCrop.css" rel="stylesheet">
+<link href="https://unpkg.com/react-image-crop/dist/ReactCrop.css" rel="stylesheet" />
 <script src="https://unpkg.com/react-image-crop/dist/index.umd.cjs"></script>
 ```
 
