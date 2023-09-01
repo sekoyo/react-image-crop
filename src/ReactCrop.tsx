@@ -80,6 +80,10 @@ export interface ReactCropProps {
   onDragStart?: (e: PointerEvent) => void
   /** A callback which happens when a user releases the cursor or touch after dragging or resizing. */
   onDragEnd?: (e: PointerEvent) => void
+  /** A callback which happens when a user enters their cursor over the crop box */
+  onMouseEnter?: () => void
+  /** A callback which happens when a user exits their cursor from the crop box */
+  onMouseLeave?: () => void
   /** Render a custom element in crop selection. */
   renderSelectionAddon?: (state: ReactCropState) => React.ReactNode
   /** Show rule of thirds lines in the cropped area. Defaults to false. */
@@ -679,6 +683,8 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
       renderSelectionAddon,
       ruleOfThirds,
       crop,
+      onMouseEnter,
+      onMouseLeave
     } = this.props
     const style = this.getCropStyle()
 
@@ -694,6 +700,8 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         aria-label={ariaLabels.cropArea}
         tabIndex={0}
         onKeyDown={this.onComponentKeyDown}
+        onMouseEnter={() => onMouseEnter ? onMouseEnter() : null}
+        onMouseLeave={() => onMouseLeave ? onMouseLeave() : null}
         role="group"
       >
         {!disabled && !locked && (
