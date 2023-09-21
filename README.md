@@ -1,5 +1,3 @@
-This documentation refers to v10. Go to [9.1.1 tag](https://github.com/DominicTobias/react-image-crop/tree/9.1.1) for v9 docs.
-
 # React Image Crop
 
 An image cropping tool for React with no dependencies.
