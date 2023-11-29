@@ -770,7 +770,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
           </div>
         )}
         {renderSelectionAddon && (
-          <div className="ReactCrop__selection-addon" onMouseDown={e => e.stopPropagation()}>
+          <div className="ReactCrop__selection-addon" onPointerDown={e => e.stopPropagation()}>
             {renderSelectionAddon(this.state)}
           </div>
         )}
