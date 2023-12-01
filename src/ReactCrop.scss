@@ -7,8 +7,8 @@ $mobile-media-query: '(pointer: coarse)' !default;
 :root {
   --rc-drag-handle-size: 12px;
   --rc-drag-handle-mobile-size: 24px;
+  --rc-drag-handle-bg-colour: rgba(0, 0, 0, 0.2);
   --rc-drag-bar-size: 6px; // The invisible grip size of the crop selection edges
-  --rc-drag-handle-background-colour: rgba(0, 0, 0, 0.2);
   --rc-border-color: rgba(255, 255, 255, 0.7);
   --rc-focus-color: #0088ff;
 }
@@ -33,6 +33,7 @@ $mobile-media-query: '(pointer: coarse)' !default;
   }
 
   &__child-wrapper {
+    overflow: hidden;
     max-height: inherit;
 
     & > img,
@@ -179,7 +180,7 @@ $mobile-media-query: '(pointer: coarse)' !default;
     position: absolute;
     width: var(--rc-drag-handle-size);
     height: var(--rc-drag-handle-size);
-    background-color: var(--rc-drag-handle-background-colour);
+    background-color: var(--rc-drag-handle-bg-colour);
     border: 1px solid var(--rc-border-color);
 
     &:focus {
