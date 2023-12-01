@@ -269,4 +269,4 @@ And your `aspect` crop should be set to the same aspect: `<ReactCrop aspect={16 
 
 ## Contributing / Developing
 
-To develop run `pnpm install && pnpm dev` and open the localhost server in your browser. Update code and it will reload. When you're ready open a pull request.
+To develop run `pnpm install && pnpm dev` and open the localhost server in your browser. Update code and it will reload. When you're ready, open a pull request.
