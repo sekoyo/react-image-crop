@@ -671,7 +671,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     return nextCrop
   }
 
-  createCropSelection() {
+  renderCropSelection() {
     const {
       ariaLabels = ReactCrop.defaultProps.ariaLabels,
       disabled,
@@ -792,7 +792,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   render() {
     const { aspect, children, circularCrop, className, crop, disabled, locked, style, ruleOfThirds } = this.props
     const { cropIsActive, newCropIsBeingDrawn } = this.state
-    const cropSelection = crop ? this.createCropSelection() : null
+    const cropSelection = crop ? this.renderCropSelection() : null
 
     const componentClasses = cls(
       'ReactCrop',
@@ -813,6 +813,33 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         <div ref={this.mediaRef} className="ReactCrop__child-wrapper" onPointerDown={this.onComponentPointerDown}>
           {children}
         </div>
+        {crop ? (
+          <svg className="ReactCrop__crop-mask" width="100%" height="100%">
+            <defs>
+              <mask id="hole">
+                <rect width="100%" height="100%" fill="white" />
+                {circularCrop ? (
+                  <ellipse
+                    cx={`${crop.x + crop.width / 2}${crop.unit}`}
+                    cy={`${crop.y + crop.height / 2}${crop.unit}`}
+                    rx={`${crop.width / 2}${crop.unit}`}
+                    ry={`${crop.height / 2}${crop.unit}`}
+                    fill="black"
+                  />
+                ) : (
+                  <rect
+                    x={`${crop.x}${crop.unit}`}
+                    y={`${crop.y}${crop.unit}`}
+                    width={`${crop.width}${crop.unit}`}
+                    height={`${crop.height}${crop.unit}`}
+                    fill="black"
+                  />
+                )}
+              </mask>
+            </defs>
+            <rect fill="black" fillOpacity={0.5} width="100%" height="100%" mask="url(#hole)" />
+          </svg>
+        ) : undefined}
         {cropSelection}
       </div>
     )

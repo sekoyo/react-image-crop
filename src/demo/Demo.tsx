@@ -108,12 +108,15 @@ export function Demo() {
       </div>
       {!!imgSrc && (
         <ReactCrop
+          // className="ReactCrop--no-animate"
           crop={crop}
           onChange={(_, percentCrop) => setCrop(percentCrop)}
           onComplete={c => setCompletedCrop(c)}
           aspect={aspect}
           minWidth={400}
           minHeight={200}
+          circularCrop
+          ruleOfThirds
         >
           <img
             ref={imgRef}

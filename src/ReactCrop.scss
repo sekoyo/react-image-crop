@@ -4,25 +4,14 @@
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer
 $mobile-media-query: '(pointer: coarse)' !default;
 
-// SASS variables for normal drag handle and bar size.
-// Override in your scss file by setting these variables FIRST, then including this file.
-$drag-handle-width: 10px !default;
-$drag-handle-height: 10px !default;
-$drag-bar-size: 6px !default;
-
-// Mobile handle/bar sizes.  Override as above.
-$drag-handle-mobile-width: 24px !default;
-$drag-handle-mobile-height: 24px !default;
-
-// Handle color/border.
-$drag-handle-background-colour: rgba(0, 0, 0, 0.2) !default;
-$drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
-$drag-handle-active-border-color: blue !default;
-$drag-handle-active-bg-color: #2dbfff !default;
-
-$half-drag-handle-height: math.div($drag-handle-height, 2);
-$half-drag-handle-width: math.div($drag-handle-width, 2);
-$half-drag-bar-size: math.div($drag-bar-size, 2);
+:root {
+  --rc-drag-handle-size: 12px;
+  --rc-drag-handle-mobile-size: 24px;
+  --rc-drag-bar-size: 6px; // The invisible grip size of the crop selection edges
+  --rc-drag-handle-background-colour: rgba(0, 0, 0, 0.2);
+  --rc-border-color: rgba(255, 255, 255, 0.7);
+  --rc-focus-color: #0088ff;
+}
 
 .ReactCrop {
   $root: &;
@@ -30,7 +19,6 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
   position: relative;
   display: inline-block;
   cursor: crosshair;
-  overflow: hidden;
   max-width: 100%;
 
   & *,
@@ -67,13 +55,21 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     }
   }
 
+  &__crop-mask {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
   &__crop-selection {
     position: absolute;
     top: 0;
     left: 0;
     transform: translate3d(0, 0, 0);
     cursor: move;
-    box-shadow: 0 0 0 9999em rgba(0, 0, 0, 0.5);
 
     .ReactCrop--disabled & {
       cursor: inherit;
@@ -81,6 +77,17 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
 
     .ReactCrop--circular-crop & {
       border-radius: 50%;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        bottom: -1px;
+        left: -1px;
+        border: 1px solid var(--rc-border-color);
+        opacity: 0.3;
+      }
     }
 
     .ReactCrop--no-animate & {
@@ -113,9 +120,8 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     }
 
     &:focus {
-      outline: none;
-      border-color: $drag-handle-active-border-color;
-      border-style: solid;
+      outline: 2px solid var(--rc-focus-color);
+      outline-offset: -1px;
     }
   }
   &--invisible-crop &__crop-selection {
@@ -170,120 +176,63 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
 
   &__drag-handle {
     position: absolute;
-
-    &::after {
-      position: absolute;
-      content: '';
-      display: block;
-      width: $drag-handle-width;
-      height: $drag-handle-height;
-      background-color: $drag-handle-background-colour;
-      border: $drag-handle-border;
-
-      // This stops the borders disappearing when keyboard
-      // nudging.
-      outline: 1px solid transparent;
-    }
+    width: var(--rc-drag-handle-size);
+    height: var(--rc-drag-handle-size);
+    background-color: var(--rc-drag-handle-background-colour);
+    border: 1px solid var(--rc-border-color);
 
     &:focus {
-      &::after {
-        border-color: $drag-handle-active-border-color;
-        background: $drag-handle-active-bg-color;
-      }
+      background: var(--rc-focus-color);
     }
   }
 
   .ord-nw {
     top: 0;
     left: 0;
-    margin-top: -$half-drag-handle-height;
-    margin-left: -$half-drag-handle-width;
+    transform: translate(-50%, -50%);
     cursor: nw-resize;
-
-    &::after {
-      top: 0;
-      left: 0;
-    }
   }
   .ord-n {
     top: 0;
     left: 50%;
-    margin-top: -$half-drag-handle-height;
-    margin-left: -$half-drag-handle-width;
+    transform: translate(-50%, -50%);
     cursor: n-resize;
-
-    &::after {
-      top: 0;
-    }
   }
   .ord-ne {
     top: 0;
     right: 0;
-    margin-top: -$half-drag-handle-height;
-    margin-right: -$half-drag-handle-width;
+    transform: translate(50%, -50%);
     cursor: ne-resize;
-
-    &::after {
-      top: 0;
-      right: 0;
-    }
   }
   .ord-e {
     top: 50%;
     right: 0;
-    margin-top: -$half-drag-handle-height;
-    margin-right: -$half-drag-handle-width;
+    transform: translate(50%, -50%);
     cursor: e-resize;
-
-    &::after {
-      right: 0;
-    }
   }
   .ord-se {
     bottom: 0;
     right: 0;
-    margin-bottom: -$half-drag-handle-height;
-    margin-right: -$half-drag-handle-width;
+    transform: translate(50%, 50%);
     cursor: se-resize;
-
-    &::after {
-      bottom: 0;
-      right: 0;
-    }
   }
   .ord-s {
     bottom: 0;
     left: 50%;
-    margin-bottom: -$half-drag-handle-height;
-    margin-left: -$half-drag-handle-width;
+    transform: translate(-50%, 50%);
     cursor: s-resize;
-
-    &::after {
-      bottom: 0;
-    }
   }
   .ord-sw {
     bottom: 0;
     left: 0;
-    margin-bottom: -$half-drag-handle-height;
-    margin-left: -$half-drag-handle-width;
+    transform: translate(-50%, 50%);
     cursor: sw-resize;
-
-    &::after {
-      bottom: 0;
-      left: 0;
-    }
   }
   .ord-w {
     top: 50%;
     left: 0;
-    margin-top: -$half-drag-handle-height;
-    margin-left: -$half-drag-handle-width;
+    transform: translate(-50%, -50%);
     cursor: w-resize;
-
-    &::after {
-      left: 0;
-    }
   }
 
   // Use the same specificity as the ords above but just
@@ -299,29 +248,29 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
       top: 0;
       left: 0;
       width: 100%;
-      height: $drag-bar-size;
-      margin-top: -$half-drag-bar-size;
+      height: var(--rc-drag-bar-size);
+      transform: translateY(-50%);
     }
     &.ord-e {
       right: 0;
       top: 0;
-      width: $drag-bar-size;
+      width: var(--rc-drag-bar-size);
       height: 100%;
-      margin-right: -$half-drag-bar-size;
+      transform: translateX(50%);
     }
     &.ord-s {
       bottom: 0;
       left: 0;
       width: 100%;
-      height: $drag-bar-size;
-      margin-bottom: -$half-drag-bar-size;
+      height: var(--rc-drag-bar-size);
+      transform: translateY(50%);
     }
     &.ord-w {
       top: 0;
       left: 0;
-      width: $drag-bar-size;
+      width: var(--rc-drag-bar-size);
       height: 100%;
-      margin-left: -$half-drag-bar-size;
+      transform: translateX(-50%);
     }
   }
 
@@ -347,8 +296,8 @@ $half-drag-bar-size: math.div($drag-bar-size, 2);
     }
 
     &__drag-handle {
-      width: $drag-handle-mobile-width;
-      height: $drag-handle-mobile-height;
+      width: var(--rc-drag-handle-mobile-size);
+      height: var(--rc-drag-handle-mobile-size);
     }
   }
 }
