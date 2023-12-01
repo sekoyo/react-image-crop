@@ -79,6 +79,7 @@ $mobile-media-query: '(pointer: coarse)' !default;
       border-radius: 50%;
 
       &::after {
+        pointer-events: none;
         content: '';
         position: absolute;
         top: -1px;
