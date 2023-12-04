@@ -277,6 +277,8 @@ Also remember to set your crop using the percentCrop on changes:
 const onCropChange = (crop, percentCrop) => setCrop(percentCrop)
 ```
 
+And your `aspect` crop should be set to the same aspect: `<ReactCrop aspect={16 / 9} ... />`.
+
 ## Contributing / Developing
 
-To develop run `pnpm install && pnpm dev` and open the localhost server in your browser. Update code and it will reload. When you're ready open a pull request.
+To develop run `pnpm install && pnpm dev` and open the localhost server in your browser. Update code and it will reload. When you're ready, open a pull request.
