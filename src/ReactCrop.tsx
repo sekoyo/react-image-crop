@@ -33,6 +33,7 @@ interface Rectangle {
 }
 
 const DOC_MOVE_OPTS = { capture: true, passive: false }
+let instanceCount = 0
 
 export interface ReactCropProps {
   /** An object of labels to override the built-in English ones */
@@ -137,6 +138,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   mediaRef = createRef<HTMLDivElement>()
   resizeObserver?: ResizeObserver
   initChangeCalled = false
+  instanceId = `rc-${instanceCount++}`
 
   state: ReactCropState = {
     cropIsActive: false,
@@ -489,7 +491,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     }
   }
 
-  onDragFocus = (e: React.FocusEvent<HTMLDivElement, Element>) => {
+  onDragFocus = (/*e: React.FocusEvent<HTMLDivElement, Element>*/) => {
     // Fixes #491
     this.componentRef.current?.scrollTo(0, 0)
   }
@@ -552,8 +554,8 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
   }
 
   resolveMinDimensions(box: Rectangle, aspect: number, minWidth = 0, minHeight = 0) {
-    let mw = Math.min(minWidth, box.width)
-    let mh = Math.min(minHeight, box.height)
+    const mw = Math.min(minWidth, box.width)
+    const mh = Math.min(minHeight, box.height)
 
     if (!aspect || (!mw && !mh)) {
       return [mw, mh]
@@ -572,7 +574,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     const box = this.getBox()
     const [minWidth, minHeight] = this.resolveMinDimensions(box, aspect, this.props.minWidth, this.props.minHeight)
     let nextCrop = this.makePixelCrop(box)
-    let area = this.getPointRegion(box, evData.ord, minWidth, minHeight)
+    const area = this.getPointRegion(box, evData.ord, minWidth, minHeight)
     const ord = evData.ord || area
     let xDiff = evData.clientX - evData.startClientX
     let yDiff = evData.clientY - evData.startClientY
@@ -816,7 +818,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
         {crop ? (
           <svg className="ReactCrop__crop-mask" width="100%" height="100%">
             <defs>
-              <mask id="hole">
+              <mask id={`hole-${this.instanceId}`}>
                 <rect width="100%" height="100%" fill="white" />
                 {circularCrop ? (
                   <ellipse
@@ -837,7 +839,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
                 )}
               </mask>
             </defs>
-            <rect fill="black" fillOpacity={0.5} width="100%" height="100%" mask="url(#hole)" />
+            <rect fill="black" fillOpacity={0.5} width="100%" height="100%" mask={`url(#hole-${this.instanceId})`} />
           </svg>
         ) : undefined}
         {cropSelection}
