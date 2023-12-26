@@ -29,7 +29,7 @@ An image cropping tool for React with no dependencies.
 - Touch enabled.
 - Free-form or fixed aspect crops.
 - Fully keyboard accessible (a11y).
-- No dependencies/small footprint (5KB gzip).
+- No dependencies/small footprint (<5KB gzip).
 - Min/max crop size.
 - Crop anything, not just images.
 
