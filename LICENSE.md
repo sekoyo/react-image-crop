@@ -1,6 +1,6 @@
 ## ISC License
 
-Copyright (c) 2015, Dominic Tobias
+Copyright (c) 2015, Sekoyo (https://github.com/sekoyo)
 
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
 
