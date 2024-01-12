@@ -126,6 +126,7 @@ $mobile-media-query: '(pointer: coarse)' !default;
       outline-offset: -1px;
     }
   }
+  &--invisible-crop &__crop-mask,
   &--invisible-crop &__crop-selection {
     display: none;
   }
