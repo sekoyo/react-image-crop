@@ -1,3 +1,5 @@
+**Psst**, I've made the greatest Datagrid on earth: [lightgrid](https://github.com/sekoyo/lightgrid)
+
 # React Image Crop
 
 An image cropping tool for React with no dependencies.
