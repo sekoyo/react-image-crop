@@ -1,4 +1,4 @@
-**Psst**, I've made the best Datagrid for React, I haven't advertised it yet 🤫: [lightgrid.io](https://lightgrid.io/)
+**Psst**, I've made the best Datagrid for React, I haven't promoted it yet 🤫: [lightgrid.io](https://lightgrid.io/)
 
 # React Image Crop
 
