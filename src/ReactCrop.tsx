@@ -173,6 +173,7 @@ export class ReactCrop extends PureComponent<ReactCropProps, ReactCropState> {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
     }
+    this.unbindDocMove()
   }
 
   bindDocMove() {
