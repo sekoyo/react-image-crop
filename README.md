@@ -1,5 +1,3 @@
-**Psst**, I've made the best Datagrid for React, I haven't promoted it yet 🤫: [lightgrid](https://github.com/sekoyo/lightgrid)
-
 # React Image Crop
 
 An image cropping tool for React with no dependencies.
@@ -35,9 +33,9 @@ An image cropping tool for React with no dependencies.
 - Min/max crop size.
 - Crop anything, not just images.
 
-If React Crop doesn't cover your requirements then take a look at [Pintura](https://pqina.nl/pintura/?aff=xw0RQ). It features cropping, rotating, filtering, annotation, and lots more.
+If React Crop doesn't cover your requirements then take a look at [Pintura](https://pqina.nl/pintura/?ref=react-image-crop) (our Sponsor). It features cropping, rotating, filtering, annotation, and lots more.
 
-[Learn more about Pintura here](https://pqina.nl/pintura/?aff=xw0RQ)
+[Learn more about Pintura here](https://pqina.nl/pintura/?ref=react-image-crop)
 
 ## Installation
 
@@ -215,11 +213,11 @@ You can use the following library to load images, which will correct the rotatio
 
 You can read an issue on this subject here: https://github.com/sekoyo/react-image-crop/issues/181
 
-If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Pintura](https://pqina.nl/pintura/?aff=xw0RQ).
+If you're looking for a complete out of the box image editor which already handles EXIF rotation then consider using [Pintura](https://pqina.nl/pintura/?ref=react-image-crop).
 
 <h3>How to filter, rotate and annotate?</h3>
 
-This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then consider using [Pintura](https://pqina.nl/pintura/?aff=xw0RQ).
+This library is deliberately lightweight and minimal for you to build features on top of. If you wish to perform more advanced image editing out of the box then consider using [Pintura](https://pqina.nl/pintura/?ref=react-image-crop).
 
 ![Pintura Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/doka-demo.gif)
 
