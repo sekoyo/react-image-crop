@@ -33,7 +33,7 @@ An image cropping tool for React with no dependencies.
 - Min/max crop size.
 - Crop anything, not just images.
 
-If React Crop doesn't cover your requirements then take a look at [Pintura](https://pqina.nl/pintura/?ref=react-image-crop) (our Sponsor). It features cropping, rotating, filtering, annotation, and lots more.
+If React Crop doesn't cover your requirements then take a look at [Pintura](https://pqina.nl/pintura/?ref=react-image-crop) (our sponsor). It features cropping, rotating, filtering, annotation, and lots more.
 
 [Learn more about Pintura here](https://pqina.nl/pintura/?ref=react-image-crop)
 
