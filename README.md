@@ -277,7 +277,7 @@ Also remember to set your crop using the percentCrop on changes:
 const onCropChange = (crop, percentCrop) => setCrop(percentCrop)
 ```
 
-And your `aspect` crop should be set to the same aspect: `<ReactCrop aspect={16 / 9} ... />`.
+And your `aspect` prop should be set to the same value: `<ReactCrop aspect={16 / 9} ... />`.
 
 ## Contributing / Developing
 
