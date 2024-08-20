@@ -221,6 +221,12 @@ This library is deliberately lightweight and minimal for you to build features o
 
 ![Pintura Demo](https://raw.githubusercontent.com/DominicTobias/react-image-crop/master/doka-demo.gif)
 
+### How can I obtain values in "%" units instead of "px" units?
+In the `onChange` parameter, the event handler you pass in can accept a `percentValue` as the 2nd parameter, and ignore the first, to obtain the crop in percentage units.
+```js
+<ReactCrop crop={crop} onChange={(pxValue, percentValue) => {}} aspect={4 / 3}>
+```
+
 ### How can I center the crop?
 
 The easiest way is to use the percentage unit:
