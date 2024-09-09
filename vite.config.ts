@@ -38,6 +38,10 @@ export default defineConfig({
     react({
       jsxRuntime: 'classic',
     }),
-    dts(),
+    dts({
+      staticImport: true,
+      insertTypesEntry: true,
+      rollupTypes: true,
+    }),
   ],
 })
